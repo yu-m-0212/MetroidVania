@@ -1,5 +1,5 @@
 ﻿#include "MyPG.h"
-#include "Task_Title.h"
+#include "Task_Game.h"
 
 
 namespace MyPG
@@ -84,10 +84,10 @@ namespace MyPG
 
 
 		//背景色の設定（デフォルト）
-		DG::EffectState( ).param.bgColor  =  ML::Color(0,0.0f,0.8f,0.0f);
+		DG::EffectState( ).param.bgColor  =  ML::Color(0,1.0f,1.0f,1.0f);
 
 		//初期実行タスク生成＆ゲームエンジンに登録
-		auto  ft = Title::Object::Create(true);
+		auto  firstTask = Game::Object::Create(true);
 
 //------------------------------------------------------------------------------------
 //レイヤー毎の描画のON/OFF

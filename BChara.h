@@ -59,8 +59,6 @@ public:
 	float		maxSpeed;		//左右方向への移動の加算量
 	float		addSpeed;		//左右方向への移動の加算量
 	float		decSpeed;		//左右方向への移動の減衰量
-	float		decLimPlus;		//減衰後、待機へ戻る基準値+方向
-	float		decLimMinus;	//減衰後、待機へ戻る基準値-方向
 	float		reach;			//パンチの射程
 	float		slide;			//パンチ時に前進する
 	//メンバ変数に最低限の初期化を行う
@@ -81,8 +79,6 @@ public:
 		, maxSpeed(0)
 		, addSpeed(0)
 		, decSpeed(0)
-		, decLimPlus(0)
-		, decLimMinus(0)
 		, reach(0)
 		, slide(0)
 	{
