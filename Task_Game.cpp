@@ -59,31 +59,30 @@ namespace  Game
 		for (int c = 0; c < 6; ++c) {
 			auto ene = Enemy00::Object::Create(true);
 			ene->pos.x = 500.0f + c * 100.0f;
-			ene->pos.y = 80;
+			ene->pos.y = 150;
 		}
 		//敵の生成(ユニーク)
 		auto ene1 = Enemy01::Object::Create(true);
 		ene1->pos.x = 400.0f;
-		ene1->pos.y = 80;
+		ene1->pos.y = 150;
 		//アイテム00(回復ポーション)
 		for (int c = 0; c < 3; ++c) {
 			auto item00 = Item00::Object::Create(true);
 			item00->pos.x = 100.0f + c * 100;
-			item00->pos.y = 80;
+			item00->pos.y = 300;
 		}
 		//アイテム01(ジャンプ力ポーション)
 		for (int c = 0; c < 3; ++c) {
 			auto item01 = Item01::Object::Create(true);
 			item01->pos.x = 400.0f + c * 100;
-			item01->pos.y = 80;
+			item01->pos.y = 300;
 		}
 		//アイテム02(無敵ポーション)
 		for (int c = 0; c < 3; ++c) {
 			auto item02 = Item02::Object::Create(true);
 			item02->pos.x = 700.0f + c * 100;
-			item02->pos.y = 80;
+			item02->pos.y = 300;
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------

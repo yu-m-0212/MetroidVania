@@ -45,11 +45,15 @@ namespace  Player
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	public:
-		//追加したい変数・メソッドはここに追加する
-		//BCharaに持たせていない変数・メソッドのみここに書く
+	//追加変数
 		string		controllerName;
-
+		//ストンプ時の上下方向移動量
+		float stompFallSpeed;
+		//ショット速度
+		float shotSpeed;
+		//格闘攻撃判定継続時間
+		int meleeCnt;
+	public:
 		//思考＆状況判断(ステータス決定）
 		void  Think();
 		//モーションに対応した処理
@@ -59,5 +63,7 @@ namespace  Player
 		void Received(BChara* from_, AttackInfo at_);
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
+		//エフェクト制御
+		BChara::DrawInfo  Effect();
 	};
 }

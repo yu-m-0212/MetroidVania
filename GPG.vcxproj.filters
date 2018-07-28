@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="LIB">
       <UniqueIdentifier>{113049ad-8f97-405e-b7fa-c2eb0d7c72af}</UniqueIdentifier>
     </Filter>
@@ -44,9 +40,6 @@
     <Filter Include="MyPG\Tasks">
       <UniqueIdentifier>{4721d42f-e82c-4cec-9cb0-53db628948c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Tasks\class">
-      <UniqueIdentifier>{75297c4b-e0a2-4e0f-beab-0876f02cf3bb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MyPG\Tasks\scenes">
       <UniqueIdentifier>{8d875217-27f1-4370-afbc-c14b988432d8}</UniqueIdentifier>
     </Filter>
@@ -55,6 +48,9 @@
     </Filter>
     <Filter Include="MyPG\Tasks\.cpp">
       <UniqueIdentifier>{7500c7ac-9b22-4095-acde-d8870723b640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\class">
+      <UniqueIdentifier>{75297c4b-e0a2-4e0f-beab-0876f02cf3bb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -122,7 +118,7 @@
       <Filter>MyPG\Tasks\scenes</Filter>
     </ClCompile>
     <ClCompile Include="BChara.cpp">
-      <Filter>MyPG\Tasks\class</Filter>
+      <Filter>MyPG\class</Filter>
     </ClCompile>
     <ClCompile Include="Task_Enemy00.cpp">
       <Filter>MyPG\Tasks\.cpp</Filter>
@@ -214,7 +210,7 @@
       <Filter>MyPG\Tasks\scenes</Filter>
     </ClInclude>
     <ClInclude Include="BChara.h">
-      <Filter>MyPG\Tasks\class</Filter>
+      <Filter>MyPG\class</Filter>
     </ClInclude>
     <ClInclude Include="Task_Enemy00.h">
       <Filter>MyPG\Tasks\.h</Filter>

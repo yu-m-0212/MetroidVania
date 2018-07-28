@@ -48,8 +48,10 @@ namespace  Player
 		this->maxFallSpeed = 15.0f;			//最大落下速度
 		this->jumpPow = -15.0f;				//ジャンプ力（初速）
 		this->gravity = ML::Gravity(64);	//重力加速度＆時間速度による加算量
-		this->reach = 100.0f;
-		this->slide = 10.0f;
+		this->reach = 100.0f;				//パンチの射程
+		this->slide = 10.0f;				//パンチで前進する距離
+		this->meleeCnt = 15;				//格闘攻撃判定継続時間
+		this->shotSpeed = 20;
 
 		//★タスクの生成
 
@@ -124,9 +126,14 @@ namespace  Player
 	{
 		if (ge->debugSwitch)
 		{
-			ML::Box2D debugBox(0, 0, 1000, 1000);
-			string debugText = "motion=" + to_string(this->motion) + "\n" +
-				"moveVec" + to_string(this->moveVec.x) + to_string(this->moveVec.y);
+			ML::Box2D debugBox(50, 50, 1000, 1000);
+			string debugText =
+				"motion = " + to_string(this->motion) + "\n" +
+				"moveVec.x = " + to_string(this->moveVec.x) + "\n" +
+				"moveVec.y = " + to_string(this->moveVec.y) + "\n" +
+				"angle = " + to_string(this->angle_LR) + "\n"
+				"moveCnt = " + to_string(this->moveCnt) + "\n" +
+				"unHitTime = " + to_string(this->unHitTime);
 			DG::Font_Draw("FontA", debugBox, debugText, ML::Color(1, 0, 0, 0));
 		}
 		//以上デバッグ----------------------------------------------------
@@ -149,7 +156,7 @@ namespace  Player
 		if (this->unHitTime > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
-		this->unHitTime = 400;
+		this->unHitTime = 180;
 		this->hp -= at_.power;	//仮処理
 		if (this->hp <= 0) {
 			this->Kill();
@@ -157,7 +164,7 @@ namespace  Player
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4, -9); }
 		else							{ this->moveVec = ML::Vec2(-4, -9); }
-		this->UpdateMotion(Bound);
+		this->UpdateMotion(Damage);
 		//from_は攻撃してきた相手、カウンターなどで逆にダメージを与えたいときに使う
 	}
 	//-----------------------------------------------------------------------------
@@ -265,7 +272,7 @@ namespace  Player
 			if (this->moveCnt >= 20) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
-		case	Bound:	//ダメージを受けて吹き飛んでいる
+		case	Damage:	//ダメージを受けて吹き飛んでいる
 			if (this->moveCnt >= 12 && this->CheckFoot()) 
 			{
 				nm = Stand;
@@ -325,7 +332,7 @@ namespace  Player
 			//未実装
 			break;
 			//移動速度減衰を無効化する必要があるモーションは下にcaseを書く
-		case Bound: break;
+		case Damage: break;
 		case Unnon:	break;
 		}
 		//-----------------------------------------------------------------
@@ -390,12 +397,16 @@ namespace  Player
 				if (this->angle_LR == Right) {
 					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
 					punch1->moveVec = ML::Vec2(0, 0);
+					punch1->Set_Limit(this->meleeCnt);
+					punch1->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = this->slide;
 				}
 				else {
 					punch1->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
 					punch1->moveVec = ML::Vec2(0, 0);
+					punch1->Set_Limit(this->meleeCnt);
+					punch1->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
 				}
@@ -413,12 +424,16 @@ namespace  Player
 				if (this->angle_LR == Right) {
 					punch2->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
 					punch2->moveVec = ML::Vec2(0, 0);
+					punch2->Set_Limit(this->meleeCnt);
+					punch2->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = this->slide;
 				}
 				else {
 					punch2->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
 					punch2->moveVec = ML::Vec2(0, 0);
+					punch2->Set_Limit(this->meleeCnt);
+					punch2->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
 				}
@@ -430,10 +445,15 @@ namespace  Player
 			}
 			break;
 		case Stomp:
+			//出だしだけ少し浮かせる
 			if (this->moveCnt == 0)
 			{
-				this->moveVec.y = +20;
+				stompFallSpeed = -3.5f;
+				//無敵時間あり
+				this->unHitTime = 60;
 			}
+			this->stompFallSpeed+=0.5f;
+			this->moveVec.y += stompFallSpeed;
 			break;
 		case StompLanding:
 			//着地の際、自身の左中右に攻撃
@@ -445,6 +465,8 @@ namespace  Player
 					//足元に攻撃矩形を生成
 					stompLanding->pos = ML::Vec2(this->pos.x + this->reach * i, this->pos.y + this->hitBase.h / 2);
 					stompLanding->moveVec = ML::Vec2(0, 0);
+					stompLanding->Set_Limit(this->meleeCnt);
+					stompLanding->Set_Erase(0);
 				}
 			}
 			break;
@@ -460,17 +482,21 @@ namespace  Player
 					//弾を正面に3発出す
 					for (int i = 0; i < 3; ++i)
 					{
-						auto shot = Shot00::Object::Create(true);
-						shot->pos = ML::Vec2(this->pos.x + this->reach * i, this->pos.y);
-						shot->moveVec = ML::Vec2(0, 0);
+						auto bunker = Shot00::Object::Create(true);
+						bunker->pos = ML::Vec2(this->pos.x + this->reach * i, this->pos.y);
+						bunker->moveVec = ML::Vec2(0, 0);
+						bunker->Set_Limit(this->meleeCnt);
+						bunker->Set_Erase(0);
 					}
 				}
 				else {
 					for (int i = 0; i < 3; ++i)
 					{
-						auto shot = Shot00::Object::Create(true);
-						shot->pos = ML::Vec2(this->pos.x - this->reach * i, this->pos.y);
-						shot->moveVec = ML::Vec2(0, 0);
+						auto bunker = Shot00::Object::Create(true);
+						bunker->pos = ML::Vec2(this->pos.x - this->reach * i, this->pos.y);
+						bunker->moveVec = ML::Vec2(0, 0);
+						bunker->Set_Limit(this->meleeCnt);
+						bunker->Set_Erase(0);
 					}
 				}
 			}
@@ -490,11 +516,15 @@ namespace  Player
 				auto shot = Shot00::Object::Create(true);
 				if (this->angle_LR == Right) {
 					shot->pos = ML::Vec2(this->pos.x + 20, this->pos.y);
-					shot->moveVec = ML::Vec2(+12, 0);
+					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
+					shot->Set_Limit(30);
+					shot->Set_Erase(1);
 				}
 				else {
 					shot->pos = ML::Vec2(this->pos.x - 20, this->pos.y);
-					shot->moveVec = ML::Vec2(-12, 0);
+					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
+					shot->Set_Limit(30);
+					shot->Set_Erase(1);
 				}
 			}
 			break;
@@ -508,14 +538,18 @@ namespace  Player
 			}
 			//空中攻撃(目の前に弾を生成)
 			if (this->moveCnt == 4) {//4フレーム目で弾を発射
-				auto shot = Shot00::Object::Create(true);
+				auto air = Shot00::Object::Create(true);
 				if (this->angle_LR == Right) {
-					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					shot->moveVec = ML::Vec2(0, 0);
+					air->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					air->moveVec = ML::Vec2(0, 0);
+					air->Set_Limit(this->meleeCnt);
+					air->Set_Erase(0);
 				}
 				else {
-					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					shot->moveVec = ML::Vec2(0, 0);
+					air->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					air->moveVec = ML::Vec2(0, 0);
+					air->Set_Limit(this->meleeCnt);
+					air->Set_Erase(0);
 				}
 			}
 			break;
@@ -532,11 +566,15 @@ namespace  Player
 				auto shot = Shot00::Object::Create(true);
 				if (this->angle_LR == Right) {
 					shot->pos = ML::Vec2(this->pos.x + 20, this->pos.y);
-					shot->moveVec = ML::Vec2(+12, 0);
+					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
+					shot->Set_Limit(30);
+					shot->Set_Erase(1);
 				}
 				else {
 					shot->pos = ML::Vec2(this->pos.x - 20, this->pos.y);
-					shot->moveVec = ML::Vec2(-12, 0);
+					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
+					shot->Set_Limit(30);
+					shot->Set_Erase(1);
 				}
 			}
 			break;
@@ -548,63 +586,69 @@ namespace  Player
 	{
 		BChara::DrawInfo imageTable[] = {
 			//draw							src
-			{ this->hitBase, ML::Box2D(   0, 0, 64, 128), ML::Color(1, 1, 1, 1) },//停止[0]
-			{ this->hitBase, ML::Box2D(  64, 0, 64, 128), ML::Color(1, 1, 1, 1) },//歩行[1]
-			{ this->hitBase, ML::Box2D( 128, 0, 64, 128), ML::Color(1, 1, 1, 1) },//減速[2]
-			{ this->hitBase, ML::Box2D( 192, 0, 64, 128), ML::Color(1, 1, 1, 1) },//パンチ1[3]
-			{ this->hitBase, ML::Box2D( 256, 0, 64, 128), ML::Color(1, 1, 1, 1) },//パンチ2[4]
-			{ this->hitBase, ML::Box2D( 320, 0, 64, 128), ML::Color(1, 1, 1, 1) },//空中攻撃[5]
-			{ this->hitBase, ML::Box2D( 384, 0, 64, 128), ML::Color(1, 1, 1, 1) },//ストンプ[6]
-			{ this->hitBase, ML::Box2D( 448, 0, 64, 128), ML::Color(1, 1, 1, 1) },//ストンプ着地[7]																				 //ストンプ着地									 64	 128
-			{ this->hitBase, ML::Box2D( 512, 0, 64, 128), ML::Color(1, 1, 1, 1) },//射撃[8]
-			{ this->hitBase, ML::Box2D( 576, 0, 64, 128), ML::Color(1, 1, 1, 1) },//空中射撃[9]
-			{ this->hitBase, ML::Box2D( 640, 0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー1[10]
-			{ this->hitBase, ML::Box2D( 704, 0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー2[11]
-			{ this->hitBase, ML::Box2D( 768, 0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー3[12]
-			{ this->hitBase, ML::Box2D( 832, 0, 64, 128), ML::Color(1, 1, 1, 1) },//ジャンプ[13]
-			{ this->hitBase, ML::Box2D( 896, 0, 64, 128), ML::Color(1, 1, 1, 1) },//落下[14]
-			{ this->hitBase, ML::Box2D( 960, 0, 64, 128), ML::Color(1, 1, 1, 1) },//着地[15]
-			{ this->hitBase, ML::Box2D(1024, 0, 64, 128), ML::Color(1, 1, 1, 1) },//ダメージ[16]
-			//飛び立つ直前
+			{ this->hitBase, ML::Box2D(   0,  0, 64, 128), ML::Color(1, 1, 1, 1) },//停止		[0]
+			{ this->hitBase, ML::Box2D(  64,  0, 64, 128), ML::Color(1, 1, 1, 1) },//歩行1		[1]
+			{ this->hitBase, ML::Box2D(  64,128, 64, 128), ML::Color(1, 1, 1, 1) },//歩行2		[2]
+			{ this->hitBase, ML::Box2D(  64,256, 64, 128), ML::Color(1, 1, 1, 1) },//歩行3		[3]
+			{ this->hitBase, ML::Box2D( 128,  0, 64, 128), ML::Color(1, 1, 1, 1) },//減速		[4]
+			{ this->hitBase, ML::Box2D( 192,  0, 64, 128), ML::Color(1, 1, 1, 1) },//パンチ1		[5]
+			{ this->hitBase, ML::Box2D( 256,  0, 64, 128), ML::Color(1, 1, 1, 1) },//パンチ2		[6]
+			{ this->hitBase, ML::Box2D( 320,  0, 64, 128), ML::Color(1, 1, 1, 1) },//空中攻撃	[7]
+			{ this->hitBase, ML::Box2D( 384,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ストンプ	[8]
+			{ this->hitBase, ML::Box2D( 448,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ストンプ着地	[9]																				 //ストンプ着地									 64	 128
+			{ this->hitBase, ML::Box2D( 512,  0, 64, 128), ML::Color(1, 1, 1, 1) },//射撃		[10]
+			{ this->hitBase, ML::Box2D( 576,  0, 64, 128), ML::Color(1, 1, 1, 1) },//空中射撃	[11]
+			{ this->hitBase, ML::Box2D( 640,  0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー1	[12]
+			{ this->hitBase, ML::Box2D( 704,  0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー2	[13]
+			{ this->hitBase, ML::Box2D( 768,  0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー3	[14]
+			{ this->hitBase, ML::Box2D( 832,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ジャンプ	[15]
+			{ this->hitBase, ML::Box2D( 896,  0, 64, 128), ML::Color(1, 1, 1, 1) },//落下		[16]
+			{ this->hitBase, ML::Box2D( 960,  0, 64, 128), ML::Color(1, 1, 1, 1) },//着地		[17]
+			{ this->hitBase, ML::Box2D(1024,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ダメージ	[18]
 		};
 		BChara::DrawInfo  rtv;
-		int  work;
+		int  walkAnim;
 		switch (this->motion) {
 		default:			rtv = imageTable[0];	break;
 		//	停止----------------------------------------------------------------------------
 		case  Stand:		rtv = imageTable[0];	break;
 		//	歩行----------------------------------------------------------------------------
-		case  Walk:			rtv = imageTable[1];	break;
+		case  Walk:
+			//歩行アニメーション
+			walkAnim = this->animCnt / 8;
+			walkAnim %= 3;
+			rtv = imageTable[walkAnim + 1];
+			break;
 		//	減速----------------------------------------------------------------------------
-		case SlowDown:		rtv = imageTable[2];	break;
+		case SlowDown:		rtv = imageTable[4];	break;
 		//	パンチ1-------------------------------------------------------------------------
-		case Punch1:		rtv = imageTable[3];	break;
+		case Punch1:		rtv = imageTable[5];	break;
 		//	パンチ2-------------------------------------------------------------------------
-		case Punch2:		rtv = imageTable[4];	break;
+		case Punch2:		rtv = imageTable[6];	break;
 		//	空中攻撃-------------------------------------------------------------------------
-		case Air:			rtv = imageTable[5];	break;
+		case Air:			rtv = imageTable[7];	break;
 		//	ストンプ-------------------------------------------------------------------------
-		case Stomp:			rtv = imageTable[6];	break;
+		case Stomp:			rtv = imageTable[8];	break;
 		//	ストンプ着地---------------------------------------------------------------------
-		case StompLanding:	rtv = imageTable[7];	break;
+		case StompLanding:	rtv = imageTable[9];	break;
 		//	地上射撃-------------------------------------------------------------------------
-		case Shoot:			rtv = imageTable[8];	break;
+		case Shoot:			rtv = imageTable[10];	break;
 		//	空中射撃-------------------------------------------------------------------------
-		case Airshoot:		rtv = imageTable[9];	break;
+		case Airshoot:		rtv = imageTable[11];	break;
 		//	バンカー1-------------------------------------------------------------------------
-		case Bunker1:		rtv = imageTable[10];	break;
+		case Bunker1:		rtv = imageTable[12];	break;
 		//	バンカー2-------------------------------------------------------------------------
-		case Bunker2:		rtv = imageTable[11];	break;
+		case Bunker2:		rtv = imageTable[13];	break;
 		//	バンカー3-------------------------------------------------------------------------
-		case Bunker3:		rtv = imageTable[12];	break;
+		case Bunker3:		rtv = imageTable[14];	break;
 		//	ジャンプ------------------------------------------------------------------------
-		case  Jump:			rtv = imageTable[13];	break;
+		case  Jump:			rtv = imageTable[15];	break;
 		//	落下----------------------------------------------------------------------------
-		case  Fall:			rtv = imageTable[14];	break;
+		case  Fall:			rtv = imageTable[16];	break;
 		//着地硬直--------------------------------------------------------------------------
-		case  Landing:		rtv = imageTable[15];	break;
+		case  Landing:		rtv = imageTable[17];	break;
 		//ダメージ--------------------------------------------------------------------------
-		case  Damage:		rtv = imageTable[16];	break;
+		case  Damage:		rtv = imageTable[18];	break;
 		}
 
 		//	向きに応じて画像を左右反転する
@@ -617,8 +661,12 @@ namespace  Player
 			//rtv.src.x = (rtv.src.x + rtv.src.w);
 			//rtv.src.w = -rtv.src.w;
 		}
-
 		return rtv;
+	}
+	//エフェクト制御
+	BChara::DrawInfo Object::Effect()
+	{
+		
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

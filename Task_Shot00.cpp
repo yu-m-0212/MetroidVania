@@ -36,8 +36,10 @@ namespace  Shot00
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.4f;
-		this->hp = 5;				//hp初期値
-		this->hitBase = ML::Box2D(-8, -8, 16, 16);
+		this->eraseFlag = true;
+		this->hp = 0;				//hp初期値
+		this->cntLimit = 0;			//消滅するまでの時間
+		this->hitBase = ML::Box2D(-32,-32,64,64);
 		
 		//★タスクの生成
 
@@ -60,7 +62,7 @@ namespace  Shot00
 		this->moveCnt++;
 		//★データ＆タスク解放
 		//限界の時間を迎えたら消滅
-		if (this->moveCnt >= 30) {
+		if (this->moveCnt >= this->cntLimit) {
 			//消滅申請
 			this->Kill();
 			return;
@@ -80,26 +82,34 @@ namespace  Shot00
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->hp,0,0 };
 					(*it)->Received(this, at);
-					this->Kill();
+					//ショットのみ消滅
+					//格闘は複数体にあたる
+					if (this->eraseFlag)
+					{
+						this->Kill();
+					}
 					break;
 				}
 			}
 		}
-
 		//移動先で障害物に接触したら消滅
 		//マップが存在するか調べてからアクセス
-		if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) {
-			ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
-			if (true == map->CheckHit(hit)) {
-				//消滅申請
-				this->Kill();
+		//shotとして呼ばれた時のみ、判定
+		if (this->eraseFlag)
+		{
+			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) {
+				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
+				if (true == map->CheckHit(hit)) {
+					//消滅申請
+					this->Kill();
 
-				//とりあえず星はばらまくよ
-				/*for (int c = 0; c < 4; ++c) {
-					auto eff = Effect00::Object::Create(true);
-					eff->pos = this->pos;
-				}*/
-				return;
+					//とりあえず星はばらまくよ
+					/*for (int c = 0; c < 4; ++c) {
+						auto eff = Effect00::Object::Create(true);
+						eff->pos = this->pos;
+					}*/
+					return;
+				}
 			}
 		}
 
@@ -132,14 +142,23 @@ namespace  Shot00
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		ML::Box2D draw(-8, -8, 16, 16);
+		ML::Box2D draw=this->hitBase;
 		draw.Offset(this->pos);
 		ML::Box2D src(0, 0, 32, 32);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Draw(this->res->imageName, draw, src);
 	}
-
+	//呼び出したタスクから寿命を設定する
+	void Object::Set_Limit(const int& cl_)
+	{
+		this->cntLimit = cl_;
+	}
+	//壁や敵に衝突したとき、消えるか否かを指定する
+	void Object::Set_Erase(const int& erase_)
+	{
+		this->eraseFlag = erase_;
+	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
