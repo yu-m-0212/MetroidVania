@@ -12,6 +12,7 @@
 #include  "Task_Item00.h"
 #include  "Task_Item01.h"
 #include  "Task_Item02.h"
+#include  "Task_UI.h"
 
 namespace  Game
 {
@@ -83,6 +84,9 @@ namespace  Game
 			item02->pos.x = 700.0f + c * 100;
 			item02->pos.y = 300;
 		}
+		//UIの生成
+		auto ui = UI::Object::Create(true);
+
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -95,6 +99,7 @@ namespace  Game
 		ge->KillAll_G("敵");
 		ge->KillAll_G("オプション");
 		ge->KillAll_G("アイテム");
+		ge->KillAll_G("UI");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 
@@ -114,6 +119,13 @@ namespace  Game
 			//自身に消滅要請
 			this->Kill();
 		}
+		//Selectボタンでデバッグモード
+		if (in.SE.down)
+		{
+			ge->debugMode = !ge->debugMode;
+		}
+		//プレイヤ死亡でエンディング
+
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理

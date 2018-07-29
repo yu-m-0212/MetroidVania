@@ -47,6 +47,8 @@ namespace  Player
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	//追加変数
 		string		controllerName;
+		//プレイヤのHP最大値
+		int max_Hp;
 		//ストンプ時の上下方向移動量
 		float stompFallSpeed;
 		//ショット速度
@@ -61,9 +63,11 @@ namespace  Player
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	(攻撃側,攻撃情報)
 		void Received(BChara* from_, AttackInfo at_);
+		//HPの値を取得する
+		int Get_HP();
+		//HPの最大値を取得する
+		int Get_Max_HP();
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
-		//エフェクト制御
-		BChara::DrawInfo  Effect();
 	};
 }

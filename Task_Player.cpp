@@ -41,7 +41,8 @@ namespace  Player
 		this->angle_LR = Right;
 		this->controllerName = "P1";
 		this->motion = Stand;				//キャラ初期状態
-		this->hp = 10;						//ヘルス初期値
+		this->max_Hp = 10;					//ヘルス最大値
+		this->hp = this->max_Hp;			//ヘルス初期値
 		this->maxSpeed = 10.0f;				//最大移動速度（横）
 		this->addSpeed = 1.0f;				//歩行加速度（地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;				//接地状態の時の速度減衰量（摩擦
@@ -66,6 +67,7 @@ namespace  Player
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
+
 		}
 
 		return  true;
@@ -119,21 +121,28 @@ namespace  Player
 		if (nullptr != map) {
 			map->AjastCameraPos();
 		}
+		//hp0でタスクキル
+		if (this->hp <= 0)
+		{
+			this->Kill();
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		if (ge->debugSwitch)
+		if (ge->debugMode)
 		{
-			ML::Box2D debugBox(50, 50, 1000, 1000);
+			ML::Box2D debugBox(150, 50, 1000, 1000);
 			string debugText =
 				"motion = " + to_string(this->motion) + "\n" +
 				"moveVec.x = " + to_string(this->moveVec.x) + "\n" +
 				"moveVec.y = " + to_string(this->moveVec.y) + "\n" +
 				"angle = " + to_string(this->angle_LR) + "\n"
 				"moveCnt = " + to_string(this->moveCnt) + "\n" +
-				"unHitTime = " + to_string(this->unHitTime);
+				"unHitTime = " + to_string(this->unHitTime) + "\n" +
+				"hp=" + to_string(this->hp)+"\n"+
+				"Selectボタンでデバッグモード切替";
 			DG::Font_Draw("FontA", debugBox, debugText, ML::Color(1, 0, 0, 0));
 		}
 		//以上デバッグ----------------------------------------------------
@@ -580,6 +589,16 @@ namespace  Player
 			break;
 		}
 	}
+	//HPの値を取得する
+	int Object::Get_HP()
+	{
+		return this->hp;
+	}
+	//HPの最大値を取得する
+	int Object::Get_Max_HP()
+	{
+		return this->max_Hp;
+	}
 	//-----------------------------------------------------------------------------
 	//アニメーション制御
 	BChara::DrawInfo  Object::Anim()
@@ -650,7 +669,6 @@ namespace  Player
 		//ダメージ--------------------------------------------------------------------------
 		case  Damage:		rtv = imageTable[18];	break;
 		}
-
 		//	向きに応じて画像を左右反転する
 		if (false == this->angle_LR) {
 			rtv.draw.x = -rtv.draw.x;
@@ -662,11 +680,6 @@ namespace  Player
 			//rtv.src.w = -rtv.src.w;
 		}
 		return rtv;
-	}
-	//エフェクト制御
-	BChara::DrawInfo Object::Effect()
-	{
-		
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

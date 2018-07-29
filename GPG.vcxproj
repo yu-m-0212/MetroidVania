@@ -112,6 +112,7 @@
     <ClCompile Include="Task_Shot00.cpp" />
     <ClCompile Include="Task_Sprite.cpp" />
     <ClCompile Include="Task_Title.cpp" />
+    <ClCompile Include="Task_UI.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="xnacollision.cpp" />
   </ItemGroup>
@@ -145,6 +146,7 @@
     <ClInclude Include="Task_Shot00.h" />
     <ClInclude Include="Task_Sprite.h" />
     <ClInclude Include="Task_Title.h" />
+    <ClInclude Include="Task_UI.h" />
     <ClInclude Include="xnacollision.h" />
   </ItemGroup>
   <ItemGroup>

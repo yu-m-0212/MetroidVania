@@ -24,8 +24,6 @@ namespace MyPG
 	//ゲームエンジンに追加したものの初期化と開放
 	bool MyGameEngine::Initialize(HWND wnd_)
 	{
-		//デバッグスイッチ
-		debugSwitch = true;
 		//　画像描画ライブラリの初期化
 		{
 			bool  rtv = DG::Initialize(	wnd_, this->screenWidth,  this->screenHeight,  this->multiSample,
