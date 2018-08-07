@@ -7,13 +7,13 @@
 
 //-----------------------------------------------------------------------------
 //モーションを更新（変更なしの場合	false)
-bool  BChara::UpdateMotion(Motion  nm_)
+bool  BChara::UpdateMotion(State  nm_)
 {
-	if (nm_ == this->motion) {
+	if (nm_ == this->state) {
 		return  false;
 	}
 	else {
-		this->motion = nm_;		//モーション変更
+		this->state = nm_;		//モーション変更
 		this->moveCnt = 0;		//行動カウンタクリア
 		this->animCnt = 0;		//アニメーションカウンタのクリア
 		return  true;

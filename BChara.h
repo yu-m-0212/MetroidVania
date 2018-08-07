@@ -14,7 +14,7 @@ public:
 public:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	//キャラクタの行動状態フラグ
-	enum Motion
+	enum State
 	{
 		Unnon = -1,		//	無効(使えません）
 		Stand,			//	停止
@@ -45,7 +45,7 @@ public:
 	Angle_LR	angle_LR;
 	WP			target;
 	//キャラクタ共通メンバ変数
-	Motion		motion;			//現在の行動を示すフラグ
+	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置
 	ML::Vec2	moveVec;		//移動ベクトル
 	ML::Box2D   hitBase;		//あたり判定範囲
@@ -64,7 +64,7 @@ public:
 	//メンバ変数に最低限の初期化を行う
 	//★★メンバ変数を追加したら必ず初期化も追加する事★★
 	BChara()
-		:motion(Stand)
+		:state(Stand)
 		, angle_LR(Right)
 		, pos(0, 0)
 		, moveVec(0, 0)
@@ -98,9 +98,10 @@ public:
 	//接触判定
 	virtual bool CheckHit(const ML::Box2D& hit);
 	//モーションを更新（変更なしの場合	false)
-	bool  UpdateMotion(Motion  nm_);
+	bool  UpdateMotion(State  nm_);
 
-	//	アニメーション情報構造体
+	//アニメーション情報構造体
+	//draw,src,color
 	struct DrawInfo {
 		ML::Box2D		draw, src;
 		ML::Color		color;
@@ -118,5 +119,4 @@ public:
 	{
 		ML::MsgBox("Recieved 実装されていません");
 	}
-
 };

@@ -150,6 +150,9 @@
     <ClCompile Include="Task_UI.cpp">
       <Filter>MyPG\Tasks\.cpp</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Effect.cpp">
+      <Filter>MyPG\Tasks\.cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -243,6 +246,9 @@
       <Filter>MyPG\Tasks\.h</Filter>
     </ClInclude>
     <ClInclude Include="Task_UI.h">
+      <Filter>MyPG\Tasks\.h</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Effect.h">
       <Filter>MyPG\Tasks\.h</Filter>
     </ClInclude>
   </ItemGroup>

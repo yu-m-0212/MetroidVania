@@ -61,5 +61,7 @@ namespace  Shot00
 		//壁や敵に衝突したとき、消えるか否かを指定する
 		//引数	：	（0か1）
 		void Set_Erase(const int&);
+		//状態ごとに行動を指定する
+		void Move();
 	};
 }

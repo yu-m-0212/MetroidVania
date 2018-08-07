@@ -58,8 +58,8 @@ namespace  Item00
 		this->animCnt++;
 		if (this->unHitTime > 0) { this->unHitTime--; }
 
-		Motion nm = this->motion;
-		switch (this->motion) {
+		State nm = this->state;
+		switch (this->state) {
 		case Stand:
 			break;
 		case Lose:
@@ -84,7 +84,7 @@ namespace  Item00
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
-		if (this->motion != Stand) {
+		if (this->state != Stand) {
 			return;
 		}
 		this->UpdateMotion(Lose);
@@ -100,7 +100,7 @@ namespace  Item00
 			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,32,32),ML::Color(0.3f,1,1,1) },//Lose
 		};
 		BChara::DrawInfo  rtv;
-		switch (this->motion) {
+		switch (this->state) {
 			//	停止----------------------------------------------------------------------------
 		case  Stand:	rtv = imageTable[0];	break;
 			//	消える・昇天---------------------------------------------------------------------

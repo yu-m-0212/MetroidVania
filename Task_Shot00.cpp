@@ -3,9 +3,8 @@
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Map2D.h"
-//#include  "Task_EnemyTest.h"
-//#include  "Task_Effect00.h"
 #include  "Task_Shot00.h"
+#include  "Task_Player.h"
 
 namespace  Shot00
 {
@@ -39,8 +38,8 @@ namespace  Shot00
 		this->eraseFlag = true;
 		this->hp = 0;				//hp初期値
 		this->cntLimit = 0;			//消滅するまでの時間
-		this->hitBase = ML::Box2D(-32,-32,64,64);
-		
+		this->hitBase = ML::Box2D(-32, -32, 64, 64);
+
 		//★タスクの生成
 
 		return  true;
@@ -67,9 +66,10 @@ namespace  Shot00
 			this->Kill();
 			return;
 		}
+		//各状態ごとの処理
+		this->Move();
 		//移動
 		this->pos += this->moveVec;
-
 		//当たり判定
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
@@ -92,9 +92,7 @@ namespace  Shot00
 				}
 			}
 		}
-		//移動先で障害物に接触したら消滅
-		//マップが存在するか調べてからアクセス
-		//shotとして呼ばれた時のみ、判定
+		//射撃は壁に当たると消滅する
 		if (this->eraseFlag)
 		{
 			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) {
@@ -102,47 +100,17 @@ namespace  Shot00
 				if (true == map->CheckHit(hit)) {
 					//消滅申請
 					this->Kill();
-
-					//とりあえず星はばらまくよ
-					/*for (int c = 0; c < 4; ++c) {
-						auto eff = Effect00::Object::Create(true);
-						eff->pos = this->pos;
-					}*/
+					//消滅時、エフェクトを生成する場合はここに記述する
 					return;
 				}
 			}
 		}
-
-		//敵対象と衝突判定&ダメージを与える処理
-		ML::Box2D me = this->hitBase.OffsetCopy(this->pos);//shot
-		//全ての敵に対してあたり判定を行う
-		//for(auto it =ge->qa_Enemys->begin();
-		//	it != ge->qa_Enemys->end();
-		//	++it)
-		//{
-		//	if ((*it)->CheckState() == BTask::eKill) { continue; }//消滅予定の敵は判定しない
-
-		//	//敵キャラクタのあたり判定矩形を用意
-		//	ML::Box2D you = (*it)->hitBase.OffsetCopy((*it)->pos);
-		//	//重なりを判定
-		//	if (true == you.Hit(me)) {
-		//		(*it)->Kill();
-		//		this->Kill();
-
-		//		//とりあえず星をばら撒くよ
-		//		for (int c = 0; c < 4; ++c) {
-		//			auto eff = Effect00::Object::Create(true);
-		//			eff->pos = this->pos;
-		//		}
-		//		break;
-		//	}
-		//}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		ML::Box2D draw=this->hitBase;
+		ML::Box2D draw = this->hitBase;
 		draw.Offset(this->pos);
 		ML::Box2D src(0, 0, 32, 32);
 		//スクロール対応
@@ -158,6 +126,57 @@ namespace  Shot00
 	void Object::Set_Erase(const int& erase_)
 	{
 		this->eraseFlag = erase_;
+	}
+	//状態ごとに行動を指定する
+	void Object::Move()
+	{
+		auto pl = ge->GetTask_One_G <Player::Object>("プレイヤ");
+		switch (this->state)
+		{
+		default:
+			break;
+		case Punch1:
+			//敵に衝突したとき消えるか否か
+			this->eraseFlag = false;
+			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
+			this->moveVec.x = pl->moveVec.x;
+			//プレイヤが壁に衝突したら移動量を0に
+			if (pl->CheckFront_LR())
+			{
+				this->moveVec.x = 0.0f;
+			}
+			break;
+		case Punch2:
+			//敵に衝突したとき消えるか否か
+			this->eraseFlag = false;
+			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
+			this->moveVec.x = pl->moveVec.x;
+			//プレイヤが壁に衝突したら移動量を0に
+			if (pl->CheckFront_LR())
+			{
+				this->moveVec.x = 0.0f;
+			}
+			break;
+		case Shoot:
+			//敵に衝突したとき消えるか否か
+			this->eraseFlag = true;
+			break;
+		case Air:
+			//敵に衝突したとき消えるか否か
+			this->eraseFlag = false;
+			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
+			this->moveVec.x = pl->moveVec.x;
+			//プレイヤが壁に衝突したら移動量を0に
+			if (pl->CheckFront_LR())
+			{
+				this->moveVec.x = 0.0f;
+			}
+			break;
+		case Airshoot:
+			//敵に衝突したとき消えるか否か
+			this->eraseFlag = true;
+			break;
+		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

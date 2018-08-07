@@ -36,7 +36,7 @@ namespace  Enemy01
 		this->render2D_Priority[1] = 0.6f;
 		this->hitBase = ML::Box2D(-28, -22, 56, 45);
 		this->angle_LR = Left;
-		this->motion = Stand;
+		this->state = Stand;
 		this->hp = 20;				//hp初期値
 		this->maxSpeed = 2.0f;		//最大移動速度(横)
 		this->addSpeed = 0.7f;		//歩行加速度(地面の影響である程度打ち消される
@@ -133,7 +133,7 @@ namespace  Enemy01
 	//思考&状況判断　モーション決定
 	void Object::Think()
 	{
-		BChara::Motion nm = this->motion; //とりあえず今の状態を指定
+		BChara::State nm = this->state; //とりあえず今の状態を指定
 
 		//思考（入力）や状況に応じてモーションを変更することを目的としている。
 		//モーションの変更以外の処理は行わない
@@ -176,7 +176,7 @@ namespace  Enemy01
 	void Object::Move()
 	{
 		//重力加速
-		switch (this->motion) {
+		switch (this->state) {
 		default:
 			//上昇中もしくは足元に地面が無い
 			if (this->moveVec.y < 0 ||
@@ -193,7 +193,7 @@ namespace  Enemy01
 		}
 
 		//移動速度減衰
-		switch (this->motion) {
+		switch (this->state) {
 		default:
 			if (this->moveVec.x < 0) {
 				this->moveVec.x = min(this->moveVec.x + this->decSpeed, 0);
@@ -209,7 +209,7 @@ namespace  Enemy01
 		}
 		//-------------------------------------------------------------------
 		//モーション毎に固有の処理
-		switch (this->motion) {
+		switch (this->state) {
 		case  Stand:	//立っている
 			break;
 		case  Walk:		//歩いている
@@ -256,7 +256,7 @@ namespace  Enemy01
 		};
 		BChara::DrawInfo rtv;
 		/*int work;*/
-		switch (this->motion) {
+		switch (this->state) {
 		default:	rtv = imageTable[0];	break;
 			//	ジャンプ------------------------------------------------------------------------
 		case  Jump:		rtv = imageTable[0];	break;
@@ -271,7 +271,7 @@ namespace  Enemy01
 		}
 		//向きに応じて画像を左右反転する
 		//モーションがBoundの時
-		if (this->motion == Bound)
+		if (this->state == Bound)
 		{
 			auto shot = ge->GetTask_One_G<Shot00::Object>("プレイヤ");
 			//位置関係		弾	| エネミー

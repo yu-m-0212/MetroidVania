@@ -5,6 +5,7 @@
 #include  "Task_Player.h"
 #include  "Task_Shot00.h"
 #include  "Task_Map2D.h"
+#include  "Task_Effect.h"
 
 namespace  Player
 {
@@ -40,7 +41,7 @@ namespace  Player
 		this->hitBase = ML::Box2D(-32, -64, 64, 128);
 		this->angle_LR = Right;
 		this->controllerName = "P1";
-		this->motion = Stand;				//キャラ初期状態
+		this->state = Stand;				//キャラ初期状態
 		this->max_Hp = 10;					//ヘルス最大値
 		this->hp = this->max_Hp;			//ヘルス初期値
 		this->maxSpeed = 10.0f;				//最大移動速度（横）
@@ -135,18 +136,18 @@ namespace  Player
 		{
 			ML::Box2D debugBox(150, 50, 1000, 1000);
 			string debugText =
-				"motion = " + to_string(this->motion) + "\n" +
+				"state = " + to_string(this->state) + "\n" +
 				"moveVec.x = " + to_string(this->moveVec.x) + "\n" +
 				"moveVec.y = " + to_string(this->moveVec.y) + "\n" +
 				"angle = " + to_string(this->angle_LR) + "\n"
 				"moveCnt = " + to_string(this->moveCnt) + "\n" +
 				"unHitTime = " + to_string(this->unHitTime) + "\n" +
 				"hp=" + to_string(this->hp)+"\n"+
-				"Selectボタンでデバッグモード切替";
+				"BackSpaceでデバッグモード切替";
 			DG::Font_Draw("FontA", debugBox, debugText, ML::Color(1, 0, 0, 0));
 		}
 		//以上デバッグ----------------------------------------------------
-		//8フレーム中4フレーム画像を表示しない
+		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
 		if (this->unHitTime > 0) {
 			if ((this->unHitTime / 4) % 2 == 0) {
 				return;
@@ -180,7 +181,7 @@ namespace  Player
 	//思考＆状況判断　モーション決定
 	void  Object::Think()
 	{
-		BChara::Motion  nm = this->motion;	//とりあえず今の状態を指定
+		BChara::State  nm = this->state;	//とりあえず今の状態を指定
 		//コントローラの宣言
 		auto in = DI::GPad_GetState(this->controllerName);
 
@@ -303,7 +304,7 @@ namespace  Player
 		//コントローラの宣言
 		auto in = DI::GPad_GetState(this->controllerName);
 		//重力加速
-		switch (this->motion) {
+		switch (this->state) {
 		default:
 			//ジャンプボタンを押す長さでジャンプの高さが変わる
 			if (in.B2.on)
@@ -330,7 +331,7 @@ namespace  Player
 		}
 
 		//移動速度減衰
-		switch (this->motion) {
+		switch (this->state) {
 		default:
 			if (this->moveVec.x < 0) {
 				this->moveVec.x = min(this->moveVec.x + this->decSpeed, 0);
@@ -346,15 +347,17 @@ namespace  Player
 		}
 		//-----------------------------------------------------------------
 		//モーション毎に固有の処理
-		switch (this->motion) {
+		switch (this->state) {
 		case  Stand:	//立っている
 			break;
 		case  Walk:		//歩いている
-			if (in.LStick.L.on) {
+			if (in.LStick.L.on)
+			{
 				this->angle_LR = Left;
 				this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
 			}
-			if (in.LStick.R.on) {
+			if (in.LStick.R.on)
+			{
 				this->angle_LR = Right;
 				this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
 			}
@@ -367,28 +370,29 @@ namespace  Player
 			}
 			break;
 		case  Jump:		//上昇中
-			if (this->moveCnt == 0) {
+			if (this->moveCnt == 0)
+			{
 				this->moveVec.y = this->jumpPow;//初速設定
 			}
-			if (in.LStick.L.on) {
-				this->angle_LR = Left;
-				this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
+			if (in.LStick.L.on)
+			{
+				this->moveVec.x = -this->maxSpeed;
 			}
-			if (in.LStick.R.on) {
-				this->angle_LR = Right;
-				this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
+			if (in.LStick.R.on) 
+			{
+				this->moveVec.x = +this->maxSpeed;
 			}
 			//天井に衝突で上昇力を0に
 			if (this->CheckHead() == true) { this->moveVec.y = 0; }
 			break;
 		case  Fall:		//落下中
-			if (in.LStick.L.on) {
-				this->angle_LR = Left;
-				this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
+			if (in.LStick.L.on) 
+			{
+				this->moveVec.x = -this->maxSpeed;
 			}
-			if (in.LStick.R.on) {
-				this->angle_LR = Right;
-				this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
+			if (in.LStick.R.on)
+			{
+				this->moveVec.x = +this->maxSpeed;
 			}
 			break;
 		case Landing:
@@ -403,19 +407,22 @@ namespace  Player
 			//目の前にパンチ矩形を生成
 			if (this->moveCnt == 0) {
 				auto punch1 = Shot00::Object::Create(true);
-				if (this->angle_LR == Right) {
+				//呼び出した判定矩形に思考させるため状態を指定
+				punch1->state = Punch1;
+				punch1->Set_Limit(this->meleeCnt);
+				punch1->Set_Erase(0);
+				//以下プレイヤの左右によって変化する
+				if (this->angle_LR == Right)
+				{
+					//初期座標をプレイヤの目の前に指定
 					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					punch1->moveVec = ML::Vec2(0, 0);
-					punch1->Set_Limit(this->meleeCnt);
-					punch1->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = this->slide;
 				}
-				else {
+				else 
+				{
+					//初期座標をプレイヤの目の前に指定
 					punch1->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					punch1->moveVec = ML::Vec2(0, 0);
-					punch1->Set_Limit(this->meleeCnt);
-					punch1->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
 				}
@@ -430,19 +437,22 @@ namespace  Player
 			//目の前にパンチ矩形を生成
 			if (this->moveCnt == 0) {
 				auto punch2 = Shot00::Object::Create(true);
-				if (this->angle_LR == Right) {
+				//呼び出した判定矩形に思考させるため状態を指定
+				punch2->state = Punch2;
+				punch2->Set_Limit(this->meleeCnt);
+				punch2->Set_Erase(0);
+				//以下プレイヤの左右によって変化する
+				if (this->angle_LR == Right)
+				{
+					//初期座標をプレイヤの目の前に指定
 					punch2->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					punch2->moveVec = ML::Vec2(0, 0);
-					punch2->Set_Limit(this->meleeCnt);
-					punch2->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = this->slide;
 				}
-				else {
+				else
+				{
+					//初期座標をプレイヤの目の前に指定
 					punch2->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					punch2->moveVec = ML::Vec2(0, 0);
-					punch2->Set_Limit(this->meleeCnt);
-					punch2->Set_Erase(0);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
 				}
@@ -468,15 +478,22 @@ namespace  Player
 			//着地の際、自身の左中右に攻撃
 			if (this->moveCnt == 0)
 			{
+				//攻撃判定の生成
 				for (int i = -1; i < 2; ++i)
 				{
-					auto stompLanding = Shot00::Object::Create(true);
 					//足元に攻撃矩形を生成
-					stompLanding->pos = ML::Vec2(this->pos.x + this->reach * i, this->pos.y + this->hitBase.h / 2);
-					stompLanding->moveVec = ML::Vec2(0, 0);
-					stompLanding->Set_Limit(this->meleeCnt);
-					stompLanding->Set_Erase(0);
+					auto stompLandingRect = Shot00::Object::Create(true);
+					stompLandingRect->pos = ML::Vec2(this->pos.x + this->reach * i, this->pos.y + this->hitBase.h / 2);
+					stompLandingRect->moveVec = ML::Vec2(0, 0);
+					stompLandingRect->Set_Limit(this->meleeCnt);
+					stompLandingRect->Set_Erase(0);
 				}
+				//エフェクトの生成
+				//タスクキルはエフェクト側で行う
+				auto stompLandingEffect = Effect::Object::Create(true);
+				stompLandingEffect->pos = this->pos;
+				stompLandingEffect->Set_Limit(18);
+				stompLandingEffect->state = StompLanding;
 			}
 			break;
 		case Bunker1:
@@ -513,73 +530,88 @@ namespace  Player
 		case Bunker3:
 				break;
 		case  Shoot:	//射撃
-			if (in.LStick.L.on) {
-				this->angle_LR = Left;
-				this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
+			//射撃中も移動できる
+			if (in.LStick.L.on) 
+			{
+				this->moveVec.x = -this->maxSpeed;
 			}
-			if (in.LStick.R.on) {
-				this->angle_LR = Right;
-				this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
+			if (in.LStick.R.on)
+			{
+				this->moveVec.x = +this->maxSpeed;
 			}
-			if (this->moveCnt == 4) {//4フレーム目で弾を発射
+			//4フレーム目で弾を発射
+			if (this->moveCnt == 4)
+			{
 				auto shot = Shot00::Object::Create(true);
-				if (this->angle_LR == Right) {
+				shot->state = Shoot;
+				shot->Set_Limit(30);
+				shot->Set_Erase(1);
+
+				if (this->angle_LR == Right)
+				{
 					shot->pos = ML::Vec2(this->pos.x + 20, this->pos.y);
 					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
-					shot->Set_Limit(30);
-					shot->Set_Erase(1);
 				}
-				else {
+				else
+				{
 					shot->pos = ML::Vec2(this->pos.x - 20, this->pos.y);
 					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
-					shot->Set_Limit(30);
-					shot->Set_Erase(1);
 				}
 			}
 			break;
 		case Air:
 			//空中制動
-			if (in.LStick.L.on) {
+			if (in.LStick.L.on)
+			{
 				this->moveVec.x = -this->maxSpeed;
 			}
-			if (in.LStick.R.on) {
-				this->moveVec.x = this->maxSpeed;
+			if (in.LStick.R.on)
+			{
+				this->moveVec.x = +this->maxSpeed;
 			}
 			//空中攻撃(目の前に弾を生成)
 			if (this->moveCnt == 4) {//4フレーム目で弾を発射
 				auto air = Shot00::Object::Create(true);
-				if (this->angle_LR == Right) {
+				air->state = Air;
+				air->Set_Limit(this->meleeCnt);
+				air->Set_Erase(0);
+				//以下プレイヤの左右によって変化する
+				if (this->angle_LR == Right) 
+				{
 					air->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					air->moveVec = ML::Vec2(0, 0);
-					air->Set_Limit(this->meleeCnt);
-					air->Set_Erase(0);
 				}
-				else {
+				else
+				{
 					air->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					air->moveVec = ML::Vec2(0, 0);
-					air->Set_Limit(this->meleeCnt);
-					air->Set_Erase(0);
 				}
 			}
 			break;
 		case Airshoot:
 			//空中制動
-			if (in.LStick.L.on) {
+			if (in.LStick.L.on)
+			{
 				this->moveVec.x = -this->maxSpeed;
 			}
-			if (in.LStick.R.on) {
+			if (in.LStick.R.on)
+			{
 				this->moveVec.x = this->maxSpeed;
 			}
 			//空中射撃
-			if (this->moveCnt == 4) {//4フレーム目で弾を発射
+			//4フレーム目で弾を発射
+			if (this->moveCnt == 4) 
+			{
 				auto shot = Shot00::Object::Create(true);
-				if (this->angle_LR == Right) {
+				if (this->angle_LR == Right) 
+				{
+					shot->state = Airshoot;
 					shot->pos = ML::Vec2(this->pos.x + 20, this->pos.y);
 					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
 					shot->Set_Limit(30);
 					shot->Set_Erase(1);
 				}
-				else {
+				else
+				{
+					shot->state = Airshoot;
 					shot->pos = ML::Vec2(this->pos.x - 20, this->pos.y);
 					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
 					shot->Set_Limit(30);
@@ -627,7 +659,7 @@ namespace  Player
 		};
 		BChara::DrawInfo  rtv;
 		int  walkAnim;
-		switch (this->motion) {
+		switch (this->state) {
 		default:			rtv = imageTable[0];	break;
 		//	停止----------------------------------------------------------------------------
 		case  Stand:		rtv = imageTable[0];	break;
