@@ -635,71 +635,86 @@ namespace  Player
 	//アニメーション制御
 	BChara::DrawInfo  Object::Anim()
 	{
+		//デフォルトカラーを宣言
+		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw							src
-			{ this->hitBase, ML::Box2D(   0,  0, 64, 128), ML::Color(1, 1, 1, 1) },//停止		[0]
-			{ this->hitBase, ML::Box2D(  64,  0, 64, 128), ML::Color(1, 1, 1, 1) },//歩行1		[1]
-			{ this->hitBase, ML::Box2D(  64,128, 64, 128), ML::Color(1, 1, 1, 1) },//歩行2		[2]
-			{ this->hitBase, ML::Box2D(  64,256, 64, 128), ML::Color(1, 1, 1, 1) },//歩行3		[3]
-			{ this->hitBase, ML::Box2D( 128,  0, 64, 128), ML::Color(1, 1, 1, 1) },//減速		[4]
-			{ this->hitBase, ML::Box2D( 192,  0, 64, 128), ML::Color(1, 1, 1, 1) },//パンチ1		[5]
-			{ this->hitBase, ML::Box2D( 256,  0, 64, 128), ML::Color(1, 1, 1, 1) },//パンチ2		[6]
-			{ this->hitBase, ML::Box2D( 320,  0, 64, 128), ML::Color(1, 1, 1, 1) },//空中攻撃	[7]
-			{ this->hitBase, ML::Box2D( 384,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ストンプ	[8]
-			{ this->hitBase, ML::Box2D( 448,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ストンプ着地	[9]																				 //ストンプ着地									 64	 128
-			{ this->hitBase, ML::Box2D( 512,  0, 64, 128), ML::Color(1, 1, 1, 1) },//射撃		[10]
-			{ this->hitBase, ML::Box2D( 576,  0, 64, 128), ML::Color(1, 1, 1, 1) },//空中射撃	[11]
-			{ this->hitBase, ML::Box2D( 640,  0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー1	[12]
-			{ this->hitBase, ML::Box2D( 704,  0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー2	[13]
-			{ this->hitBase, ML::Box2D( 768,  0, 64, 128), ML::Color(1, 1, 1, 1) },//バンカー3	[14]
-			{ this->hitBase, ML::Box2D( 832,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ジャンプ	[15]
-			{ this->hitBase, ML::Box2D( 896,  0, 64, 128), ML::Color(1, 1, 1, 1) },//落下		[16]
-			{ this->hitBase, ML::Box2D( 960,  0, 64, 128), ML::Color(1, 1, 1, 1) },//着地		[17]
-			{ this->hitBase, ML::Box2D(1024,  0, 64, 128), ML::Color(1, 1, 1, 1) },//ダメージ	[18]
+			{ this->hitBase, ML::Box2D(   0,   0, 64, 128), dc },//停止1			[0]
+			{ this->hitBase, ML::Box2D(   0, 128, 64, 128), dc },//停止2			[1]
+			{ this->hitBase, ML::Box2D(   0, 256, 64, 128), dc },//停止3			[2]
+			{ this->hitBase, ML::Box2D(   0, 384, 64, 128), dc },//停止4			[3]
+			{ this->hitBase, ML::Box2D(   0, 512, 64, 128), dc },//停止5			[4]
+			{ this->hitBase, ML::Box2D(  64,   0, 64, 128), dc },//歩行1			[5]
+			{ this->hitBase, ML::Box2D(  64, 128, 64, 128), dc },//歩行2			[6]
+			{ this->hitBase, ML::Box2D(  64, 256, 64, 128), dc },//歩行3			[7]
+			{ this->hitBase, ML::Box2D( 128,   0, 64, 128), dc },//減速			[8]
+			{ this->hitBase, ML::Box2D( 192,   0, 64, 128), dc },//パンチ1		[9]
+			{ this->hitBase, ML::Box2D( 256,   0, 64, 128), dc },//パンチ2		[10]
+			{ this->hitBase, ML::Box2D( 320,   0, 64, 128), dc },//空中攻撃		[11]
+			{ this->hitBase, ML::Box2D( 384,   0, 64, 128), dc },//ストンプ		[12]
+			{ this->hitBase, ML::Box2D( 448,   0, 64, 128), dc },//ストンプ着地	[13]
+			{ this->hitBase, ML::Box2D( 512,   0, 64, 128), dc },//射撃			[14]
+			{ this->hitBase, ML::Box2D( 576,   0, 64, 128), dc },//空中射撃		[15]
+			{ this->hitBase, ML::Box2D( 640,   0, 64, 128), dc },//バンカー1		[16]
+			{ this->hitBase, ML::Box2D( 704,   0, 64, 128), dc },//バンカー2		[17]
+			{ this->hitBase, ML::Box2D( 768,   0, 64, 128), dc },//バンカー3		[18]
+			{ this->hitBase, ML::Box2D( 832,   0, 64, 128), dc },//ジャンプ		[19]
+			{ this->hitBase, ML::Box2D( 896,   0, 64, 128), dc },//落下			[20]
+			{ this->hitBase, ML::Box2D( 960,   0, 64, 128), dc },//着地			[21]
+			{ this->hitBase, ML::Box2D(1024,   0, 64, 128), dc },//ダメージ		[22]
 		};
 		BChara::DrawInfo  rtv;
-		int  walkAnim;
+		int  standAnim,walkAnim;
 		switch (this->state) {
 		default:			rtv = imageTable[0];	break;
 		//	停止----------------------------------------------------------------------------
-		case  Stand:		rtv = imageTable[0];	break;
+		case  Stand:
+			//切り替わるフレーム数
+			standAnim = this->animCnt / 12;
+			//パターン数
+			standAnim %= 5;
+			//出た値に一枚目の要素番号を足す
+			rtv = imageTable[standAnim + 0];
+			break;
 		//	歩行----------------------------------------------------------------------------
 		case  Walk:
-			//歩行アニメーション
+			//切り替わるフレーム数
 			walkAnim = this->animCnt / 8;
+			//パターン数
 			walkAnim %= 3;
-			rtv = imageTable[walkAnim + 1];
+			//出た値に一枚目の要素番号を足す
+			rtv = imageTable[walkAnim + 5];
 			break;
 		//	減速----------------------------------------------------------------------------
-		case SlowDown:		rtv = imageTable[4];	break;
+		case SlowDown:		rtv = imageTable[8];	break;
 		//	パンチ1-------------------------------------------------------------------------
-		case Punch1:		rtv = imageTable[5];	break;
+		case Punch1:		rtv = imageTable[9];	break;
 		//	パンチ2-------------------------------------------------------------------------
-		case Punch2:		rtv = imageTable[6];	break;
+		case Punch2:		rtv = imageTable[10];	break;
 		//	空中攻撃-------------------------------------------------------------------------
-		case Air:			rtv = imageTable[7];	break;
+		case Air:			rtv = imageTable[11];	break;
 		//	ストンプ-------------------------------------------------------------------------
-		case Stomp:			rtv = imageTable[8];	break;
+		case Stomp:			rtv = imageTable[12];	break;
 		//	ストンプ着地---------------------------------------------------------------------
-		case StompLanding:	rtv = imageTable[9];	break;
+		case StompLanding:	rtv = imageTable[13];	break;
 		//	地上射撃-------------------------------------------------------------------------
-		case Shoot:			rtv = imageTable[10];	break;
+		case Shoot:			rtv = imageTable[14];	break;
 		//	空中射撃-------------------------------------------------------------------------
-		case Airshoot:		rtv = imageTable[11];	break;
+		case Airshoot:		rtv = imageTable[15];	break;
 		//	バンカー1-------------------------------------------------------------------------
-		case Bunker1:		rtv = imageTable[12];	break;
+		case Bunker1:		rtv = imageTable[16];	break;
 		//	バンカー2-------------------------------------------------------------------------
-		case Bunker2:		rtv = imageTable[13];	break;
+		case Bunker2:		rtv = imageTable[17];	break;
 		//	バンカー3-------------------------------------------------------------------------
-		case Bunker3:		rtv = imageTable[14];	break;
+		case Bunker3:		rtv = imageTable[18];	break;
 		//	ジャンプ------------------------------------------------------------------------
-		case  Jump:			rtv = imageTable[15];	break;
+		case  Jump:			rtv = imageTable[19];	break;
 		//	落下----------------------------------------------------------------------------
-		case  Fall:			rtv = imageTable[16];	break;
+		case  Fall:			rtv = imageTable[20];	break;
 		//着地硬直--------------------------------------------------------------------------
-		case  Landing:		rtv = imageTable[17];	break;
+		case  Landing:		rtv = imageTable[21];	break;
 		//ダメージ--------------------------------------------------------------------------
-		case  Damage:		rtv = imageTable[18];	break;
+		case  Damage:		rtv = imageTable[22];	break;
 		}
 		//	向きに応じて画像を左右反転する
 		if (false == this->angle_LR) {

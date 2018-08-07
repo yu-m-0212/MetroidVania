@@ -58,7 +58,10 @@ namespace  Shot00
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		this->moveCnt++;
+		//各状態ごとの処理
+		this->Move();
 		//★データ＆タスク解放
 		//限界の時間を迎えたら消滅
 		if (this->moveCnt >= this->cntLimit) {
@@ -66,8 +69,6 @@ namespace  Shot00
 			this->Kill();
 			return;
 		}
-		//各状態ごとの処理
-		this->Move();
 		//移動
 		this->pos += this->moveVec;
 		//当たり判定
@@ -139,22 +140,34 @@ namespace  Shot00
 			//敵に衝突したとき消えるか否か
 			this->eraseFlag = false;
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
-			this->moveVec.x = pl->moveVec.x;
+			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
 			if (pl->CheckFront_LR())
 			{
 				this->moveVec.x = 0.0f;
+			}
+			//プレイヤがダメージを受ける(状態が変わる)と消滅
+			if (pl->state == Damage)
+			{
+				this->Kill();
+				return;
 			}
 			break;
 		case Punch2:
 			//敵に衝突したとき消えるか否か
 			this->eraseFlag = false;
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
-			this->moveVec.x = pl->moveVec.x;
+			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
 			if (pl->CheckFront_LR())
 			{
 				this->moveVec.x = 0.0f;
+			}
+			//プレイヤがダメージを受ける(状態が変わる)と消滅
+			if (pl->state == Damage)
+			{
+				this->Kill();
+				return;
 			}
 			break;
 		case Shoot:
@@ -165,11 +178,17 @@ namespace  Shot00
 			//敵に衝突したとき消えるか否か
 			this->eraseFlag = false;
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
-			this->moveVec.x = pl->moveVec.x;
+			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
 			if (pl->CheckFront_LR())
 			{
 				this->moveVec.x = 0.0f;
+			}
+			//プレイヤがダメージを受ける(状態が変わる)と消滅
+			if (pl->state == Damage)
+			{
+				this->Kill();
+				return;
 			}
 			break;
 		case Airshoot:
