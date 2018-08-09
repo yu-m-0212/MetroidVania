@@ -76,12 +76,32 @@ namespace  UI
 	void  Object::Render2D_AF()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (ge->debugMode)
+		{
+			ML::Box2D debugBox(200, 100, 1000, 1000);
+			string debugText =
+				"state = " + to_string(pl->state) + "\n" +
+				"moveVec.x = " + to_string(pl->moveVec.x) + "\n" +
+				"moveVec.y = " + to_string(pl->moveVec.y) + "\n" +
+				"angle = " + to_string(pl->angle_LR) + "\n"
+				"moveCnt = " + to_string(pl->moveCnt) + "\n" +
+				"unHitTime = " + to_string(pl->unHitTime) + "\n" +
+				"hp=" + to_string(pl->hp) + "\n" +
+				"BackSpaceでデバッグモード切替";
+			DG::Font_Draw("FontA", debugBox, debugText, ML::Color(1, 1, 1, 1));
+		}
+		//以上デバッグ----------------------------------------------------
 		//プレイヤのHP表示
 		for (int i = 0; i < pl->Get_HP(); ++i)
 		{
 			if (this->playerHp[i].active)
 			{
 				ML::Box2D draw(32 + 32 * i, 32, 32, 32);
+				//デバッグ時は表示をずらす
+				if (ge->debugMode)
+				{
+					draw.x += 100;
+				}
 				ML::Box2D src(0, 0, 32, 32);
 				//残り体力によって色を指定する
 				float red = 1.0f - 0.1f * i;

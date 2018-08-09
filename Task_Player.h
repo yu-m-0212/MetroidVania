@@ -8,7 +8,7 @@
 namespace  Player
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("プレイヤ");	//グループ名
+	const  string  defGroupName("プレイヤ");		//グループ名
 	const  string  defName("仮");				//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
@@ -51,6 +51,8 @@ namespace  Player
 		int max_Hp;
 		//ストンプ時の上下方向移動量
 		float stompFallSpeed;
+		//ストンプ着地時の硬直時間
+		int stompHoldTime;
 		//ショット速度
 		float shotSpeed;
 		//格闘攻撃判定継続時間

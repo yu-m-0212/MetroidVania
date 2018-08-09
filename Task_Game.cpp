@@ -13,6 +13,7 @@
 #include  "Task_Item01.h"
 #include  "Task_Item02.h"
 #include  "Task_UI.h"
+#include  "Task_Back.h"
 
 namespace  Game
 {
@@ -86,6 +87,8 @@ namespace  Game
 		}
 		//UIの生成
 		auto ui = UI::Object::Create(true);
+		//背景の生成
+		auto back = Back::Object::Create(true);
 
 		return  true;
 	}
@@ -100,6 +103,8 @@ namespace  Game
 		ge->KillAll_G("オプション");
 		ge->KillAll_G("アイテム");
 		ge->KillAll_G("UI");
+		ge->KillAll_G("エフェクト");
+		ge->KillAll_G("背景");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 

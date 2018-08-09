@@ -4,12 +4,13 @@
 //エフェクト
 //-------------------------------------------------------------------
 #include "BChara.h"
+using namespace ML;
 
 namespace  Effect
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("Effect");	//グループ名
-	const  string  defName("NoName");	//タスク名
+	const  string  defGroupName("エフェクト");	//グループ名
+	const  string  defName("NoName");			//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -55,6 +56,8 @@ namespace  Effect
 		//呼び出す際に消滅までの時間を指定する
 		//引数	：	（消滅までの時間）
 		void Set_Limit(const int&);
+		//状態ごとに行動を指定する
+		void Move();
 		//アニメーション
 		BChara::DrawInfo Anim();
 	};

@@ -38,7 +38,6 @@ namespace  Shot00
 		this->eraseFlag = true;
 		this->hp = 0;				//hp初期値
 		this->cntLimit = 0;			//消滅するまでの時間
-		this->hitBase = ML::Box2D(-32, -32, 64, 64);
 
 		//★タスクの生成
 
@@ -116,7 +115,7 @@ namespace  Shot00
 		ML::Box2D src(0, 0, 32, 32);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src);
+		DG::Image_Draw(this->res->imageName, draw, src,ML::Color(0.5f,1.0f,1.0f,1.0f));
 	}
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)

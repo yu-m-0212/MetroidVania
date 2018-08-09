@@ -9,7 +9,7 @@ namespace  Enemy01
 {
 	//タスクに割り当てるグループ名と固有名
 	const  string  defGroupName("敵");	//グループ名
-	const  string  defName("NoName");		//タスク名
+	const  string  defName("NoName");	//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{

@@ -1,15 +1,16 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//アイテム01(ジャンプ力ポーション)
+//背景
 //-------------------------------------------------------------------
-#include "BChara.h"
+#include "GameEngine_Ver3_7.h"
+using namespace ML;
 
-namespace  Item01
+namespace  Back
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("アイテム");		//グループ名
-	const  string  defName("NoName");			//タスク名
+	const  string  defGroupName("背景");		//グループ名
+	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -23,10 +24,10 @@ namespace  Item01
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string imageName;
+		string image01;
 	};
 	//-------------------------------------------------------------------
-	class  Object : public  BChara
+	class  Object : public  BTask
 	{
 	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
@@ -45,11 +46,12 @@ namespace  Item01
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+	
+	//追加変数
+		//表示座標
+		Vec2 pos;
 	public:
 		//追加したい変数・メソッドはここに追加する
-		//追加メソッド：
-		BChara::DrawInfo Anim();
-		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_);
+		
 	};
 }

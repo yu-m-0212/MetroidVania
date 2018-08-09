@@ -9,7 +9,7 @@ namespace  Map2D
 {
 	//タスクに割り当てるグループ名と固有名
 	const  string  defGroupName("フィールド");	//グループ名
-	const  string  defName("マップ");	//タスク名
+	const  string  defName("マップ");			//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{

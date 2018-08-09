@@ -100,6 +100,7 @@
     <ClCompile Include="GameEngine_Ver3_7.cpp" />
     <ClCompile Include="myLib.cpp" />
     <ClCompile Include="MyPG.cpp" />
+    <ClCompile Include="Task_Back.cpp" />
     <ClCompile Include="Task_Effect.cpp" />
     <ClCompile Include="Task_Ending.cpp" />
     <ClCompile Include="Task_Enemy00.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="GameEngine_Ver3_7.h" />
     <ClInclude Include="myLib.h" />
     <ClInclude Include="MyPG.h" />
+    <ClInclude Include="Task_Back.h" />
     <ClInclude Include="Task_Effect.h" />
     <ClInclude Include="Task_Ending.h" />
     <ClInclude Include="Task_Enemy00.h" />

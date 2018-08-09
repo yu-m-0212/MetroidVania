@@ -153,6 +153,9 @@
     <ClCompile Include="Task_Effect.cpp">
       <Filter>MyPG\Tasks\.cpp</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Back.cpp">
+      <Filter>MyPG\Tasks\.cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -249,6 +252,9 @@
       <Filter>MyPG\Tasks\.h</Filter>
     </ClInclude>
     <ClInclude Include="Task_Effect.h">
+      <Filter>MyPG\Tasks\.h</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Back.h">
       <Filter>MyPG\Tasks\.h</Filter>
     </ClInclude>
   </ItemGroup>
