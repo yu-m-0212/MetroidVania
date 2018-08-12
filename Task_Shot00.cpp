@@ -36,7 +36,7 @@ namespace  Shot00
 		//★データ初期化
 		this->render2D_Priority[1] = 0.4f;
 		this->eraseFlag = true;
-		this->hp = 0;				//hp初期値
+		this->power = 0;			
 		this->cntLimit = 0;			//消滅するまでの時間
 
 		//★タスクの生成
@@ -80,7 +80,7 @@ namespace  Shot00
 				//相手に接触の有無を確認させる
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
-					BChara::AttackInfo at = { this->hp,0,0 };
+					BChara::AttackInfo at = { this->power,0,0 };
 					(*it)->Received(this, at);
 					//ショットのみ消滅
 					//格闘は複数体にあたる
@@ -126,6 +126,12 @@ namespace  Shot00
 	void Object::Set_Erase(const int& erase_)
 	{
 		this->eraseFlag = erase_;
+	}
+	//外部から生成する際、攻撃力を指定
+	//引数	：	（整数値）
+	void Object::Set_Power(const int& pow_)
+	{
+		this->power = pow_;
 	}
 	//状態ごとに行動を指定する
 	void Object::Move()

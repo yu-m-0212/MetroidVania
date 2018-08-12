@@ -7,6 +7,7 @@
 #include  "Task_Shot00.h"
 #include  "Task_Map2D.h"
 #include  "Task_Effect.h"
+#include  "Task_Goal.h"
 
 namespace  Player
 {
@@ -116,7 +117,6 @@ namespace  Player
 			int  cpx = int(this->pos.x) - px;
 			int  cpy = int(this->pos.y) - py;
 			//カメラの座標を更新
-			//揺れ表現がある場合はここで加算する
 			ge->camera2D.x = cpx;
 			ge->camera2D.y = cpy;
 		}
@@ -127,6 +127,14 @@ namespace  Player
 		}
 		//hp0でタスクキル
 		if (this->hp <= 0)
+		{
+			this->Kill();
+		}
+		//仮ゴールとの接触判定
+		auto goal = ge->GetTask_One_G<Goal::Object>("ゴール");
+		ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+		ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
+		if (you.Hit(me))
 		{
 			this->Kill();
 		}
@@ -405,6 +413,7 @@ namespace  Player
 				punch1->hitBase = ML::Box2D(-64, -32, 128, 64);
 				punch1->Set_Limit(this->meleeCnt);
 				punch1->Set_Erase(0);
+				punch1->Set_Power(2);
 				//エフェクトの呼び出し
 				auto punch1Effect = Effect::Object::Create(true);
 				punch1Effect->state = Punch1;
@@ -442,6 +451,7 @@ namespace  Player
 				punch2->hitBase = ML::Box2D(-64, -32, 128, 64);
 				punch2->Set_Limit(this->meleeCnt);
 				punch2->Set_Erase(0);
+				punch2->Set_Power(2);
 				//以下プレイヤの左右によって変化する
 				if (this->angle_LR == Right)
 				{
@@ -486,6 +496,7 @@ namespace  Player
 				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 2);
 				stompLandingRect->Set_Limit(this->meleeCnt);
 				stompLandingRect->Set_Erase(0);
+				stompLandingRect->Set_Power(5);
 				//エフェクトの生成
 				//タスクキルはエフェクト側で行う
 				auto stompLandingEffect = Effect::Object::Create(true);
@@ -544,6 +555,7 @@ namespace  Player
 				shot->hitBase = ML::Box2D(-32, -32, 64, 64);
 				shot->Set_Limit(30);
 				shot->Set_Erase(1);
+				shot->Set_Power(1);
 
 				if (this->angle_LR == Right)
 				{
@@ -575,6 +587,7 @@ namespace  Player
 				air->hitBase = ML::Box2D(-64, -32, 128, 64);
 				air->Set_Limit(this->meleeCnt);
 				air->Set_Erase(0);
+				air->Set_Power(3);
 				//以下プレイヤの左右によって変化する
 				if (this->angle_LR == Right) 
 				{
@@ -610,6 +623,7 @@ namespace  Player
 					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
 					shot->Set_Limit(30);
 					shot->Set_Erase(1);
+					shot->Set_Power(1);
 				}
 				else
 				{

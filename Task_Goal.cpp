@@ -2,25 +2,24 @@
 //
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_UI.h"
-#include  "Task_Player.h"
+#include  "Task_Goal.h"
 
-namespace  UI
+namespace  Goal
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->hpImageName = "hpImage";
-		DG::Image_Create(this->hpImageName, "./data/image/ui.png");
+		this->imageName = "goal";
+		DG::Image_Create(this->imageName, "./data/image/exit.jpg");
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->hpImageName);
+		DG::Image_Erase(this->imageName);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -33,12 +32,9 @@ namespace  UI
 		this->res = Resource::Create();
 
 		//★データ初期化
-		for (int i = 0; i < 10; ++i)
-		{
-			this->playerHp[i].active = true;
-			this->playerHp[i].x = 0;
-			this->playerHp[i].y = 32;
-		}
+		this->render2D_Priority[1] = 0.1f;
+		this->pos = Vec2(100, 2688);
+		this->hitBase = Box2D(-32, -32, 64, 64);
 		
 		//★タスクの生成
 
@@ -61,56 +57,16 @@ namespace  UI
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		for (int i = 0; i < pl->Get_HP(); ++i)
-		{
-			this->playerHp[i].active = true;
-		}
-		for (int j = pl->Get_Max_HP(); j > pl->Get_HP(); --j)
-		{
-			this->playerHp[j].active = false;
-		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		if (ge->debugMode)
-		{
-			ML::Box2D debugBox(200, 100, 1000, 1000);
-			string debugText =
-				"state = " + to_string(pl->state) + "\n" +
-				"pos.x = " + to_string(pl->pos.x) + "\n" +
-				"pos.y = " + to_string(pl->pos.y) + "\n" +
-				"moveVec.x = " + to_string(pl->moveVec.x) + "\n" +
-				"moveVec.y = " + to_string(pl->moveVec.y) + "\n" +
-				"angle = " + to_string(pl->angle_LR) + "\n"
-				"moveCnt = " + to_string(pl->moveCnt) + "\n" +
-				"unHitTime = " + to_string(pl->unHitTime) + "\n" +
-				"hp=" + to_string(pl->hp) + "\n" +
-				"BackSpace/Selectボタンでデバッグモード切替";
-			DG::Font_Draw("FontA", debugBox, debugText, ML::Color(1, 1, 1, 1));
-		}
-		//以上デバッグ----------------------------------------------------
-		//プレイヤのHP表示
-		for (int i = 0; i < pl->Get_HP(); ++i)
-		{
-			if (this->playerHp[i].active)
-			{
-				ML::Box2D draw(32 + 32 * i, 32, 32, 32);
-				//デバッグ時は表示をずらす
-				if (ge->debugMode)
-				{
-					draw.x += 100;
-				}
-				ML::Box2D src(0, 0, 32, 32);
-				//残り体力によって色を指定する
-				float red = 1.0f - 0.1f * i;
-				float blue = 0.1f + 0.1f * i;
-				DG::Image_Draw(this->res->hpImageName, draw, src, ML::Color(1.0f, red, 0.0f, blue));
-			}
-		}
+		Box2D draw = this->hitBase;
+		draw.Offset(this->pos);
+		Box2D src(0, 0, 792, 792);
+		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+		DG::Image_Draw(this->res->imageName, draw, src);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

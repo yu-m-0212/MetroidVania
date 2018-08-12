@@ -37,9 +37,9 @@ namespace  Enemy01
 		this->hitBase = ML::Box2D(-28, -22, 56, 45);
 		this->angle_LR = Left;
 		this->state = Stand;
-		this->hp = 20;				//hp初期値
+		/*this->hp = 20;*/				//hp初期値
 		this->maxSpeed = 2.0f;		//最大移動速度(横)
-		this->addSpeed = 0.7f;		//歩行加速度(地面の影響である程度打ち消される
+		/*this->addSpeed = 0.7f;*/		//歩行加速度(地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;		//接地状態の時の速度減衰量(摩擦
 		this->maxFallSpeed = 10.0f;	//最大落下速度
 		this->jumpPow = -6.0f;		//ジャンプ力(初速)

@@ -3,7 +3,6 @@
 //-------------------------------------------------------------------
 //プレイヤの出す弾
 //-------------------------------------------------------------------
-//#include "GameEngine_Ver3_7.h"
 #include "BChara.h"
 
 namespace  Shot00
@@ -52,6 +51,8 @@ namespace  Shot00
 		bool eraseFlag;
 		//消滅するまでの時間
 		int cntLimit;
+		//攻撃力
+		int power;
 	public:
 		//追加したい変数・メソッドはここに追加する
 
@@ -61,6 +62,9 @@ namespace  Shot00
 		//壁や敵に衝突したとき、消えるか否かを指定する
 		//引数	：	（0か1）
 		void Set_Erase(const int&);
+		//外部から生成する際、攻撃力を指定
+		//引数	：	（整数値）
+		void Set_Power(const int&);
 		//状態ごとに行動を指定する
 		void Move();
 	};
