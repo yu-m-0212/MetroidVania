@@ -78,6 +78,10 @@ namespace  MyPG
 		MyPG::Camera::SP		camera[4];		//	カメラ
 		//２Ｄカメラ座標
 		ML::Box2D				camera2D;	//  ２Ｄスクロール制御用
+		//クリアフラグ
+		bool clear;
+		//ミスフラグ
+		bool failure;
 	//----------------------------------------------
 	};
 }

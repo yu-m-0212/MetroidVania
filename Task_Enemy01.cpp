@@ -4,6 +4,7 @@
 #include  "MyPG.h"
 #include  "Task_Shot00.h"
 #include  "Task_Enemy01.h"
+#include  "Task_Map2D.h"
 
 namespace  Enemy01
 {
@@ -93,6 +94,12 @@ namespace  Enemy01
 				}
 			}
 		}
+		//HPが0かつ床に触れたら消滅
+		//吹っ飛びも見せてから倒したい
+		if (this->hp <= 0&& this->CheckFoot())
+		{
+			this->Kill();
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -120,9 +127,6 @@ namespace  Enemy01
 		}
 		this->unHitTime = 30;//無敵時間
 		this->hp -= at_.power;//弾のhp
-		if (this->hp <= 0) {
-			this->Kill();
-		}
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4, -9); }
 		else { this->moveVec = ML::Vec2(-4, -9); }
@@ -181,7 +185,7 @@ namespace  Enemy01
 			//上昇中もしくは足元に地面が無い
 			if (this->moveVec.y < 0 ||
 				this->CheckFoot() == false) {
-				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);//min( , )
+				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);
 			}
 			//地面に接触している
 			else {

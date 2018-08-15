@@ -1,15 +1,15 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//プレイヤ
+//リトライ
 //-------------------------------------------------------------------
-#include "BChara.h"
-
-namespace  Player
+#include "GameEngine_Ver3_7.h"
+using namespace ML;
+namespace  Retry
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("プレイヤ");		//グループ名
-	const  string  defName("仮");				//タスク名
+	const  string  defGroupName("リトライ");	//グループ名
+	const  string  defName("シーン");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -23,10 +23,10 @@ namespace  Player
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string		imageName;
+		string imageName;
 	};
 	//-------------------------------------------------------------------
-	class  Object : public  BChara
+	class  Object : public  BTask
 	{
 	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
@@ -40,36 +40,20 @@ namespace  Player
 		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
-		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
-		void  UpDate();		//「実行」１フレーム毎に行う処理
+		bool  Initialize();		//「初期化」タスク生成時に１回だけ行う処理
+		void  UpDate();			//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	//追加変数
-		string		controllerName;
-		//ストンプ時の上下方向移動量
-		float stompFallSpeed;
-		//ストンプ着地時の硬直時間
-		int stompHoldTime;
-		//ショット速度
-		float shotSpeed;
-		//格闘攻撃判定継続時間
-		int meleeCnt;
-		//被弾時に得られる無敵時間
-		int addUnHitTime;
+	private:
+		//コントローラの宣言
+		string controllerName;
+		//前回の死亡地点
+		Vec2 deadPos;
 	public:
-		//思考＆状況判断(ステータス決定）
-		void  Think();
-		//モーションに対応した処理
-		void  Move();
-		//接触時の応答処理（必ず受け身の処理として実装する）
-		//引数	：	(攻撃側,攻撃情報)
-		void Received(BChara* from_, AttackInfo at_);
-		//HPの値を取得する
-		int Get_HP();
-		//HPの最大値を取得する
-		int Get_Max_HP();
-		//アニメーション制御
-		BChara::DrawInfo  Anim();
+		//死亡した座標を保存する
+		//引数	：	（Vec2)
+		void Set_DeadPos(const Vec2&);
 	};
 }

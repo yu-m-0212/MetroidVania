@@ -53,6 +53,7 @@ public:
 	int			unHitTime;		//無敵時間カウンタ
 	int			animCnt;		//アニメーションカウンタ
 	int			hp;				//ヘルスポイント
+	int			max_Hp;			//HP最大値
 	float		jumpPow;		//ジャンプ初速
 	float		maxFallSpeed;	//落下最大速度
 	float		gravity;		//フレーム単位の加算量

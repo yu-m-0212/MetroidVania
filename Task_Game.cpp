@@ -2,18 +2,20 @@
 //ゲーム本編
 //-------------------------------------------------------------------
 #include  "MyPG.h"
+#include  "Task_Title.h"
 #include  "Task_Game.h"
+#include  "Task_Retry.h"
 #include  "Task_Ending.h"
+#include  "Task_UI.h"
+#include  "Task_Back.h"
 #include  "Task_Map2D.h"
 #include  "Task_Player.h"
+#include  "Task_Sprite.h"
 #include  "Task_Enemy00.h"
 #include  "Task_Enemy01.h"
-#include  "Task_Sprite.h"
 #include  "Task_Item00.h"
 #include  "Task_Item01.h"
 #include  "Task_Item02.h"
-#include  "Task_UI.h"
-#include  "Task_Back.h"
 #include  "Task_Goal.h"
 
 namespace  Game
@@ -42,6 +44,10 @@ namespace  Game
 
 		//★データ初期化
 		ge->camera2D = ML::Box2D(-960, -540, 1920, 1080);//取りあえず初期値設定
+		//クリアフラグ初期化
+		ge->clear = false;
+		//ミスフラグ初期化
+		ge->failure = false;
 		
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
@@ -58,6 +64,12 @@ namespace  Game
 		auto  spr = Sprite::Object::Create(true);
 		spr->pos = pl->pos;
 		spr->target = pl;
+		//デバッグ用
+		//敵の生成
+		auto ene0 = Enemy01::Object::Create(true);
+		ene0->pos.x = 1000.0f;
+		ene0->pos.y = 2400.0f;
+		ene0->hp = 5;
 		//敵の生成
 		auto ene1 = Enemy01::Object::Create(true);
 		ene1->pos.x = 5535.0f;
@@ -116,12 +128,30 @@ namespace  Game
 		ge->KillAll_G("エフェクト");
 		ge->KillAll_G("背景");
 		ge->KillAll_G("ゴール");
+		ge->KillAll_G("遺体");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
-			auto  nextTask = Ending::Object::Create(true);
+			auto in = DI::GPad_GetState("P1");
+			//スタートボタンでタイトルに戻る
+			if (in.ST.down)
+			{
+				auto  title = Title::Object::Create(true);
+			}
+			//クリア画面に移る
+			else if (ge->clear)
+			{
+				auto ending = Ending::Object::Create(true);
+			}
+			//リトライ画面に移る
+			else if (ge->failure)
+			{
+				auto retry = Retry::Object::Create(true);
+				//死亡地点を渡す
+				retry->Set_DeadPos(this->deadPos);
+			}
 		}
 
 		return  true;
@@ -131,24 +161,33 @@ namespace  Game
 	void  Object::UpDate()
 	{
 		auto in = DI::GPad_GetState("P1");
-		if (in.ST.down) {
+		if (in.ST.down) 
+		{
 			//自身に消滅要請
 			this->Kill();
+		}
+		else if (ge->clear)
+		{
+			this->Kill();
+		}
+		else if (ge->failure)
+		{
+			this->Kill();
+			//死亡地点を保存
+			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			this->deadPos = pl->pos;
 		}
 		//Selectボタンでデバッグモード
 		if (in.SE.down)
 		{
 			ge->debugMode = !ge->debugMode;
 		}
-		//プレイヤ死亡でエンディング
-
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
 	}
-
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

@@ -8,6 +8,8 @@
 #include  "Task_Map2D.h"
 #include  "Task_Effect.h"
 #include  "Task_Goal.h"
+#include  "Task_Retry.h"
+#include  "Task_Corpse.h"
 
 namespace  Player
 {
@@ -18,7 +20,6 @@ namespace  Player
 	{
 		this->imageName = "PlayerImg";
 		DG::Image_Create(this->imageName, "./data/image/chara(仮)01.png");
-		DG::Font_Create("FontA", "ＭＳ ゴシック", 16, 32);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -26,7 +27,6 @@ namespace  Player
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
-		DG::Font_Erase("FontA");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -44,7 +44,7 @@ namespace  Player
 		this->angle_LR = Right;
 		this->controllerName = "P1";
 		this->state = Stand;				//キャラ初期状態
-		this->max_Hp = 10;					//ヘルス最大値
+		this->max_Hp = 3;					//ヘルス最大値
 		this->hp = this->max_Hp;			//ヘルス初期値
 		this->maxSpeed = 10.0f;				//最大移動速度（横）
 		this->addSpeed = 1.0f;				//歩行加速度（地面の影響である程度打ち消される
@@ -57,6 +57,7 @@ namespace  Player
 		this->meleeCnt = 15;				//格闘攻撃判定継続時間
 		this->shotSpeed = 20;				//ショット速度
 		this->stompHoldTime = 30;			//ストンプ着地時の硬直時間
+		this->addUnHitTime = 120;			//被弾時に得られる無敵時間
 
 		//★タスクの生成
 
@@ -91,8 +92,7 @@ namespace  Player
 		//めり込まない移動
 		ML::Vec2  est = this->moveVec;
 		this->CheckMove(est);
-
-		//当たり判定
+		//アイテムとの接触判定
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("アイテム");
@@ -103,6 +103,22 @@ namespace  Player
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 0,0,0 };
+					(*it)->Received(this, at);
+					break;
+				}
+			}
+		}
+		//遺体との接触判定
+		{
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			auto targets = ge->GetTask_Group_G<BChara>("遺体");
+			for (auto it = targets->begin();
+				it != targets->end();
+				++it) {
+				//相手に接触の有無を確認させる
+				if ((*it)->CheckHit(me)) {
+					//相手にダメージの処理を行わせる
+					BChara::AttackInfo at = { 1,0,0 };
 					(*it)->Received(this, at);
 					break;
 				}
@@ -125,10 +141,11 @@ namespace  Player
 		if (nullptr != map) {
 			map->AjastCameraPos();
 		}
-		//hp0でタスクキル
+		//hp0でゲームオーバー
 		if (this->hp <= 0)
 		{
-			this->Kill();
+			//ゲームオーバーフラグ成立
+			ge->failure = true;
 		}
 		//仮ゴールとの接触判定
 		auto goal = ge->GetTask_One_G<Goal::Object>("ゴール");
@@ -136,7 +153,7 @@ namespace  Player
 		ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
 		if (you.Hit(me))
 		{
-			this->Kill();
+			ge->clear = true;
 		}
 	}
 	//-------------------------------------------------------------------
@@ -162,12 +179,8 @@ namespace  Player
 		if (this->unHitTime > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
-		this->unHitTime = 180;
+		this->unHitTime = this->addUnHitTime;
 		this->hp -= at_.power;	//仮処理
-		if (this->hp <= 0)
-		{
-			this->Kill();
-		}
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4, -9); }
 		else							{ this->moveVec = ML::Vec2(-4, -9); }

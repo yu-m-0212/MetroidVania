@@ -1,28 +1,30 @@
 //-------------------------------------------------------------------
-//UI
+//リトライ
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_UI.h"
-#include  "Task_Player.h"
+#include  "Task_Retry.h"
+#include  "Task_Game.h"
+#include  "Task_Title.h"
+#include  "Task_Corpse.h"
+using namespace ML;
 
-namespace  UI
+namespace  Retry
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->hpImageName = "hpImage";
-		DG::Image_Create(this->hpImageName, "./data/image/ui.png");
-		DG::Font_Create("fontUI", "ＭＳ ゴシック", 16, 32);
+		this->imageName = "retryImage";
+		DG::Font_Create("fontRetry", "HG丸ｺﾞｼｯｸM-PRO", 8, 16);
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->hpImageName);
-		DG::Font_Erase("fontUI");
+		DG::Image_Erase(this->imageName);
+		DG::Font_Erase("fontRetry");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -35,13 +37,7 @@ namespace  UI
 		this->res = Resource::Create();
 
 		//★データ初期化
-		//HPボタン表示用
-		/*for (int i = 0; i < 10; ++i)
-		{
-			this->playerHp[i].active = true;
-			this->playerHp[i].x = 0;
-			this->playerHp[i].y = 32;
-		}*/
+		this->controllerName = "P1";
 		
 		//★タスクの生成
 
@@ -51,11 +47,24 @@ namespace  UI
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
+		auto in = DI::GPad_GetState(this->controllerName);
 		//★データ＆タスク解放
-
-
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
 			//★引き継ぎタスクの生成
+			//リトライ
+			if (in.ST.down)
+			{
+				auto nextTask = Game::Object::Create(true);
+				//リトライする場合は前回の死亡地点に遺体を設置
+				auto corpse = Corpse::Object::Create(true);
+				corpse->pos = this->deadPos;
+			}
+			//タイトルに戻る
+			else if (in.SE.down)
+			{
+				auto nextTask = Title::Object::Create(true);
+			}
 		}
 
 		return  true;
@@ -64,70 +73,26 @@ namespace  UI
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		//HPのボタン表示
-		//auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		//for (int i = 0; i < pl->Get_HP(); ++i)
-		//{
-		//	this->playerHp[i].active = true;
-		//}
-		//for (int j = pl->Get_Max_HP(); j > pl->Get_HP(); --j)
-		//{
-		//	this->playerHp[j].active = false;
-		//}
+		auto in = DI::GPad_GetState(this->controllerName);
+		//スタートセレクトボタンで自身を消滅
+		if (in.ST.down || in.SE.down)
+		{
+			this->Kill();
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		if (ge->debugMode)
-		{
-			ML::Box2D debugBox(200, 100, 600, 600);
-			string debugText =
-				"state = " + to_string(pl->state) + "\n" +
-				"pos.x = " + to_string(pl->pos.x) + "\n" +
-				"pos.y = " + to_string(pl->pos.y) + "\n" +
-				"moveVec.x = " + to_string(pl->moveVec.x) + "\n" +
-				"moveVec.y = " + to_string(pl->moveVec.y) + "\n" +
-				"angle = " + to_string(pl->angle_LR) + "\n"
-				"moveCnt = " + to_string(pl->moveCnt) + "\n" +
-				"unHitTime = " + to_string(pl->unHitTime) + "\n" +
-				"hp=" + to_string(pl->hp) + "\n" +
-				"ge->clear = " + to_string(ge->clear) + "\n" +
-				"ge->failure = " + to_string(ge->failure) + "\n" +
-				"BackSpace/Selectボタンでデバッグモード切替";
-			DG::Font_Draw("fontUI", debugBox, debugText, ML::Color(1, 1, 1, 1));
-		}
-		//以上デバッグ----------------------------------------------------
-		//プレイヤのHP表示
-		//ボタン表示板
-		//for (int i = 0; i < pl->Get_HP(); ++i)
-		//{
-		//	if (this->playerHp[i].active)
-		//	{
-		//		ML::Box2D draw(32 + 32 * i, 32, 32, 32);
-		//		//デバッグ時は表示をずらす
-		//		if (ge->debugMode)
-		//		{
-		//			draw.x += 100;
-		//		}
-		//		ML::Box2D src(0, 0, 32, 32);
-		//		//残り体力によって色を指定する
-		//		float red = 1.0f - 0.1f * i;
-		//		float blue = 0.1f + 0.1f * i;
-		//		DG::Image_Draw(this->res->hpImageName, draw, src, ML::Color(1.0f, red, 0.0f, blue));
-		//	}
-		//}
-		//プレイヤのHP表示
-		//バーで表示
-		ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
-		//デバッグ時は表示をずらす
-		if (ge->debugMode)
-		{
-			draw.x += 100;
-		}
-		ML::Box2D  src(32, 0, 32, 32);
-		DG::Image_Draw(this->res->hpImageName, draw, src);
+		Box2D textBox(ge->screenWidth / 2 - 125, ge->screenHeight / 2, 250, 250);
+		string	 textJp = "スタートボタンで続行\nセレクトボタンでタイトルへ戻る";
+		DG::Font_Draw("fontRetry", textBox, textJp, Color(1.0f, 0.0f, 0.0f, 0.0f));
+	}
+	//死亡した座標を保存する
+	//引数	：	（Vec2)
+	void Object::Set_DeadPos(const Vec2& dead_)
+	{
+		this->deadPos = dead_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
