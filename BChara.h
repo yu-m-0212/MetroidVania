@@ -39,6 +39,9 @@ public:
 		TakeOff,		//	飛び立つ瞬間
 		Bound,			//	ダメージを受けて吹き飛んでいる
 		Lose,			//	消える・昇天
+		//以下、エフェクトタスク表示用
+		ImpactPunch,	//	パンチを当てた時の衝撃
+		Heal,			//	遺体から回復
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };

@@ -5,6 +5,7 @@
 #include  "Task_Map2D.h"
 #include  "Task_Shot00.h"
 #include  "Task_Player.h"
+#include  "Task_Effect.h"
 
 namespace  Shot00
 {
@@ -50,7 +51,6 @@ namespace  Shot00
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -61,13 +61,7 @@ namespace  Shot00
 		this->moveCnt++;
 		//各状態ごとの処理
 		this->Move();
-		//★データ＆タスク解放
-		//限界の時間を迎えたら消滅
-		if (this->moveCnt >= this->cntLimit) {
-			//消滅申請
-			this->Kill();
-			return;
-		}
+		
 		//移動
 		this->pos += this->moveVec;
 		//当たり判定
@@ -86,7 +80,20 @@ namespace  Shot00
 					//格闘は複数体にあたる
 					if (this->eraseFlag)
 					{
+						//対応したヒット時のエフェクトを生成
+						//現状、引数には対象の敵の座標をいれる
+						this->Effect_Hit((*it)->pos);
 						this->Kill();
+					}
+					else
+					{
+						//対応したヒット時のエフェクトを生成
+						//現状、引数には対象の敵の座標をいれる
+						//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
+						if ((*it)->moveCnt == 0)
+						{
+							this->Effect_Hit((*it)->pos);
+						}
 					}
 					break;
 				}
@@ -97,13 +104,19 @@ namespace  Shot00
 		{
 			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) {
 				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
-				if (true == map->CheckHit(hit)) {
-					//消滅申請
+				if (true == map->CheckHit(hit))
+				{
+					//対応したヒット時のエフェクトを生成し消滅する
+					this->Effect_Hit(this->pos);
 					this->Kill();
-					//消滅時、エフェクトを生成する場合はここに記述する
-					return;
 				}
 			}
+		}
+		//限界の時間を迎えたら消滅
+		if (this->moveCnt >= this->cntLimit) {
+			//消滅申請
+			this->Kill();
+			return;
 		}
 	}
 	//-------------------------------------------------------------------
@@ -200,6 +213,81 @@ namespace  Shot00
 			//敵に衝突したとき消えるか否か
 			this->eraseFlag = true;
 			break;
+		}
+	}
+	//消滅する際、状態に応じてエフェクトを生成
+	//引数	：	（エフェクトを生成する座標）
+	//caseの中で宣言したローカル変数のスコープがswitch文全体に及ぶ恐れがある為
+	//意図的にブロック{}を設けること
+	void Object::Effect_Hit(const ML::Vec2& pos_)
+	{
+		switch (this->state)
+		{
+		default:
+			break;
+		case Punch1:
+		{
+			auto ImpactPunchEffect1 = Effect::Object::Create(true);
+			ImpactPunchEffect1->pos = this->pos;
+			ImpactPunchEffect1->Set_Limit(18);
+			ImpactPunchEffect1->state = ImpactPunch;
+			ImpactPunchEffect1->angle_LR = this->angle_LR;
+			break;
+		}
+		case Punch2:
+		{
+			auto ImpactPunchEffect2 = Effect::Object::Create(true);
+			ImpactPunchEffect2->pos = this->pos;
+			ImpactPunchEffect2->Set_Limit(18);
+			ImpactPunchEffect2->state = ImpactPunch;
+			ImpactPunchEffect2->angle_LR = this->angle_LR;
+			break;
+		}
+		case StompLanding:
+		{
+			auto StompLandingHitEffect = Effect::Object::Create(true);
+			//範囲攻撃は敵の位置を基準にエフェクトを生成する
+			StompLandingHitEffect->pos = pos_;
+			StompLandingHitEffect->Set_Limit(18);
+			StompLandingHitEffect->state = ImpactPunch;
+			//範囲攻撃は弾と敵との位置関係で左右を決める
+			if (this->pos.x - pos_.x > 0)
+			{
+				StompLandingHitEffect->angle_LR = Left;
+			}
+			else
+			{
+				StompLandingHitEffect->angle_LR = Right;
+			}
+			break;
+		}
+		case Shoot:
+		{
+			auto ShootHitEffect = Effect::Object::Create(true);
+			ShootHitEffect->pos = pos_;
+			ShootHitEffect->Set_Limit(18);
+			ShootHitEffect->state = ImpactPunch;
+			ShootHitEffect->angle_LR = this->angle_LR;
+			break;
+		}
+		case Air:
+		{
+			auto AirHitEffect = Effect::Object::Create(true);
+			AirHitEffect->pos = pos_;
+			AirHitEffect->Set_Limit(18);
+			AirHitEffect->state = ImpactPunch;
+			AirHitEffect->angle_LR = this->angle_LR;
+			break;
+		}
+		case Airshoot:
+		{
+			auto AirshootHitEffect = Effect::Object::Create(true);
+			AirshootHitEffect->pos = pos_;
+			AirshootHitEffect->Set_Limit(18);
+			AirshootHitEffect->state = ImpactPunch;
+			AirshootHitEffect->angle_LR = this->angle_LR;
+			break;
+		}
 		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

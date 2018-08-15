@@ -67,5 +67,8 @@ namespace  Shot00
 		void Set_Power(const int&);
 		//状態ごとに行動を指定する
 		void Move();
+		//消滅する際、状態に応じてエフェクトを生成
+		//引数	：	（エフェクトを生成する座標）
+		void Effect_Hit(const ML::Vec2&);
 	};
 }

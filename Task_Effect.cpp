@@ -91,12 +91,19 @@ namespace  Effect
 		//各エフェクトをテーブルで用意する
 		BChara::DrawInfo imageTable[]
 		{
-			{Box2D(-96, -64, 192, 128),Box2D(  0,   0, 192, 128),dc},//ストンプ着地の衝撃1	[0]
-			{Box2D(-96, -64, 192, 128),Box2D(  0, 128, 192, 128),dc},//ストンプ着地の衝撃2	[1]
-			{Box2D(-96, -64, 192, 128),Box2D(  0, 256, 192, 128),dc},//ストンプ着地の衝撃3	[2]
-			{Box2D(-96, -64, 192, 128),Box2D(192,   0, 192, 128),dc},//パンチ風切り1			[3]
-			{Box2D(-96, -64, 192, 128),Box2D(192, 128, 192, 128),dc},//パンチ風切り2			[4]
-			{Box2D(-96, -64, 192, 128),Box2D(192, 256, 192, 128),dc} //パンチ風切り3			[5]
+			{Box2D(-96, -64, 192, 128),Box2D(  0,   0, 192, 128),dc},//ストンプ着地の衝撃1	[ 0]
+			{Box2D(-96, -64, 192, 128),Box2D(  0, 128, 192, 128),dc},//ストンプ着地の衝撃2	[ 1]
+			{Box2D(-96, -64, 192, 128),Box2D(  0, 256, 192, 128),dc},//ストンプ着地の衝撃3	[ 2]
+			{Box2D(-96, -64, 192, 128),Box2D(192,   0, 192, 128),dc},//パンチ風切り1			[ 3]
+			{Box2D(-96, -64, 192, 128),Box2D(192, 128, 192, 128),dc},//パンチ風切り2			[ 4]
+			{Box2D(-96, -64, 192, 128),Box2D(192, 256, 192, 128),dc},//パンチ風切り3			[ 5]
+			{Box2D(-96, -64, 192, 128),Box2D(384,   0, 192, 128),dc},//パンチの衝撃1			[ 6]
+			{Box2D(-96, -64, 192, 128),Box2D(384, 128, 192, 128),dc},//パンチの衝撃2			[ 7]
+			{Box2D(-96, -64, 192, 128),Box2D(384, 256, 192, 128),dc},//パンチの衝撃3			[ 8]
+			{Box2D(-96, -64, 192, 128),Box2D(576,   0, 192, 128),dc},//遺体から回復1			[ 9]
+			{Box2D(-96, -64, 192, 128),Box2D(576, 128, 192, 128),dc},//遺体から回復2			[10]
+			{Box2D(-96, -64, 192, 128),Box2D(576, 256, 192, 128),dc} //遺体から回復3			[11]
+
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -116,14 +123,29 @@ namespace  Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt + 3];
 			break;
+		case Punch2:
+			effectCnt = this->animCnt / 6;
+			effectCnt %= 3;
+			rtv = imageTable[effectCnt + 3];
+			break;
+		case ImpactPunch:
+			effectCnt = this->animCnt / 6;
+			effectCnt %= 3;
+			rtv = imageTable[effectCnt + 6];
+			break;
 		case StompLanding:
 			effectCnt	= this->animCnt / 6;
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt+0];
 			break;
+		case Heal:
+			effectCnt	= this->animCnt / 8;
+			effectCnt %= 3;
+			rtv = imageTable[effectCnt+9];
+			break;
 		}
 		//	向きに応じて画像を左右反転する
-		if (false == pl->angle_LR)
+		if (this->angle_LR == Left)
 		{
 			rtv.draw.x = -rtv.draw.x;
 			rtv.draw.w = -rtv.draw.w;

@@ -77,7 +77,6 @@ namespace  Enemy01
 		//めり込まない移動
 		ML::Vec2 est = this->moveVec;
 		this->CheckMove(est);
-
 		//当たり判定
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
@@ -125,8 +124,17 @@ namespace  Enemy01
 		if (this->unHitTime > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
+		this->hp -= at_.power;
+		//射撃の時はノックバックせず、無敵時間が発生しない
+		//倒されたときはアクションを起こす
+		if (this->hp > 0)
+		{
+			if (from_->state == Shoot || from_->state == Airshoot)
+			{
+				return;
+			}
+		}
 		this->unHitTime = 30;//無敵時間
-		this->hp -= at_.power;//弾のhp
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4, -9); }
 		else { this->moveVec = ML::Vec2(-4, -9); }
@@ -254,20 +262,29 @@ namespace  Enemy01
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw						src
-			{ ML::Box2D(-32,-24,64,48),ML::Box2D(0,0,64,48),dc },//停止
-		{ ML::Box2D(-32,-32,64,64),ML::Box2D(128,48,64,64),dc },//落下
-		{ ML::Box2D(-32,-32,64,64),ML::Box2D(0,116,64,64),dc }//ダメージ
+			{ ML::Box2D(-32,-24,64,48),ML::Box2D(  0,  0,64,48),dc },	//停止1
+			{ ML::Box2D(-32,-24,64,48),ML::Box2D( 64,  0,64,48),dc },	//停止2
+			{ ML::Box2D(-32,-32,64,64),ML::Box2D(128, 48,64,64),dc },	//落下
+			{ ML::Box2D(-32,-32,64,64),ML::Box2D(  0,116,64,64),dc }	//ダメージ
 		};
 		BChara::DrawInfo rtv;
-		/*int work;*/
+		int anim = 0;
 		switch (this->state) {
 		default:	rtv = imageTable[0];	break;
 			//	ジャンプ------------------------------------------------------------------------
 		case  Jump:		rtv = imageTable[0];	break;
 			//	停止----------------------------------------------------------------------------
-		case  Stand:	rtv = imageTable[0];	break;
+		case  Stand:
+			anim = this->animCnt / 24;
+			anim %= 2;
+			rtv = imageTable[anim + 0];
+			break;
 			//	歩行----------------------------------------------------------------------------
-		case  Walk:		rtv = imageTable[0];	break;
+		case  Walk:
+			anim = this->animCnt / 24;
+			anim %= 2;
+			rtv = imageTable[anim + 0];	
+			break;
 			//	落下----------------------------------------------------------------------------
 		case  Fall:		rtv = imageTable[1];	break;
 			//	ダメージ------------------------------------------------------------------------

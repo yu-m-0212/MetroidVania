@@ -120,6 +120,11 @@ namespace  Player
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 1,0,0 };
 					(*it)->Received(this, at);
+					//回復エフェクトを生成
+					auto healEffect = Effect::Object::Create(true);
+					healEffect->pos = this->pos;
+					healEffect->Set_Limit(24);
+					healEffect->state = Heal;
 					break;
 				}
 			}
@@ -194,13 +199,13 @@ namespace  Player
 		BChara::State  nm = this->state;	//とりあえず今の状態を指定
 		//コントローラの宣言
 		auto in = DI::GPad_GetState(this->controllerName);
-
 		//思考（入力）や状況に応じてモーションを変更する事を目的としている。
 		//モーションの変更以外の処理は行わない
 		switch (nm) {
 		case  Stand:	//立っている
-			if (in.LStick.L.on) { nm = Walk; }
-			if (in.LStick.R.on) { nm = Walk; }
+			//押した瞬間は方向転換のみ行う
+			if (in.LStick.L.on && this->moveCnt >= 6) { nm = Walk; }
+			if (in.LStick.R.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.L1.down) { nm = Shoot; }
 			if (in.R1.down) { nm = Punch1; }
@@ -361,6 +366,17 @@ namespace  Player
 		switch (this->state) 
 		{
 		case  Stand:	//立っている
+			//方向だけ変える
+			if (in.LStick.L.down)
+			{
+				this->moveCnt = 0;
+				this->angle_LR = Left;
+			}
+			if (in.LStick.R.down)
+			{
+				this->moveCnt = 0;
+				this->angle_LR = Right;
+			}
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.on)
@@ -427,25 +443,27 @@ namespace  Player
 				punch1->Set_Limit(this->meleeCnt);
 				punch1->Set_Erase(0);
 				punch1->Set_Power(2);
+				punch1->angle_LR = this->angle_LR;
 				//エフェクトの呼び出し
 				auto punch1Effect = Effect::Object::Create(true);
 				punch1Effect->state = Punch1;
 				punch1Effect->Set_Limit(18);
 				punch1Effect->pos = this->pos;
+				punch1Effect->angle_LR = this->angle_LR;
 				//以下プレイヤの左右によって変化する
-				if (this->angle_LR == Right)
-				{
-					//初期座標をプレイヤの目の前に指定
-					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					//攻撃時に前進する
-					this->moveVec.x = this->slide;
-				}
-				else 
+				if (this->angle_LR == Left)
 				{
 					//初期座標をプレイヤの目の前に指定
 					punch1->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
+				}
+				else 
+				{
+					//初期座標をプレイヤの目の前に指定
+					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					//攻撃時に前進する
+					this->moveVec.x = +this->slide;
 				}
 			}
 			//目の前に足場がなければ前進をやめる(足場から落下しない)
@@ -456,7 +474,8 @@ namespace  Player
 			break;
 		case Punch2:
 			//目の前にパンチ矩形を生成
-			if (this->moveCnt == 0) {
+			if (this->moveCnt == 0) 
+			{
 				auto punch2 = Shot00::Object::Create(true);
 				//呼び出した判定矩形に思考させるため状態を指定
 				punch2->state = Punch2;
@@ -465,20 +484,27 @@ namespace  Player
 				punch2->Set_Limit(this->meleeCnt);
 				punch2->Set_Erase(0);
 				punch2->Set_Power(2);
+				punch2->angle_LR = this->angle_LR;
+				//エフェクトの呼び出し
+				auto punch2Effect = Effect::Object::Create(true);
+				punch2Effect->state = Punch2;
+				punch2Effect->Set_Limit(18);
+				punch2Effect->pos = this->pos;
+				punch2Effect->angle_LR = this->angle_LR;
 				//以下プレイヤの左右によって変化する
-				if (this->angle_LR == Right)
-				{
-					//初期座標をプレイヤの目の前に指定
-					punch2->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					//攻撃時に前進する
-					this->moveVec.x = this->slide;
-				}
-				else
+				if (this->angle_LR == Left)
 				{
 					//初期座標をプレイヤの目の前に指定
 					punch2->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
+				}
+				else
+				{
+					//初期座標をプレイヤの目の前に指定
+					punch2->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					//攻撃時に前進する
+					this->moveVec.x = +this->slide;
 				}
 			}
 			//目の前に足場がなければ前進をやめる(足場から落下しない)
@@ -504,6 +530,7 @@ namespace  Player
 			{
 				//足元に攻撃矩形を生成
 				auto stompLandingRect = Shot00::Object::Create(true);
+				stompLandingRect->state = StompLanding;
 				//攻撃毎に攻撃範囲を生成時に指定
 				stompLandingRect->hitBase = ML::Box2D(-96, -32, 192, 64);
 				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 2);
@@ -535,6 +562,7 @@ namespace  Player
 					bunker->moveVec = ML::Vec2(0, 0);
 					bunker->Set_Limit(this->meleeCnt);
 					bunker->Set_Erase(0);
+					bunker->angle_LR = this->angle_LR;
 				}
 				else {
 					auto bunker = Shot00::Object::Create(true);
@@ -544,6 +572,7 @@ namespace  Player
 					bunker->moveVec = ML::Vec2(0, 0);
 					bunker->Set_Limit(this->meleeCnt);
 					bunker->Set_Erase(0);
+					bunker->angle_LR = this->angle_LR;
 				}
 			}
 			break;
@@ -569,7 +598,7 @@ namespace  Player
 				shot->Set_Limit(30);
 				shot->Set_Erase(1);
 				shot->Set_Power(1);
-
+				shot->angle_LR = this->angle_LR;
 				if (this->angle_LR == Right)
 				{
 					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
@@ -601,6 +630,7 @@ namespace  Player
 				air->Set_Limit(this->meleeCnt);
 				air->Set_Erase(0);
 				air->Set_Power(3);
+				air->angle_LR = this->angle_LR;
 				//以下プレイヤの左右によって変化する
 				if (this->angle_LR == Right) 
 				{
@@ -624,29 +654,25 @@ namespace  Player
 			}
 			//空中射撃
 			//4フレーム目で弾を発射
-			if (this->moveCnt == 4) 
+			if (this->moveCnt == 4)
 			{
 				auto shot = Shot00::Object::Create(true);
-				if (this->angle_LR == Right) 
+				//攻撃毎に攻撃範囲を生成時に指定
+				shot->hitBase = ML::Box2D(-32, -32, 64, 64);
+				shot->state = Airshoot;
+				shot->Set_Limit(30);
+				shot->Set_Erase(1);
+				shot->Set_Power(1);
+				shot->angle_LR = this->angle_LR;
+				if (this->angle_LR == Left)
 				{
-					shot->state = Airshoot;
-					//攻撃毎に攻撃範囲を生成時に指定
-					shot->hitBase = ML::Box2D(-32, -32, 64, 64);
-					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
-					shot->Set_Limit(30);
-					shot->Set_Erase(1);
-					shot->Set_Power(1);
+					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
 				}
 				else
 				{
-					shot->state = Airshoot;
-					//攻撃毎に攻撃範囲を生成時に指定
-					shot->hitBase = ML::Box2D(-32, -32, 64, 64);
-					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
-					shot->Set_Limit(30);
-					shot->Set_Erase(1);
+					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
 				}
 			}
 			break;
