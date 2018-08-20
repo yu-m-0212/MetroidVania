@@ -36,10 +36,10 @@ namespace  Shot00
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.4f;
+		this->recieveBase = this->hitBase;
 		this->eraseFlag = true;
 		this->power = 0;			
 		this->cntLimit = 0;			//消滅するまでの時間
-
 		//★タスクの生成
 
 		return  true;
@@ -102,7 +102,8 @@ namespace  Shot00
 		//射撃は壁に当たると消滅する
 		if (this->eraseFlag)
 		{
-			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) {
+			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) 
+			{
 				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
 				if (true == map->CheckHit(hit))
 				{
@@ -113,7 +114,8 @@ namespace  Shot00
 			}
 		}
 		//限界の時間を迎えたら消滅
-		if (this->moveCnt >= this->cntLimit) {
+		if (this->moveCnt >= this->cntLimit)
+		{
 			//消滅申請
 			this->Kill();
 			return;
@@ -160,7 +162,7 @@ namespace  Shot00
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
-			if (pl->CheckFront_LR())
+			if (pl->CheckFront_LR() || pl->CheckBack_LR())
 			{
 				this->moveVec.x = 0.0f;
 			}
@@ -177,7 +179,7 @@ namespace  Shot00
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
-			if (pl->CheckFront_LR())
+			if (pl->CheckFront_LR() || pl->CheckBack_LR())
 			{
 				this->moveVec.x = 0.0f;
 			}
@@ -186,6 +188,13 @@ namespace  Shot00
 			{
 				this->Kill();
 				return;
+			}
+			break;
+		case StompLanding:
+			this->eraseFlag = false;
+			if (pl->state == Damage)
+			{
+				this->Kill();
 			}
 			break;
 		case Shoot:
@@ -198,7 +207,7 @@ namespace  Shot00
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
-			if (pl->CheckFront_LR())
+			if (pl->CheckFront_LR() || pl->CheckBack_LR())
 			{
 				this->moveVec.x = 0.0f;
 			}

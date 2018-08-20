@@ -1,17 +1,16 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//エフェクト
+//エネミーの発生させる判定矩形(弾）
 //-------------------------------------------------------------------
 #include "BChara.h"
-using namespace ML;
 
-namespace  Effect
+namespace  Shot01
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("エフェクト");	//グループ名
-	const  string  defName("NoName");			//タスク名
-	//-------------------------------------------------------------------
+	const  string  defGroupName("弾");	//グループ名
+	const  string  defName("NoName");				//タスク名
+	//-------------------------------------------------------------------//リソース
 	class  Resource
 	{
 		bool  Initialize();
@@ -23,13 +22,12 @@ namespace  Effect
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
-		//共有する変数はここに追加する
-		string effectImage;
+		string imageName;
 	};
-	//-------------------------------------------------------------------
+	//-------------------------------------------------------------------//オブジェクト
 	class  Object : public  BChara
 	{
-	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+		//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
 		virtual  ~Object();
 		typedef  shared_ptr<Object>		SP;
@@ -45,37 +43,32 @@ namespace  Effect
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		//追加変数
+		//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		//変数
 
-		//消滅までの時間
+		//壁や敵に衝突したとき、消滅するか否か
+		//shotは消える、meleeは消えない
+		bool eraseFlag;
+		//消滅するまでの時間
 		int cntLimit;
-		//撃破エフェクトの中心からの距離
-		float dist;
-		//表示する角度
-		float angle;
-		//回転軸
-		Vec2 center;
+		//攻撃力
+		int power;
 	public:
 		//追加したい変数・メソッドはここに追加する
 
-		//呼び出す際に消滅までの時間を指定する
-		//引数	：	（消滅までの時間）
+		//攻撃毎に寿命を設ける際に使用
+		//引数	：	（寿命）
 		void Set_Limit(const int&);
-		//中心点から広がるエフェクトを呼び出す際、中心からの初期位置を指定する
-		//引数	：	（中心点からの初期位置)
-		void Set_Dist(const float&);
-		//表示する角度を指定する
-		//引数	：	 (ML::ToRadian(角度))
-		void Set_Angle(const float&);
-		//回転の中心を外部から指定する
-		//引数	：	（中心座標）
-		void Set_Center(const Vec2&);
-		//中心点から広がるエフェクトの中心からの距離を取得する
-		float Get_Dist();
+		//壁や敵に衝突したとき、消えるか否かを指定する
+		//引数	：	（0か1）
+		void Set_Erase(const int&);
+		//外部から生成する際、攻撃力を指定
+		//引数	：	（整数値）
+		void Set_Power(const int&);
 		//状態ごとに行動を指定する
 		void Move();
-		//アニメーション
-		BChara::DrawInfo Anim();
+		//消滅する際、状態に応じてエフェクトを生成
+		//引数	：	（エフェクトを生成する座標）
+		void Effect_Hit(const ML::Vec2&);
 	};
 }

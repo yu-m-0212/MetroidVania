@@ -17,6 +17,7 @@
 #include  "Task_Item01.h"
 #include  "Task_Item02.h"
 #include  "Task_Goal.h"
+#include  "Task_EnemySearch.h"
 
 namespace  Game
 {
@@ -55,11 +56,11 @@ namespace  Game
 		//šƒ^ƒXƒN‚Ì¶¬
 		//ƒ}ƒbƒv‚Ì¶¬
 		auto  m = Map2D::Object::Create(true);
-		m->Load("./data/Map/map0.txt");
+		m->Load("./data/Map/map1.txt");
 		//ƒvƒŒƒCƒ„‚Ì¶¬
 		auto  pl = Player::Object::Create(true);
 		pl->pos.x = 770;
-		pl->pos.y = 2200;
+		pl->pos.y = 1000;
 		//—d¸‚Ì¶¬
 		auto  spr = Sprite::Object::Create(true);
 		spr->pos = pl->pos;
@@ -68,43 +69,43 @@ namespace  Game
 		//“G‚Ì¶¬
 		auto ene0 = Enemy01::Object::Create(true);
 		ene0->pos.x = 1000.0f;
-		ene0->pos.y = 2400.0f;
+		ene0->pos.y = /*2400.0*/0.0f;
 		ene0->hp = 5;
-		//“G‚Ì¶¬
-		auto ene1 = Enemy01::Object::Create(true);
-		ene1->pos.x = 5535.0f;
-		ene1->pos.y = 3712.0f;
-		ene1->hp = 5;
-		//“G‚Ì¶¬
-		auto ene2 = Enemy01::Object::Create(true);
-		ene2->pos.x = 4769.0f;
-		ene2->pos.y = 3712.0f;
-		ene2->hp = 5;
-		//“G‚Ì¶¬
-		auto ene3 = Enemy01::Object::Create(true);
-		ene3->pos.x = 3299.0f;
-		ene3->pos.y = 3712.0f;
-		ene3->hp = 5;
-		//“G‚Ì¶¬
-		auto ene4 = Enemy01::Object::Create(true);
-		ene4->pos.x = 2339.0f;
-		ene4->pos.y = 3456.0f;
-		ene4->hp = 5;
-		//“G‚Ì¶¬
-		auto ene5 = Enemy01::Object::Create(true);
-		ene5->pos.x = 1340.0f;
-		ene5->pos.y = 3072.0f;
-		ene5->hp = 5;
-		//“G‚Ì¶¬
-		auto ene6 = Enemy01::Object::Create(true);
-		ene6->pos.x =  836.0f;
-		ene6->pos.y = 3392.0f;
-		ene6->hp = 5;
-		//“G‚Ì¶¬
-		auto ene7 = Enemy01::Object::Create(true);
-		ene7->pos.x =  966.0f;
-		ene7->pos.y = 3776.0f;
-		ene7->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene1 = Enemy01::Object::Create(true);
+		//ene1->pos.x = 5535.0f;
+		//ene1->pos.y = 3712.0f;
+		//ene1->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene2 = Enemy01::Object::Create(true);
+		//ene2->pos.x = 4769.0f;
+		//ene2->pos.y = 3712.0f;
+		//ene2->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene3 = Enemy01::Object::Create(true);
+		//ene3->pos.x = 3299.0f;
+		//ene3->pos.y = 3712.0f;
+		//ene3->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene4 = Enemy01::Object::Create(true);
+		//ene4->pos.x = 2339.0f;
+		//ene4->pos.y = 3456.0f;
+		//ene4->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene5 = Enemy01::Object::Create(true);
+		//ene5->pos.x = 1340.0f;
+		//ene5->pos.y = 3072.0f;
+		//ene5->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene6 = Enemy01::Object::Create(true);
+		//ene6->pos.x =  836.0f;
+		//ene6->pos.y = 3392.0f;
+		//ene6->hp = 5;
+		////“G‚Ì¶¬
+		//auto ene7 = Enemy01::Object::Create(true);
+		//ene7->pos.x =  966.0f;
+		//ene7->pos.y = 3776.0f;
+		//ene7->hp = 5;
 		//UI‚Ì¶¬
 		auto ui = UI::Object::Create(true);
 		//”wŒi‚Ì¶¬
@@ -122,6 +123,8 @@ namespace  Game
 		ge->KillAll_G("ƒtƒB[ƒ‹ƒh");
 		ge->KillAll_G("ƒvƒŒƒCƒ„");
 		ge->KillAll_G("“G");
+		ge->KillAll_G("“GƒIƒvƒVƒ‡ƒ“");
+		ge->KillAll_G("’e");
 		ge->KillAll_G("ƒIƒvƒVƒ‡ƒ“");
 		ge->KillAll_G("ƒAƒCƒeƒ€");
 		ge->KillAll_G("UI");
@@ -153,7 +156,6 @@ namespace  Game
 				retry->Set_DeadPos(this->deadPos);
 			}
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------

@@ -106,6 +106,7 @@
     <ClCompile Include="Task_Ending.cpp" />
     <ClCompile Include="Task_Enemy00.cpp" />
     <ClCompile Include="Task_Enemy01.cpp" />
+    <ClCompile Include="Task_EnemySearch.cpp" />
     <ClCompile Include="Task_Game.cpp" />
     <ClCompile Include="Task_Goal.cpp" />
     <ClCompile Include="Task_Item00.cpp" />
@@ -115,6 +116,7 @@
     <ClCompile Include="Task_Player.cpp" />
     <ClCompile Include="Task_Retry.cpp" />
     <ClCompile Include="Task_Shot00.cpp" />
+    <ClCompile Include="Task_Shot01.cpp" />
     <ClCompile Include="Task_Sprite.cpp" />
     <ClCompile Include="Task_Title.cpp" />
     <ClCompile Include="Task_UI.cpp" />
@@ -145,6 +147,7 @@
     <ClInclude Include="Task_Ending.h" />
     <ClInclude Include="Task_Enemy00.h" />
     <ClInclude Include="Task_Enemy01.h" />
+    <ClInclude Include="Task_EnemySearch.h" />
     <ClInclude Include="Task_Game.h" />
     <ClInclude Include="Task_Goal.h" />
     <ClInclude Include="Task_Item00.h" />
@@ -154,6 +157,7 @@
     <ClInclude Include="Task_Player.h" />
     <ClInclude Include="Task_Retry.h" />
     <ClInclude Include="Task_Shot00.h" />
+    <ClInclude Include="Task_Shot01.h" />
     <ClInclude Include="Task_Sprite.h" />
     <ClInclude Include="Task_Title.h" />
     <ClInclude Include="Task_UI.h" />

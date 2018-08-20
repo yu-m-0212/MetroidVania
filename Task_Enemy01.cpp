@@ -1,10 +1,14 @@
 //-------------------------------------------------------------------
 //敵00(スライム
 //-------------------------------------------------------------------
-#include  "MyPG.h"
-#include  "Task_Shot00.h"
-#include  "Task_Enemy01.h"
-#include  "Task_Map2D.h"
+#include	"MyPG.h"
+#include	"Task_Shot00.h"
+#include	"Task_Shot01.h"
+#include	"Task_Enemy01.h"
+#include	"Task_Map2D.h"
+#include	"Task_Effect.h"
+#include	"Task_Player.h"
+#include	"Task_EnemySearch.h"
 
 namespace  Enemy01
 {
@@ -14,7 +18,7 @@ namespace  Enemy01
 	bool  Resource::Initialize()
 	{
 		this->imageName = "Enemy01Img";
-		DG::Image_Create(this->imageName, "./data/image/Enemy01.png");
+		DG::Image_Create(this->imageName, "./data/image/enemy.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -35,18 +39,23 @@ namespace  Enemy01
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.6f;
-		this->hitBase = ML::Box2D(-28, -22, 56, 45);
+		this->hitBase = ML::Box2D(-96,-96,192,192);
+		this->recieveBase = ML::Box2D(-32, -46, 64, 92);
 		this->angle_LR = Left;
 		this->state = Stand;
-		/*this->hp = 20;*/				//hp初期値
-		this->maxSpeed = 2.0f;		//最大移動速度(横)
-		/*this->addSpeed = 0.7f;*/		//歩行加速度(地面の影響である程度打ち消される
-		this->decSpeed = 0.5f;		//接地状態の時の速度減衰量(摩擦
-		this->maxFallSpeed = 10.0f;	//最大落下速度
-		this->jumpPow = -6.0f;		//ジャンプ力(初速)
-		this->gravity = ML::Gravity(32) * 5;	//重力加速度&時間速度による加算量
-		
+		this->maxSpeed = 2.0f;							//最大移動速度(横)
+		this->addSpeed = 0.7f;							//歩行加速度(地面の影響である程度打ち消される
+		this->decSpeed = 0.5f;							//接地状態の時の速度減衰量(摩擦
+		this->maxFallSpeed = 10.0f;						//最大落下速度
+		this->jumpPow = -6.0f;							//ジャンプ力(初速)
+		this->gravity = ML::Gravity(32) * 5;			//重力加速度&時間速度による加算量
+		this->interval_Caution = 180;
+		this->interval_Attack = 120;
+		this->searchBase = ML::Box2D(-192, -96, 384, 192);
+		this->shot_Init = ML::Vec2(0, -45);
 		//★タスクの生成
+		//視認表示矩形の生成
+		auto es = EnemySearch::Object::Create(true);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -54,12 +63,16 @@ namespace  Enemy01
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
-
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
 			//★引き継ぎタスクの生成
 		}
-
+		//撃破エフェクトの生成
+		auto DefeatEffect = Effect::Object::Create(true);
+		DefeatEffect->pos = this->pos;
+		DefeatEffect->Set_Limit(24);
+		DefeatEffect->state = Lose;
+		DefeatEffect->angle_LR = this->angle_LR;
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -78,8 +91,10 @@ namespace  Enemy01
 		ML::Vec2 est = this->moveVec;
 		this->CheckMove(est);
 		//当たり判定
+		//自身がやられ状態の時はプレイヤに接触しても攻撃しない
+		if (this->state != Bound)
 		{
-			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			ML::Box2D me = this->recieveBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
 			for (auto it = targets->begin();
 				it != targets->end();
@@ -93,9 +108,10 @@ namespace  Enemy01
 				}
 			}
 		}
-		//HPが0かつ床に触れたら消滅
-		//吹っ飛びも見せてから倒したい
-		if (this->hp <= 0&& this->CheckFoot())
+		//HPが0かつ
+		//床に触れるか一定時間経過で消滅
+		if (this->hp <= 0 &&
+			(this->CheckFoot() || this->moveCnt >= 60))
 		{
 			this->Kill();
 		}
@@ -121,23 +137,44 @@ namespace  Enemy01
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
+		//攻撃を受けた方向を向く
+		if (this->pos.x - from_->pos.x > 0)
+		{
+			this->angle_LR = Left;
+		}
+		else
+		{
+			this->angle_LR = Right;
+		}
 		if (this->unHitTime > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
 		this->hp -= at_.power;
-		//射撃の時はノックバックせず、無敵時間が発生しない
-		//倒されたときはアクションを起こす
-		if (this->hp > 0)
+		//ノックバックの発生しない攻撃の場合、以下を読まない
+		if (from_->tip) { return; }
+		//無敵時間
+		this->unHitTime = 30;
+		//まず範囲攻撃かどうかを判定する
+		if (!from_->wideRange)
 		{
-			if (from_->state == Shoot || from_->state == Airshoot)
+			//吹き飛ばされる
+			this->moveVec = from_->moveBack;
+		}
+		//範囲攻撃の場合は攻撃を受けた瞬間の位置関係で飛ぶ方向を決める
+		else
+		{
+			//自分が右側にいるとき
+			if (this->pos.x - from_->pos.x > 0)
 			{
-				return;
+				this->moveVec = from_->moveBack;
+			}
+			//自分が左側にいるとき
+			else
+			{
+				float x = from_->moveBack.x*(-1);
+				this->moveVec = ML::Vec2(x, from_->moveBack.y);
 			}
 		}
-		this->unHitTime = 30;//無敵時間
-		//吹き飛ばされる
-		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4, -9); }
-		else { this->moveVec = ML::Vec2(-4, -9); }
 		this->UpdateMotion(Bound);
 		//from_は攻撃してきた相手、カウンターなどで逆にダメージを与えたいときに使う
 	}
@@ -146,7 +183,6 @@ namespace  Enemy01
 	void Object::Think()
 	{
 		BChara::State nm = this->state; //とりあえず今の状態を指定
-
 		//思考（入力）や状況に応じてモーションを変更することを目的としている。
 		//モーションの変更以外の処理は行わない
 		switch (nm) {
@@ -155,12 +191,14 @@ namespace  Enemy01
 			else							{ nm = Walk; }//接地で歩きに移行
 			break;
 		case	Walk:	//歩いている
+			if ( this->Search_Player()) { nm = Caution; }
 			if (this->CheckFront_LR() == true) { nm = Turn; }//壁に衝突
 			if (this->CheckFoot() == false) { nm = Fall; }
 			if (this->CheckFrontFoot_LR() == false) { nm = Turn; }
 			break;
 		case	Turn:	//旋回中
 			if (this->moveCnt >= 5) { nm = Stand;}
+			if ( this->Search_Player()) { nm = Caution; }
 			break;
 		case	Jump:	//上昇中
 			if (this->moveVec.y >= 0) { nm = Fall; }
@@ -168,8 +206,9 @@ namespace  Enemy01
 		case	Fall:	//落下中
 			if (this->CheckFoot() == true) { nm = Stand; }
 			break;
-		case	Bound:	//ダメージを受けて吹き飛んでいる
-						//8フレーム経過と接地で「立っている」に戻る
+		case	Bound:
+			//ダメージを受けて吹き飛んでいる
+			//8フレーム経過と接地で「立っている」に戻る
 			if (this->moveCnt >= 8 && this->CheckFoot() == true) { nm = Stand; }
 			break;
 		case	TakeOff://飛び立ち
@@ -177,6 +216,23 @@ namespace  Enemy01
 			break;
 		case	Landing://着地
 			if (this->CheckFoot() == false) { nm = Fall; }
+			break;
+		case Caution:
+			if (! this->Search_Player()) { nm = TargetLost; }
+			else if ( this->Search_Player() && this->moveCnt >= this->interval_Attack) { nm = Shoot; }
+			break;
+		case TargetLost:
+			if ( this->Search_Player()) { nm = Caution; }
+			//発見されずに一定時間経過すると警戒解除
+			if (this->moveCnt >= this->interval_Caution &&
+				! this->Search_Player())
+			{
+				nm = Stand;
+			}
+			break;
+		case Shoot:
+			if (! this->Search_Player()) { nm = TargetLost; }
+			if (this->moveCnt >= 12&&  this->Search_Player()) { nm = Caution; }
 			break;
 		}
 		//モーション更新
@@ -192,7 +248,8 @@ namespace  Enemy01
 		default:
 			//上昇中もしくは足元に地面が無い
 			if (this->moveVec.y < 0 ||
-				this->CheckFoot() == false) {
+				this->CheckFoot() == false) 
+			{
 				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);
 			}
 			//地面に接触している
@@ -221,11 +278,11 @@ namespace  Enemy01
 		}
 		//-------------------------------------------------------------------
 		//モーション毎に固有の処理
-		switch (this->state) {
+		switch (this->state) 
+		{
 		case  Stand:	//立っている
 			break;
 		case  Walk:		//歩いている
-			/*this->maxSpeed = this->maxSpeed * 3;*/
 			if (this->angle_LR == Left) {//横軸移動(徐々に加速)
 				this->moveVec.x =
 					max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
@@ -253,6 +310,39 @@ namespace  Enemy01
 			break;
 		case  Jump:		//上昇中
 			break;
+		case Caution:
+		{
+			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			//プレイヤに向きを変える
+			if (this->pos.x - pl->pos.x > 0)
+			{
+				this->angle_LR = Left;
+			}
+			else
+			{
+				this->angle_LR = Right;
+			}
+			break;
+		}
+		case Shoot:
+			if (this->moveCnt == 0)
+			{
+				auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+				auto shot = Shot01::Object::Create(true);
+				//呼び出した判定矩形に思考させるため状態を指定
+				shot->state = Shoot;
+				shot->hitBase = ML::Box2D(-16, -16, 32, 32);
+				shot->Set_Limit(300);
+				shot->Set_Erase(0);
+				shot->Set_Power(1);
+				shot->angle_LR = this->angle_LR;
+				shot->pos = this->pos + this->shot_Init;
+				//プレイヤに向かって弾を発射
+				ML::Vec2 toTarget = pl->pos - this->pos;
+				float angle = atan2(toTarget.y, toTarget.x);
+				shot->moveVec = ML::Vec2(cos(angle), sin(angle))*8.0f;
+			}
+			break;
 		}
 	}
 	//-----------------------------------------------------------------------------
@@ -262,62 +352,80 @@ namespace  Enemy01
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw						src
-			{ ML::Box2D(-32,-24,64,48),ML::Box2D(  0,  0,64,48),dc },	//停止1
-			{ ML::Box2D(-32,-24,64,48),ML::Box2D( 64,  0,64,48),dc },	//停止2
-			{ ML::Box2D(-32,-32,64,64),ML::Box2D(128, 48,64,64),dc },	//落下
-			{ ML::Box2D(-32,-32,64,64),ML::Box2D(  0,116,64,64),dc }	//ダメージ
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(  0,  0,192,192),dc },	//待機		[0]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,  0,192,192),dc },	//歩行1		[1]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,192,192,192),dc },	//歩行2		[2]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,384,192,192),dc },	//歩行3		[3]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,576,192,192),dc },	//歩行4		[4]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(384,  0,192,192),dc },	//ターン		[5]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(576,  0,192,192),dc },	//射撃01		[6]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(576,192,192,192),dc },	//射撃02		[7]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(768,  0,192,192),dc },	//見失う01	[8]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(768,192,192,192),dc },	//見失う02	[9]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(960,  0,192,192),dc },	//警戒01		[10]
+			{ ML::Box2D(-96,-96,192,192),ML::Box2D(960,192,192,192),dc }	//警戒02		[11]
 		};
 		BChara::DrawInfo rtv;
 		int anim = 0;
 		switch (this->state) {
-		default:	rtv = imageTable[0];	break;
-			//	ジャンプ------------------------------------------------------------------------
-		case  Jump:		rtv = imageTable[0];	break;
-			//	停止----------------------------------------------------------------------------
+		default:		rtv = imageTable[0];	break;
 		case  Stand:
-			anim = this->animCnt / 24;
-			anim %= 2;
-			rtv = imageTable[anim + 0];
+			rtv = imageTable[0];
 			break;
-			//	歩行----------------------------------------------------------------------------
 		case  Walk:
+			anim = this->animCnt / 8;
+			anim %= 4;
+			rtv = imageTable[anim + 1];	
+			break;
+		case Turn:		rtv = imageTable[5];	break;
+		case Shoot:
+			anim = this->animCnt / 6;
+			anim %= 2;
+			rtv = imageTable[anim + 6];
+			break;
+		case TargetLost:
 			anim = this->animCnt / 24;
 			anim %= 2;
-			rtv = imageTable[anim + 0];	
+			rtv = imageTable[anim+8];
 			break;
-			//	落下----------------------------------------------------------------------------
-		case  Fall:		rtv = imageTable[1];	break;
-			//	ダメージ------------------------------------------------------------------------
-		case  Bound:	rtv = imageTable[2];	break;
+		case Caution:
+			anim = this->animCnt / 24;
+			anim %= 2;
+			rtv = imageTable[anim+10];
+			break;
 		}
 		//向きに応じて画像を左右反転する
-		//モーションがBoundの時
-		if (this->state == Bound)
-		{
-			auto shot = ge->GetTask_One_G<Shot00::Object>("プレイヤ");
-			//位置関係		弾	| エネミー
-			if (shot->pos.x < this->pos.x)
-			{
-				rtv.src = ML::Box2D(64, 116, -64, 64);
-			}
-			//位置関係	エネミー |	弾
-			else
-			{
-				rtv.src = ML::Box2D(0, 116, 64, 64);
-			}
-		}
-		//モーションがBound以外の時
 		//アングルが変わると画像を反転
-		else
+		if (false == this->angle_LR) 
 		{
-			if (false == this->angle_LR) {
-				rtv.draw.x = -rtv.draw.x;
-				rtv.draw.w = -rtv.draw.w;
-			}
+			rtv.draw.x = -rtv.draw.x;
+			rtv.draw.w = -rtv.draw.w;
 		}
 		return rtv;
 	}
-
+	//プレイヤを発見したら警戒モードに入る
+	bool Object::Search_Player()
+	{
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (pl == nullptr || this == nullptr) { return false; }
+		ML::Box2D you = pl->hitBase.OffsetCopy(pl->pos);
+		ML::Box2D  me = this->searchBase.OffsetCopy(this->pos);
+		//自身の左右で探知矩形をずらす
+		if (this->angle_LR == Left)
+		{
+			me.x -= this->searchBase.w / 2;
+		}
+		else
+		{
+			me.x += this->searchBase.w / 2;
+		}
+		return you.Hit(me);
+	}
+	//探知矩形を取得する
+	ML::Box2D Object::Get_Search()
+	{
+		return this->searchBase;
+	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

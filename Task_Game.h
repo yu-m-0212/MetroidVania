@@ -5,6 +5,8 @@
 //-------------------------------------------------------------------
 #include "GameEngine_Ver3_7.h"
 #include  "Task_Shot00.h"
+#include  "Task_Shot01.h"
+#include  "Task_Effect.h"
 
 namespace  Game
 {
@@ -52,5 +54,7 @@ namespace  Game
 		//追加したい変数・メソッドはここに追加する
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;
+		Shot01::Resource::SP	shot01_Resource;
+		Effect::Resource::SP	effect_Resource;
 	};
 }

@@ -41,6 +41,7 @@ namespace  Player
 		//★データ初期化
 		this->render2D_Priority[1] = 0.5f;
 		this->hitBase = ML::Box2D(-32, -64, 64, 128);
+		this->recieveBase = this->hitBase;
 		this->angle_LR = Right;
 		this->controllerName = "P1";
 		this->state = Stand;				//キャラ初期状態
@@ -50,6 +51,7 @@ namespace  Player
 		this->addSpeed = 1.0f;				//歩行加速度（地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;				//接地状態の時の速度減衰量（摩擦
 		this->maxFallSpeed = 15.0f;			//最大落下速度
+		this->max_StompFallSpeed = 30.0f;	//ストンプの最大降下速度
 		this->jumpPow = -15.0f;				//ジャンプ力（初速）
 		this->gravity = ML::Gravity(64);	//重力加速度＆時間速度による加算量
 		this->reach = 64.0;					//パンチの射程
@@ -275,7 +277,7 @@ namespace  Player
 			break;
 		case Stomp:
 			if (this->CheckFoot()) { nm = StompLanding; }
-			if (!this->CheckFoot() && this->moveCnt >= 30) { nm = Fall; }
+			if (!this->CheckFoot() && this->moveCnt >= 60) { nm = Fall; }
 			break;
 		case StompLanding:
 			if (this->moveCnt >= this->stompHoldTime) { nm = Stand; }
@@ -455,6 +457,8 @@ namespace  Player
 				{
 					//初期座標をプレイヤの目の前に指定
 					punch1->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					//ふっとび量を指定する
+					punch1->moveBack = ML::Vec2(-6, 0);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
 				}
@@ -462,6 +466,8 @@ namespace  Player
 				{
 					//初期座標をプレイヤの目の前に指定
 					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					//ふっとび量を指定する
+					punch1->moveBack = ML::Vec2(+6, 0);
 					//攻撃時に前進する
 					this->moveVec.x = +this->slide;
 				}
@@ -496,6 +502,8 @@ namespace  Player
 				{
 					//初期座標をプレイヤの目の前に指定
 					punch2->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					//ふっとび量を指定する
+					punch2->moveBack = ML::Vec2(-6, 0);
 					//攻撃時に前進する
 					this->moveVec.x = -this->slide;
 				}
@@ -503,6 +511,8 @@ namespace  Player
 				{
 					//初期座標をプレイヤの目の前に指定
 					punch2->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					//ふっとび量を指定する
+					punch2->moveBack = ML::Vec2(+6, 0);
 					//攻撃時に前進する
 					this->moveVec.x = +this->slide;
 				}
@@ -517,12 +527,20 @@ namespace  Player
 			//出だしだけ少し浮かせる
 			if (this->moveCnt == 0)
 			{
-				stompFallSpeed = -3.5f;
 				//無敵時間あり
 				this->unHitTime = 60;
 			}
-			this->stompFallSpeed+=0.5f;
-			this->moveVec.y += stompFallSpeed;
+			else if (this->moveCnt <= 10)
+			{
+				this->moveVec.y = -0.5f;
+			}
+			else if (this->moveCnt > 20)
+			{
+				if (this->moveVec.y <= this->maxFallSpeed)
+				{
+					this->moveVec.y += 1.5f;
+				}
+			}
 			break;
 		case StompLanding:
 			//着地の際、自身の左中右に攻撃
@@ -532,11 +550,15 @@ namespace  Player
 				auto stompLandingRect = Shot00::Object::Create(true);
 				stompLandingRect->state = StompLanding;
 				//攻撃毎に攻撃範囲を生成時に指定
-				stompLandingRect->hitBase = ML::Box2D(-96, -32, 192, 64);
-				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 2);
+				stompLandingRect->hitBase = ML::Box2D(-128, -32, 256, 64);
+				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
 				stompLandingRect->Set_Limit(this->meleeCnt);
 				stompLandingRect->Set_Erase(0);
 				stompLandingRect->Set_Power(5);
+				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
+				stompLandingRect->moveBack = ML::Vec2(8, -9);
+				//範囲攻撃であることを知らせるフラグをtrue
+				stompLandingRect->wideRange = true;
 				//エフェクトの生成
 				//タスクキルはエフェクト側で行う
 				auto stompLandingEffect = Effect::Object::Create(true);
@@ -599,6 +621,7 @@ namespace  Player
 				shot->Set_Erase(1);
 				shot->Set_Power(1);
 				shot->angle_LR = this->angle_LR;
+				shot->tip = true;
 				if (this->angle_LR == Right)
 				{
 					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
@@ -635,10 +658,12 @@ namespace  Player
 				if (this->angle_LR == Right) 
 				{
 					air->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					air->moveBack = ML::Vec2(+6, 0);
 				}
 				else
 				{
 					air->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					air->moveBack = ML::Vec2(-6, 0);
 				}
 			}
 			break;
@@ -664,6 +689,7 @@ namespace  Player
 				shot->Set_Erase(1);
 				shot->Set_Power(1);
 				shot->angle_LR = this->angle_LR;
+				shot->tip = true;
 				if (this->angle_LR == Left)
 				{
 					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);

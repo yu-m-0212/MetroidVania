@@ -36,6 +36,9 @@ namespace  Effect
 		this->cntLimit = 0;
 		this->animCnt = 0;
 		this->moveCnt = 0;
+		this->dist = 0.0f;
+		this->angle = 0.0f;
+		this->center = Vec2(0, 0);
 		
 		//★タスクの生成
 
@@ -102,7 +105,10 @@ namespace  Effect
 			{Box2D(-96, -64, 192, 128),Box2D(384, 256, 192, 128),dc},//パンチの衝撃3			[ 8]
 			{Box2D(-96, -64, 192, 128),Box2D(576,   0, 192, 128),dc},//遺体から回復1			[ 9]
 			{Box2D(-96, -64, 192, 128),Box2D(576, 128, 192, 128),dc},//遺体から回復2			[10]
-			{Box2D(-96, -64, 192, 128),Box2D(576, 256, 192, 128),dc} //遺体から回復3			[11]
+			{Box2D(-96, -64, 192, 128),Box2D(576, 256, 192, 128),dc},//遺体から回復3			[11]
+			{Box2D(-96, -96, 192, 192),Box2D(768,   0, 192, 192),dc},//エネミー爆散1			[12]
+			{Box2D(-96, -96, 192, 192),Box2D(768, 192, 192, 192),dc},//エネミー爆散2			[13]
+			{Box2D(-96, -96, 192, 192),Box2D(768, 384, 192, 192),dc} //エネミー爆散3			[14]
 
 		};
 		//返す変数を用意
@@ -143,6 +149,11 @@ namespace  Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt+9];
 			break;
+		case Lose:
+			effectCnt = this->animCnt / 8;
+			effectCnt %= 3;
+			rtv = imageTable[effectCnt + 12];
+			break;
 		}
 		//	向きに応じて画像を左右反転する
 		if (this->angle_LR == Left)
@@ -164,6 +175,8 @@ namespace  Effect
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		switch (this->state)
 		{
+		default:
+			break;
 		case Punch1:
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
@@ -182,7 +195,38 @@ namespace  Effect
 				this->moveVec.x = 0.0f;
 			}
 			break;
+		case StompLanding:
+			break;
+		case Shoot:
+			break;
+		case Airshoot:
+			break;
+		case Lose:
+			break;
 		}
+	}
+	//中心点から広がるエフェクトを呼び出す際、中心からの初期位置を指定する
+	//引数	：	（中心点からの初期位置)
+	void Object::Set_Dist(const float& dist_)
+	{
+		this->dist = dist_;
+	}
+	//中心点から広がるエフェクトの中心からの距離を取得する
+	float Object::Get_Dist()
+	{
+		return this->dist;
+	}
+	//表示する角度を指定する
+	//引数	：	 (ML::ToRadian(角度))
+	void Object::Set_Angle(const float& angle_)
+	{
+		this->angle = angle_;
+	}
+	//回転の中心を外部から指定する
+	//引数	：	（中心座標）
+	void Object::Set_Center(const Vec2& center_)
+	{
+		this->center = center_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

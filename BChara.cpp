@@ -100,6 +100,21 @@ bool BChara::CheckFront_LR()
 	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
 	return map->CheckHit(front);
 }
+//背面接触判定（サイドビューゲーム専用）
+bool BChara::CheckBack_LR()
+{
+	//背面の矩形に使用する変数を宣言
+	int x = 0;
+	if (this->angle_LR == Left) { x = this->hitBase.x + this->hitBase.w; }//キャラが左向きの時
+	else						{ x = this->hitBase.x - 1; }			  //キャラが右向きの時
+	//あたり判定を基にして背面矩形を生成
+	ML::Box2D back(x, this->hitBase.y, 1, this->hitBase.h);
+	back.Offset(this->pos);
+
+	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
+	return map->CheckHit(back);
+}
 //-----------------------------------------------------------------------------
 //正面足元判定（サイドビューゲーム専用）
 bool BChara::CheckFrontFoot_LR()
@@ -120,6 +135,7 @@ bool BChara::CheckFrontFoot_LR()
 //接触判定
 bool BChara::CheckHit(const ML::Box2D& hit_)
 {
-	ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+	//キャラクタとの判定範囲に変更
+	ML::Box2D me = this->recieveBase.OffsetCopy(this->pos);
 	return me.Hit(hit_);
 }

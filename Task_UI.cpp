@@ -1,9 +1,10 @@
 //-------------------------------------------------------------------
 //UI
 //-------------------------------------------------------------------
-#include  "MyPG.h"
-#include  "Task_UI.h"
-#include  "Task_Player.h"
+#include	"MyPG.h"
+#include	"Task_UI.h"
+#include	"Task_Player.h"
+#include	"Task_Enemy01.h"
 
 namespace  UI
 {
@@ -80,6 +81,7 @@ namespace  UI
 	void  Object::Render2D_AF()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto es = ge->GetTask_One_G<Enemy01::Object>("敵");
 		if (ge->debugMode)
 		{
 			ML::Box2D debugBox(200, 100, 600, 600);
@@ -95,6 +97,7 @@ namespace  UI
 				"hp=" + to_string(pl->hp) + "\n" +
 				"ge->clear = " + to_string(ge->clear) + "\n" +
 				"ge->failure = " + to_string(ge->failure) + "\n" +
+				"Search_Player() = " + to_string(es->Search_Player()) + "\n" +
 				"BackSpace/Selectボタンでデバッグモード切替";
 			DG::Font_Draw("fontUI", debugBox, debugText, ML::Color(1, 1, 1, 1));
 		}

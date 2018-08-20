@@ -34,6 +34,7 @@ namespace  Item00
 		//★データ初期化
 		this->render2D_Priority[1] = 0.7f;
 		this->hitBase = ML::Box2D(-16, -16, 32, 32);
+		this->recieveBase = this->hitBase;
 		//★タスクの生成
 		return  true;
 	}

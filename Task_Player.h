@@ -47,8 +47,8 @@ namespace  Player
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	//追加変数
 		string		controllerName;
-		//ストンプ時の上下方向移動量
-		float stompFallSpeed;
+		//ストンプ時の最大効果速度
+		float max_StompFallSpeed;
 		//ストンプ着地時の硬直時間
 		int stompHoldTime;
 		//ショット速度

@@ -1,19 +1,18 @@
 //-------------------------------------------------------------------
-//前回死亡した地点に置かれる遺体
+//エネミーの探知矩形表示用
 //-------------------------------------------------------------------
-#include  "MyPG.h"
-#include  "Task_Corpse.h"
-using namespace ML;
-namespace  Corpse
+#include	"MyPG.h"
+#include	"Task_EnemySearch.h"
+#include	"Task_Enemy01.h"
+namespace  EnemySearch
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "corpseImage";
-		DG::Image_Create(this->imageName,"./data/image/chara(仮)01.png");
-		DG::Font_Create("fontCorpse", "ＭＳ ゴシック", 16, 32);
+		this->imageName = "EnemySearch";
+		DG::Image_Create(this->imageName, "./data/image/effect.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -21,7 +20,6 @@ namespace  Corpse
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
-		DG::Font_Erase("fontCorpse");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -34,10 +32,9 @@ namespace  Corpse
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->hitBase = Box2D(-64, -64, 128, 128);
+		auto en = ge->GetTask_One_G<Enemy01::Object>("敵");
+		this->hitBase = en->Get_Search();
 		this->recieveBase = this->hitBase;
-		this->gravity = ML::Gravity(64);			//重力加速度＆時間速度による加算量
-		this->maxFallSpeed = 15.0f;					//最大落下速度
 		
 		//★タスクの生成
 
@@ -60,46 +57,59 @@ namespace  Corpse
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		//上昇中もしくは足元に地面が無い
-		if (this->moveVec.y < 0 ||
-			this->CheckFoot() == false) {
-			this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);
+		auto en = ge->GetTask_One_G<Enemy01::Object>("敵");
+		//エネミーが消滅すると自動的に消滅する
+		if (en==nullptr)
+		{
+			this->Kill();
 		}
-		//地面に接触している
+		//自身かエネミーがいなければ処理しない
+		if (this == nullptr || en == nullptr) { return; }
+		this->pos = en->pos;
+		this->state = en->state;
+		this->angle_LR = en->angle_LR;
+		//エネミーの向きで座標を更新
+		if (this->angle_LR == Left)
+		{
+			this->pos.x -= this->hitBase.w / 2;
+		}
 		else
 		{
-			this->moveVec.y = 0.0f;
+			this->pos.x += this->hitBase.w / 2;
 		}
-		//移動処理
-		this->pos += this->moveVec;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		if(ge->debugMode)
+		ML::Box2D draw = this->hitBase;
+		ML::Box2D src(960, 0, 384, 192);
+		//状態によって色が変わる
+		switch (this->state)
 		{
-			//情報表示
-			Box2D textBox(800, 100, 500, 500);
-			string text =
-				"corpse->pos.x = " + to_string(this->pos.x) + "\n" +
-				"corpse->pos.y = " + to_string(this->pos.y);
-			DG::Font_Draw("fontCorpse", textBox, text, Color(1.0f, 1.0f, 1.0f, 1.0f));
+		default:
+			src.y = 0;
+			break;
+		case TargetLost:
+			src.y = 192;
+			break;
+		case Caution:
+			src.y = 384;
+			break;
+		case Bound:
+			src.y = 384;
+			break;
 		}
-		Box2D draw(-64, -64, 128, 128);
+		//左右反転
+		if (this->angle_LR==Left)
+		{
+			draw.x = -draw.x;
+			draw.w = -draw.w;
+		}
 		draw.Offset(this->pos);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		Box2D  src(1088, 0, 128, 128);
-		DG::Image_Draw(this->res->imageName, draw, src);
-	}
-	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_)
-	{
-		//一度だけプレイヤを回復する
-		from_->hp = from_->max_Hp;
-		//自身を消滅させる
-		this->Kill();
+		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1.0f, 1.0f, 1.0f));
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
