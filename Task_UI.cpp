@@ -37,12 +37,13 @@ namespace  UI
 
 		//★データ初期化
 		//HPボタン表示用
-		/*for (int i = 0; i < 10; ++i)
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		for (int i = 0; i < pl->max_Hp; ++i)
 		{
 			this->playerHp[i].active = true;
 			this->playerHp[i].x = 0;
 			this->playerHp[i].y = 32;
-		}*/
+		}
 		
 		//★タスクの生成
 
@@ -103,34 +104,34 @@ namespace  UI
 		}
 		//以上デバッグ----------------------------------------------------
 		//プレイヤのHP表示
-		//ボタン表示板
-		//for (int i = 0; i < pl->Get_HP(); ++i)
-		//{
-		//	if (this->playerHp[i].active)
-		//	{
-		//		ML::Box2D draw(32 + 32 * i, 32, 32, 32);
-		//		//デバッグ時は表示をずらす
-		//		if (ge->debugMode)
-		//		{
-		//			draw.x += 100;
-		//		}
-		//		ML::Box2D src(0, 0, 32, 32);
-		//		//残り体力によって色を指定する
-		//		float red = 1.0f - 0.1f * i;
-		//		float blue = 0.1f + 0.1f * i;
-		//		DG::Image_Draw(this->res->hpImageName, draw, src, ML::Color(1.0f, red, 0.0f, blue));
-		//	}
-		//}
+		//ボタン表示
+		for (int i = 0; i < pl->Get_HP(); ++i)
+		{
+			if (this->playerHp[i].active)
+			{
+				ML::Box2D draw(64 + 64 * i, 64, 64, 64);
+				//デバッグ時は表示をずらす
+				if (ge->debugMode)
+				{
+					draw.x += 100;
+				}
+				ML::Box2D src(0, 0, 32, 32);
+				//残り体力によって色を指定する
+				float red = 1.0f - 0.1f * i;
+				float blue = 0.1f + 0.1f * i;
+				DG::Image_Draw(this->res->hpImageName, draw, src, ML::Color(1.0f, red, 0.0f, blue));
+			}
+		}
 		//プレイヤのHP表示
 		//バーで表示
-		ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
-		//デバッグ時は表示をずらす
-		if (ge->debugMode)
-		{
-			draw.x += 100;
-		}
-		ML::Box2D  src(32, 0, 32, 32);
-		DG::Image_Draw(this->res->hpImageName, draw, src);
+		//ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
+		////デバッグ時は表示をずらす
+		//if (ge->debugMode)
+		//{
+		//	draw.x += 100;
+		//}
+		//ML::Box2D  src(32, 0, 32, 32);
+		//DG::Image_Draw(this->res->hpImageName, draw, src);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

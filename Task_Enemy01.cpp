@@ -131,12 +131,16 @@ namespace  Enemy01
 		di.draw.Offset(this->pos);
 		//スクロール対応
 		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, di.draw, di.src);
+		DG::Image_Draw(this->res->imageName, di.draw, di.src,ML::Color(1.0f,1.0f,1.0f,1.0f));
 	}
 	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
+		//仮処理
+		//hpが減ると行動が早くなる
+		this->interval_Caution -= 4;
+		this->interval_Attack -= 1;
 		//攻撃を受けた方向を向く
 		if (this->pos.x - from_->pos.x > 0)
 		{

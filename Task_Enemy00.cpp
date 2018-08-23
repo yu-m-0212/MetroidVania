@@ -4,6 +4,7 @@
 #include  "MyPG.h"
 #include  "Task_Shot00.h"
 #include  "Task_Enemy00.h"
+#include  "Task_Effect.h"
 
 namespace  Enemy00
 {
@@ -35,7 +36,8 @@ namespace  Enemy00
 		//★データ初期化
 		this->render2D_Priority[1] = 0.6f;
 		this->hitBase = ML::Box2D(-28, -22, 56, 45);
-		this->angle_LR = Left;
+		this->recieveBase = this->hitBase;
+		this->angle_LR = Right;
 		this->state = Stand;
 		this->hp = 20;				//hp初期値
 		this->maxSpeed = 2.0f;		//最大移動速度(横)
@@ -59,7 +61,12 @@ namespace  Enemy00
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}
-
+		//撃破エフェクトの生成
+		auto DefeatEffect = Effect::Object::Create(true);
+		DefeatEffect->pos = this->pos;
+		DefeatEffect->Set_Limit(24);
+		DefeatEffect->state = Lose;
+		DefeatEffect->angle_LR = this->angle_LR;
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -79,14 +86,17 @@ namespace  Enemy00
 		this->CheckMove(est);
 
 		//当たり判定
+		if(this->state!=Bound)
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
 			for (auto it = targets->begin();
 				it != targets->end();
-				++it) {
+				++it) 
+			{
 				//相手に接触の有無を確認させる
-				if ((*it)->CheckHit(me)) {
+				if ((*it)->CheckHit(me))
+				{
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 1,0,0 };
 					(*it)->Received(this, at);
@@ -94,18 +104,19 @@ namespace  Enemy00
 				}
 			}
 		}
+		//HPが0かつ
+		//床に触れるか一定時間経過で消滅
+		if (this->hp <= 0 &&
+			(this->CheckFoot() || this->moveCnt >= 60))
+		{
+			this->Kill();
+		}
+
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		//無敵時間中は点滅
-		//8フレーム中4フレーム画像を表示しない
-		if (this->unHitTime > 0) {
-			if ((this->unHitTime / 4) % 2 == 0) {
-				return;//8フレーム中4フレーム画像を表示しない
-			}
-		}
 		BChara::DrawInfo di = this->Anim();
 		di.draw.Offset(this->pos);
 		//スクロール対応
@@ -116,17 +127,41 @@ namespace  Enemy00
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
+		if (this->pos.x - from_->pos.x > 0)
+		{
+			this->angle_LR = Left;
+		}
+		else
+		{
+			this->angle_LR = Right;
+		}
 		if (this->unHitTime > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
-		this->unHitTime = 30;//無敵時間
-		this->hp -= at_.power;//弾のhp
-		if (this->hp <= 0) {
-			this->Kill();
+		this->hp -= at_.power;
+		//無敵時間
+		this->unHitTime = 30;
+		//まず範囲攻撃かどうかを判定する
+		if (!from_->wideRange)
+		{
+			//吹き飛ばされる
+			this->moveVec = from_->moveBack;
 		}
-		//吹き飛ばされる
-		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4, -9); }
-		else { this->moveVec = ML::Vec2(-4, -9); }
+		//範囲攻撃の場合は攻撃を受けた瞬間の位置関係で飛ぶ方向を決める
+		else
+		{
+			//自分が右側にいるとき
+			if (this->pos.x - from_->pos.x > 0)
+			{
+				this->moveVec = from_->moveBack;
+			}
+			//自分が左側にいるとき
+			else
+			{
+				float x = from_->moveBack.x*(-1);
+				this->moveVec = ML::Vec2(x, from_->moveBack.y);
+			}
+		}
 		this->UpdateMotion(Bound);
 		//from_は攻撃してきた相手、カウンターなどで逆にダメージを与えたいときに使う
 	}
@@ -249,9 +284,9 @@ namespace  Enemy00
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw						src
-			{ML::Box2D(-32,-24,64,48),ML::Box2D(0,0,64,48),dc},//停止
-			{ML::Box2D(-32,-32,64,64),ML::Box2D(128,48,64,64),dc},//落下
-			{ML::Box2D(-32,-32,64,64),ML::Box2D(0,116,64,64),dc}//ダメージ
+			{this->hitBase,ML::Box2D(0,0,64,48),dc},//停止
+			{this->hitBase,ML::Box2D(128,48,64,64),dc},//落下
+			{this->hitBase,ML::Box2D(0,116,64,64),dc}//ダメージ
 		};
 		BChara::DrawInfo rtv;
 		/*int work;*/

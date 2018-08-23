@@ -68,6 +68,7 @@ namespace  EnemySearch
 		this->pos = en->pos;
 		this->state = en->state;
 		this->angle_LR = en->angle_LR;
+		this->hitBase = en->Get_Search();
 		//エネミーの向きで座標を更新
 		if (this->angle_LR == Left)
 		{

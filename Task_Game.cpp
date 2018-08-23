@@ -56,11 +56,11 @@ namespace  Game
 		//šƒ^ƒXƒN‚Ì¶¬
 		//ƒ}ƒbƒv‚Ì¶¬
 		auto  m = Map2D::Object::Create(true);
-		m->Load("./data/Map/map1.txt");
+		m->Load("./data/Map/map0.txt");
 		//ƒvƒŒƒCƒ„‚Ì¶¬
 		auto  pl = Player::Object::Create(true);
 		pl->pos.x = 770;
-		pl->pos.y = 1000;
+		pl->pos.y = 2000;
 		//—d¸‚Ì¶¬
 		auto  spr = Sprite::Object::Create(true);
 		spr->pos = pl->pos;
@@ -68,44 +68,58 @@ namespace  Game
 		//ƒfƒoƒbƒO—p
 		//“G‚Ì¶¬
 		auto ene0 = Enemy01::Object::Create(true);
-		ene0->pos.x = 1000.0f;
-		ene0->pos.y = /*2400.0*/0.0f;
-		ene0->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene1 = Enemy01::Object::Create(true);
-		//ene1->pos.x = 5535.0f;
-		//ene1->pos.y = 3712.0f;
-		//ene1->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene2 = Enemy01::Object::Create(true);
-		//ene2->pos.x = 4769.0f;
-		//ene2->pos.y = 3712.0f;
-		//ene2->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene3 = Enemy01::Object::Create(true);
-		//ene3->pos.x = 3299.0f;
-		//ene3->pos.y = 3712.0f;
-		//ene3->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene4 = Enemy01::Object::Create(true);
-		//ene4->pos.x = 2339.0f;
-		//ene4->pos.y = 3456.0f;
-		//ene4->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene5 = Enemy01::Object::Create(true);
-		//ene5->pos.x = 1340.0f;
-		//ene5->pos.y = 3072.0f;
-		//ene5->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene6 = Enemy01::Object::Create(true);
-		//ene6->pos.x =  836.0f;
-		//ene6->pos.y = 3392.0f;
-		//ene6->hp = 5;
-		////“G‚Ì¶¬
-		//auto ene7 = Enemy01::Object::Create(true);
-		//ene7->pos.x =  966.0f;
-		//ene7->pos.y = 3776.0f;
-		//ene7->hp = 5;
+		ene0->pos.x = 550.0f;
+		ene0->pos.y = 4200.0f;
+		ene0->hp = 30;
+		//“G‚Ì¶¬
+		auto ene1 = Enemy00::Object::Create(true);
+		ene1->pos.x = 5535.0f;
+		ene1->pos.y = 3712.0f;
+		ene1->addSpeed = 0.0f;
+		ene1->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene1->hp = 5;
+		//“G‚Ì¶¬
+		auto ene2 = Enemy00::Object::Create(true);
+		ene2->pos.x = 4769.0f;
+		ene2->pos.y = 3712.0f;
+		ene2->addSpeed = 0.0f;
+		ene2->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene2->hp = 5;
+		//“G‚Ì¶¬
+		auto ene3 = Enemy00::Object::Create(true);
+		ene3->pos.x = 3299.0f;
+		ene3->pos.y = 3712.0f;
+		ene3->addSpeed = 0.0f;
+		ene3->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene3->hp = 5;
+		//“G‚Ì¶¬
+		auto ene4 = Enemy00::Object::Create(true);
+		ene4->pos.x = 2339.0f;
+		ene4->pos.y = 3456.0f;
+		ene4->addSpeed = 0.0f;
+		ene4->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene4->hp = 5;
+		//“G‚Ì¶¬
+		auto ene5 = Enemy00::Object::Create(true);
+		ene5->pos.x = 1340.0f;
+		ene5->pos.y = 3072.0f;
+		ene5->addSpeed = 0.0f;
+		ene5->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene5->hp = 5;
+		//“G‚Ì¶¬
+		auto ene6 = Enemy00::Object::Create(true);
+		ene6->pos.x =  836.0f;
+		ene6->pos.y = 3392.0f;
+		ene6->addSpeed = 0.0f;
+		ene6->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene6->hp = 5;
+		//“G‚Ì¶¬
+		auto ene7 = Enemy00::Object::Create(true);
+		ene7->pos.x =  966.0f;
+		ene7->pos.y = 3776.0f;
+		ene7->addSpeed = 0.0f;
+		ene7->hitBase = ML::Box2D(-56, -48, 102, 96);
+		ene7->hp = 5;
 		//UI‚Ì¶¬
 		auto ui = UI::Object::Create(true);
 		//”wŒi‚Ì¶¬
