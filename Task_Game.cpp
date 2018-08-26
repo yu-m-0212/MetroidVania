@@ -18,6 +18,9 @@
 #include  "Task_Item02.h"
 #include  "Task_Goal.h"
 #include  "Task_EnemySearch.h"
+#include  "Task_Pause.h"
+#include  "Task_Tutorials.h"
+#include  "Task_Corpse.h"
 
 namespace  Game
 {
@@ -49,6 +52,8 @@ namespace  Game
 		ge->clear = false;
 		//ミスフラグ初期化
 		ge->failure = false;
+		//ポーズフラグの初期化
+		ge->pause = false;
 		
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
@@ -122,11 +127,58 @@ namespace  Game
 		ene7->hp = 5;
 		//UIの生成
 		auto ui = UI::Object::Create(true);
+		//チュートリアル01の生成
+		auto tutorials01 = Tutorials::Object::Create(true);
+		tutorials01->pos = ML::Vec2(770, 2624);
+		tutorials01->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials01->Set_Message("左スティックを横に倒すと移動");
+		//チュートリアル02の生成
+		auto tutorials02 = Tutorials::Object::Create(true);
+		tutorials02->pos = ML::Vec2(1857, 2624);
+		tutorials02->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials02->Set_Message("×ボタンでジャンプ");
+		//チュートリアル03の生成
+		auto tutorials03 = Tutorials::Object::Create(true);
+		tutorials03->pos = ML::Vec2(4032, 2624);
+		tutorials03->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials03->Set_Message("×ボタン長押しで高くジャンプ");
+		//チュートリアル04の生成
+		auto tutorials04 = Tutorials::Object::Create(true);
+		tutorials04->pos = ML::Vec2(5570, 1920);
+		tutorials04->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials04->Set_Message("遺体に触れると回復する");
+		//チュートリアル05の生成
+		auto tutorials05 = Tutorials::Object::Create(true);
+		tutorials05->pos = ML::Vec2(6210, 3648);
+		tutorials05->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials05->Set_Message("□ボタンでパンチ");
+		//チュートリアル06の生成
+		auto tutorials06 = Tutorials::Object::Create(true);
+		tutorials06->pos = ML::Vec2(3774, 3648);
+		tutorials06->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials06->Set_Message("R1ボタンでショット");
+		//チュートリアル07の生成
+		auto tutorials07 = Tutorials::Object::Create(true);
+		tutorials07->pos = ML::Vec2(2688, 3648);
+		tutorials07->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials07->Set_Message("空中にいるとき□ボタンで空中攻撃");
+		//チュートリアル08の生成
+		auto tutorials08 = Tutorials::Object::Create(true);
+		tutorials08->pos = ML::Vec2(1600, 3136);
+		tutorials08->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials08->Set_Message("空中にいるときR1ボタンで空中ショット");
+		//チュートリアル09の生成
+		auto tutorials09 = Tutorials::Object::Create(true);
+		tutorials09->pos = ML::Vec2(1088, 3008);
+		tutorials09->recieveBase = ML::Box2D(-256, -128, 512, 256);
+		tutorials09->Set_Message("△ボタンで踏みつけ");
 		//背景の生成
 		auto back = Back::Object::Create(true);
 		//仮ゴールの生成
 		auto goal = Goal::Object::Create(true);
-
+		//チュートリアル用の遺体を配置
+		auto corpse = Corpse::Object::Create(true);
+		corpse->pos = ML::Vec2(5955, 1984);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -146,19 +198,16 @@ namespace  Game
 		ge->KillAll_G("背景");
 		ge->KillAll_G("ゴール");
 		ge->KillAll_G("遺体");
+		ge->KillAll_G("シーン");
+		ge->KillAll_G("チュートリアル");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 			auto in = DI::GPad_GetState("P1");
-			//スタートボタンでタイトルに戻る
-			if (in.ST.down)
-			{
-				auto  title = Title::Object::Create(true);
-			}
 			//クリア画面に移る
-			else if (ge->clear)
+			if (ge->clear)
 			{
 				auto ending = Ending::Object::Create(true);
 			}
@@ -177,16 +226,22 @@ namespace  Game
 	void  Object::UpDate()
 	{
 		auto in = DI::GPad_GetState("P1");
-		if (in.ST.down) 
+		if (!ge->pause&&in.ST.down)
 		{
-			//自身に消滅要請
+			//スタートでポーズ
+			ge->pause = true;
+			auto pause = Pause::Object::Create(true);
+		}
+		//ポーズ中にスタートでポーズ解除
+		else if (ge->pause&&in.ST.down)
+		{
+			ge->pause = false;
+		}
+		if (ge->clear)
+		{
 			this->Kill();
 		}
-		else if (ge->clear)
-		{
-			this->Kill();
-		}
-		else if (ge->failure)
+		if (ge->failure)
 		{
 			this->Kill();
 			//死亡地点を保存

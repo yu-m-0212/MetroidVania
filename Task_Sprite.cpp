@@ -56,6 +56,8 @@ namespace  Sprite
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ポーズ
+		if (ge->pause) { return; }
 		//ターゲットが存在するか調べてからアクセス
 		if (auto  tg = this->target.lock()) {
 			//ターゲットへの相対座標を求める

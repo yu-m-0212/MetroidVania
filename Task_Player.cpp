@@ -83,6 +83,8 @@ namespace  Player
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ポーズ
+		if (ge->pause) { return; }
 		this->moveCnt++;
 		this->animCnt++;
 		//無敵時間の減少
@@ -209,16 +211,16 @@ namespace  Player
 			if (in.LStick.L.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.LStick.R.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B4.down) { nm = Shoot; }
-			if (in.B3.down) { nm = Punch1; }
+			if (in.R1.down) { nm = Shoot; }
+			if (in.B1.down) { nm = Punch1; }
 			/*if (in.B1.down) { nm = Bunker1; }*/
 			if (!this->CheckFoot()) { nm = Fall; }//足元 障害　無し
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.off&&in.LStick.R.off) { nm = SlowDown; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B4.down) { nm = Shoot; }
-			if (in.B3.down) { nm = Punch1; }
+			if (in.R1.down) { nm = Shoot; }
+			if (in.B1.down) { nm = Punch1; }
 			/*if (in.B1.down) { nm = Bunker1; }*/
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			break;
@@ -226,8 +228,8 @@ namespace  Player
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B3.down) { nm = Punch1; }
-			if (in.B4.down) { nm = Shoot; }
+			if (in.B1.down) { nm = Punch1; }
+			if (in.R1.down) { nm = Shoot; }
 			/*if (in.B1.down) { nm = Bunker1; }*/
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
@@ -237,32 +239,32 @@ namespace  Player
 			break;
 		case  Jump:		//上昇中
 			if (this->moveVec.y >= 0) { nm = Fall; }
-			if (in.B3.down) { nm = Air; }//空中攻撃
-			if (in.B4.down) { nm = Airshoot; }
-			if (in.B1.down) { nm = Stomp; }
+			if (in.B1.down) { nm = Air; }//空中攻撃
+			if (in.R1.down) { nm = Airshoot; }
+			if (in.B4.down) { nm = Stomp; }
 			break;
 		case  Fall:		//落下中1
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
-			if (in.B3.down) { nm = Air; }//空中攻撃
-			if (in.B4.down) { nm = Airshoot; }
-			if (in.B1.down) { nm = Stomp; }
+			if (in.B1.down) { nm = Air; }//空中攻撃
+			if (in.R1.down) { nm = Airshoot; }
+			if (in.B4.down) { nm = Stomp; }
 			break;
 		case  Landing:	//着地
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
-			if (in.B1.down) { nm = Jump; }
+			if (in.B2.down) { nm = Jump; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 3) { nm = Stand; }
 			break;
 		case Punch1:
 			if (this->moveCnt >= 20) { nm = Stand; }
-			if (in.B1.down) { nm = Jump; }
+			if (in.B2.down) { nm = Jump; }
 			if (!this->CheckFoot()) { nm = Fall; }
-			if (in.B3.down) { nm = Punch2; }
+			if (in.B1.down) { nm = Punch2; }
 			break;
 		case Punch2:
 			if (this->moveCnt >= 20) { nm = Stand; }
-			if (in.B1.down) { nm = Jump; }
+			if (in.B2.down) { nm = Jump; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
 		case  Shoot:
@@ -283,7 +285,7 @@ namespace  Player
 			if (this->moveCnt >= this->stompHoldTime) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
-		case Bunker1:
+		/*case Bunker1:
 			if (this->moveCnt >= 8 && in.B1.off) { nm = Bunker2; }
 			if (in.B1.down) { nm = Jump; }
 			if (in.B4.down) { nm = Shoot; }
@@ -298,7 +300,7 @@ namespace  Player
 		case Bunker3:
 			if (this->moveCnt >= 20) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
-			break;
+			break;*/
 		case	Damage:	//ダメージを受けて吹き飛んでいる
 			if (this->moveCnt >= 12 && this->CheckFoot()) 
 			{
@@ -434,6 +436,7 @@ namespace  Player
 			}
 			break;
 		case Punch1:
+		case Punch2:
 			//目の前にパンチ矩形を生成
 			if (this->moveCnt == 0) 
 			{
@@ -468,51 +471,6 @@ namespace  Player
 					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
 					//ふっとび量を指定する
 					punch1->moveBack = ML::Vec2(+6, -4);
-					//攻撃時に前進する
-					this->moveVec.x = +this->slide;
-				}
-			}
-			//目の前に足場がなければ前進をやめる(足場から落下しない)
-			if (!this->CheckFrontFoot_LR())
-			{
-				this->moveVec.x = 0.0f;
-			}
-			break;
-		case Punch2:
-			//目の前にパンチ矩形を生成
-			if (this->moveCnt == 0) 
-			{
-				auto punch2 = Shot00::Object::Create(true);
-				//呼び出した判定矩形に思考させるため状態を指定
-				punch2->state = Punch2;
-				//攻撃毎に攻撃範囲を生成時に指定
-				punch2->hitBase = ML::Box2D(-64, -32, 128, 64);
-				punch2->Set_Limit(this->meleeCnt);
-				punch2->Set_Erase(0);
-				punch2->Set_Power(2);
-				punch2->angle_LR = this->angle_LR;
-				//エフェクトの呼び出し
-				auto punch2Effect = Effect::Object::Create(true);
-				punch2Effect->state = Punch2;
-				punch2Effect->Set_Limit(18);
-				punch2Effect->pos = this->pos;
-				punch2Effect->angle_LR = this->angle_LR;
-				//以下プレイヤの左右によって変化する
-				if (this->angle_LR == Left)
-				{
-					//初期座標をプレイヤの目の前に指定
-					punch2->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					//ふっとび量を指定する
-					punch2->moveBack = ML::Vec2(-6, -4);
-					//攻撃時に前進する
-					this->moveVec.x = -this->slide;
-				}
-				else
-				{
-					//初期座標をプレイヤの目の前に指定
-					punch2->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					//ふっとび量を指定する
-					punch2->moveBack = ML::Vec2(+6, -4);
 					//攻撃時に前進する
 					this->moveVec.x = +this->slide;
 				}

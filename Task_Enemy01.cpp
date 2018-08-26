@@ -79,6 +79,8 @@ namespace  Enemy01
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ポーズ
+		if (ge->pause) { return; }
 		this->moveCnt++;
 		this->animCnt++;
 		//無敵時間の減少

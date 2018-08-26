@@ -82,6 +82,8 @@ namespace  MyPG
 		bool clear;
 		//ミスフラグ
 		bool failure;
+		//ポーズフラグ
+		bool pause;
 	//----------------------------------------------
 	};
 }

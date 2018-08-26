@@ -34,6 +34,7 @@ namespace  Corpse
 		this->res = Resource::Create();
 
 		//★データ初期化
+		this->render2D_Priority[1] = 0.6f;
 		this->hitBase = Box2D(-64, -64, 128, 128);
 		this->recieveBase = this->hitBase;
 		this->gravity = ML::Gravity(64);			//重力加速度＆時間速度による加算量
@@ -80,7 +81,7 @@ namespace  Corpse
 		if(ge->debugMode)
 		{
 			//情報表示
-			Box2D textBox(800, 100, 500, 500);
+			Box2D textBox(1450, 50, 500, 500);
 			string text =
 				"corpse->pos.x = " + to_string(this->pos.x) + "\n" +
 				"corpse->pos.y = " + to_string(this->pos.y);

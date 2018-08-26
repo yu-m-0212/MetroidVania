@@ -57,6 +57,8 @@ namespace  Shot01
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ポーズ
+		if (ge->pause) { return; }
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		this->moveCnt++;
 		//各状態ごとの処理
@@ -130,7 +132,7 @@ namespace  Shot01
 		ML::Box2D src(0, 0, 32, 32);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1.0f, 1.0f, 1.0f));
+		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
 	}
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)

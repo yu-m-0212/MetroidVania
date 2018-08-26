@@ -57,6 +57,8 @@ namespace  Shot00
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ポーズ
+		if (ge->pause) { return; }
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		this->moveCnt++;
 		//各状態ごとの処理
@@ -130,7 +132,7 @@ namespace  Shot00
 		ML::Box2D src(0, 0, 32, 32);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src,ML::Color(0.5f,1.0f,1.0f,1.0f));
+		DG::Image_Draw(this->res->imageName, draw, src,ML::Color(0.5f,1.0f,0.0f,0.0f));
 	}
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)
@@ -157,22 +159,6 @@ namespace  Shot00
 		default:
 			break;
 		case Punch1:
-			//敵に衝突したとき消えるか否か
-			this->eraseFlag = false;
-			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
-			this->moveVec = pl->moveVec;
-			//プレイヤが壁に衝突したら移動量を0に
-			if (pl->CheckFront_LR() || pl->CheckBack_LR())
-			{
-				this->moveVec.x = 0.0f;
-			}
-			//プレイヤがダメージを受ける(状態が変わる)と消滅
-			if (pl->state == Damage)
-			{
-				this->Kill();
-				return;
-			}
-			break;
 		case Punch2:
 			//敵に衝突したとき消えるか否か
 			this->eraseFlag = false;

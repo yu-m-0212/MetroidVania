@@ -36,6 +36,7 @@ namespace  UI
 		this->res = Resource::Create();
 
 		//★データ初期化
+		this->render2D_Priority[1] = 0.2f;
 		//HPボタン表示用
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		for (int i = 0; i < pl->max_Hp; ++i)
@@ -85,7 +86,7 @@ namespace  UI
 		auto es = ge->GetTask_One_G<Enemy01::Object>("敵");
 		if (ge->debugMode)
 		{
-			ML::Box2D debugBox(200, 100, 600, 600);
+			ML::Box2D debugBox(850, 50, 600, 600);
 			string debugText =
 				"state = " + to_string(pl->state) + "\n" +
 				"pos.x = " + to_string(pl->pos.x) + "\n" +

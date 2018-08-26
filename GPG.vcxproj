@@ -113,12 +113,14 @@
     <ClCompile Include="Task_Item01.cpp" />
     <ClCompile Include="Task_Item02.cpp" />
     <ClCompile Include="Task_Map2D.cpp" />
+    <ClCompile Include="Task_Pause.cpp" />
     <ClCompile Include="Task_Player.cpp" />
     <ClCompile Include="Task_Retry.cpp" />
     <ClCompile Include="Task_Shot00.cpp" />
     <ClCompile Include="Task_Shot01.cpp" />
     <ClCompile Include="Task_Sprite.cpp" />
     <ClCompile Include="Task_Title.cpp" />
+    <ClCompile Include="Task_Tutorials.cpp" />
     <ClCompile Include="Task_UI.cpp" />
     <ClCompile Include="WinMain.cpp" />
     <ClCompile Include="xnacollision.cpp" />
@@ -154,12 +156,14 @@
     <ClInclude Include="Task_Item01.h" />
     <ClInclude Include="Task_Item02.h" />
     <ClInclude Include="Task_Map2D.h" />
+    <ClInclude Include="Task_Pause.h" />
     <ClInclude Include="Task_Player.h" />
     <ClInclude Include="Task_Retry.h" />
     <ClInclude Include="Task_Shot00.h" />
     <ClInclude Include="Task_Shot01.h" />
     <ClInclude Include="Task_Sprite.h" />
     <ClInclude Include="Task_Title.h" />
+    <ClInclude Include="Task_Tutorials.h" />
     <ClInclude Include="Task_UI.h" />
     <ClInclude Include="xnacollision.h" />
   </ItemGroup>

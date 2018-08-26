@@ -39,6 +39,7 @@ namespace  Effect
 		this->dist = 0.0f;
 		this->angle = 0.0f;
 		this->center = Vec2(0, 0);
+		this->render2D_Priority[1] = 0.3f;
 		
 		//★タスクの生成
 
@@ -61,6 +62,8 @@ namespace  Effect
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ポーズ
+		if (ge->pause) { return; }
 		this->moveCnt++;
 		this->animCnt++;
 		//状態毎の行動
@@ -187,9 +190,7 @@ namespace  Effect
 			}
 			break;
 		case Punch2:
-			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
-			//プレイヤが壁に衝突したら移動量を0に
 			if (pl->CheckFront_LR())
 			{
 				this->moveVec.x = 0.0f;
@@ -200,6 +201,13 @@ namespace  Effect
 		case Shoot:
 			break;
 		case Airshoot:
+			break;
+		case Heal:
+			this->moveVec = pl->moveVec;
+			if (pl->CheckFront_LR())
+			{
+				this->moveVec.x = 0.0f;
+			}
 			break;
 		case Lose:
 			break;

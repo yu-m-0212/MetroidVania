@@ -8,8 +8,8 @@ using namespace ML;
 namespace  Retry
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("リトライ");	//グループ名
-	const  string  defName("シーン");		//タスク名
+	const  string  defGroupName("シーン");	//グループ名
+	const  string  defName("リトライ");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -55,5 +55,7 @@ namespace  Retry
 		//死亡した座標を保存する
 		//引数	：	（Vec2)
 		void Set_DeadPos(const Vec2&);
+		//前回死亡した座標を返す
+		ML::Vec2 Get_DeadPos();
 	};
 }
