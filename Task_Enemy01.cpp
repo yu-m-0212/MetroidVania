@@ -18,7 +18,7 @@ namespace  Enemy01
 	bool  Resource::Initialize()
 	{
 		this->imageName = "Enemy01Img";
-		DG::Image_Create(this->imageName, "./data/image/enemy.png");
+		DG::Image_Create(this->imageName, "./data/image/enemy01.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
