@@ -57,6 +57,8 @@ namespace  Player
 		int meleeCnt;
 		//被弾時に得られる無敵時間
 		int addUnHitTime;
+		//射撃の発射間隔（フレーム）
+		int shotInterval;
 	public:
 		//思考＆状況判断(ステータス決定）
 		void  Think();
@@ -71,5 +73,7 @@ namespace  Player
 		int Get_Max_HP();
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
+		//ショット生成スタンダード
+		void Shot_Appear();
 	};
 }

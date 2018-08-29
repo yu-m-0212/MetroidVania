@@ -14,7 +14,7 @@ namespace  Enemy00
 	bool  Resource::Initialize()
 	{
 		this->imageName = "Enemy00Img";
-		DG::Image_Create(this->imageName, "./data/image/testEnemy00.png");
+		DG::Image_Create(this->imageName, "./data/image/enemy01.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -37,7 +37,6 @@ namespace  Enemy00
 		this->render2D_Priority[1] = 0.6f;
 		this->hitBase = ML::Box2D(-28, -22, 56, 45);
 		this->recieveBase = this->hitBase;
-		this->angle_LR = Right;
 		this->state = Stand;
 		this->hp = 20;				//hp初期値
 		this->maxSpeed = 2.0f;		//最大移動速度(横)
@@ -141,6 +140,7 @@ namespace  Enemy00
 			return;//無敵時間中はダメージを受けない
 		}
 		this->hp -= at_.power;
+		if (from_->tip) { return; }
 		//無敵時間
 		this->unHitTime = 30;
 		//まず範囲攻撃かどうかを判定する
@@ -178,7 +178,8 @@ namespace  Enemy00
 		switch (nm) {
 		case	Stand:	//立っている
 			if (this->CheckFoot() == false) { nm = Fall; }
-			else							{ nm = Walk; }//接地で歩きに移行
+			//チュートリアルでは行動しない
+			//else							{ nm = Walk; }//接地で歩きに移行
 			break;
 		case	Walk:	//歩いている
 			if (this->CheckFront_LR() == true) { nm = Turn; }//壁に衝突
@@ -286,49 +287,27 @@ namespace  Enemy00
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw						src
-			{this->hitBase,ML::Box2D(0,0,64,48),dc},//停止
-			{this->hitBase,ML::Box2D(128,48,64,64),dc},//落下
-			{this->hitBase,ML::Box2D(0,116,64,64),dc}//ダメージ
+			{ this->hitBase,ML::Box2D(0,  0,192,192),dc },//待機01[0]
+			{ this->hitBase,ML::Box2D(0,192,192,192),dc },//待機02[1]
 		};
 		BChara::DrawInfo rtv;
-		/*int work;*/
+		int anim = 0;
 		switch (this->state) {
-		default:	rtv = imageTable[0];	break;
-			//	ジャンプ------------------------------------------------------------------------
-		case  Jump:		rtv = imageTable[0];	break;
-			//	停止----------------------------------------------------------------------------
-		case  Stand:	rtv = imageTable[0];	break;
-			//	歩行----------------------------------------------------------------------------
-		case  Walk:		rtv = imageTable[0];	break;
-			//	落下----------------------------------------------------------------------------
-		case  Fall:		rtv = imageTable[1];	break;
-			//	ダメージ------------------------------------------------------------------------
-		case  Bound:	rtv = imageTable[2];	break;
+		default:
+			rtv = imageTable[0];
+			break;
+		//直立
+		case  Stand:
+			anim = this->animCnt / 24;
+			anim %= 2;
+			rtv = imageTable[anim + 0];
+			break;
 		}
-		//向きに応じて画像を左右反転する
-		//モーションがBoundの時
-		if (this->state == Bound)
-		{
-			auto shot = ge->GetTask_One_G<Shot00::Object>("プレイヤ");
-			//位置関係		弾	| エネミー
-			if (shot->pos.x < this->pos.x)
-			{
-				rtv.src = ML::Box2D(64, 116, -64, 64);
-			}
-			//位置関係	エネミー |	弾
-			else
-			{
-				rtv.src = ML::Box2D(0, 116, 64, 64);
-			}
-		}
-		//モーションがBound以外の時
 		//アングルが変わると画像を反転
-		else
+		if (false == this->angle_LR)
 		{
-			if (false == this->angle_LR) {
-				rtv.draw.x = -rtv.draw.x;
-				rtv.draw.w = -rtv.draw.w;
-			}
+			rtv.draw.x = -rtv.draw.x;
+			rtv.draw.w = -rtv.draw.w;
 		}
 		return rtv;
 	}

@@ -65,7 +65,7 @@ namespace  Game
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
 		pl->pos.x = 770;
-		pl->pos.y = 2000;
+		pl->pos.y = 2400;
 		//妖精の生成
 		auto  spr = Sprite::Object::Create(true);
 		spr->pos = pl->pos;
@@ -174,7 +174,7 @@ namespace  Game
 		tutorials09->Set_Message("△ボタンで踏みつけ");
 		//背景の生成
 		auto back = Back::Object::Create(true);
-		//仮ゴールの生成
+		//ゴールの生成
 		auto goal = Goal::Object::Create(true);
 		//チュートリアル用の遺体を配置
 		auto corpse = Corpse::Object::Create(true);

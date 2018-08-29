@@ -60,6 +60,7 @@ namespace  Player
 		this->shotSpeed = 20;				//ショット速度
 		this->stompHoldTime = 30;			//ストンプ着地時の硬直時間
 		this->addUnHitTime = 120;			//被弾時に得られる無敵時間
+		this->shotInterval = 12;			//射撃の発射間隔（フレーム）
 
 		//★タスクの生成
 
@@ -211,26 +212,23 @@ namespace  Player
 			if (in.LStick.L.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.LStick.R.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.R1.down) { nm = Shoot; }
-			if (in.B1.down) { nm = Punch1; }
-			/*if (in.B1.down) { nm = Bunker1; }*/
+			if (in.R1.on) { nm = Shoot; }
+			if (in.B1.down) { nm = PreStomp; }
 			if (!this->CheckFoot()) { nm = Fall; }//足元 障害　無し
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.off&&in.LStick.R.off) { nm = SlowDown; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.R1.down) { nm = Shoot; }
-			if (in.B1.down) { nm = Punch1; }
-			/*if (in.B1.down) { nm = Bunker1; }*/
+			if (in.R1.on) { nm = Shoot; }
+			if (in.B1.down) { nm = PreStomp; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			break;
 		case SlowDown:
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B1.down) { nm = Punch1; }
-			if (in.R1.down) { nm = Shoot; }
-			/*if (in.B1.down) { nm = Bunker1; }*/
+			if (in.B1.down) { nm = LandStomp; }
+			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
 			break;
@@ -239,45 +237,44 @@ namespace  Player
 			break;
 		case  Jump:		//上昇中
 			if (this->moveVec.y >= 0) { nm = Fall; }
-			if (in.B1.down) { nm = Air; }//空中攻撃
-			if (in.R1.down) { nm = Airshoot; }
-			if (in.B4.down) { nm = Stomp; }
+			if (in.R1.on) { nm = Jumpshoot; }
+			if (in.B1.down) { nm = AirStomp; }
 			break;
 		case  Fall:		//落下中1
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
-			if (in.B1.down) { nm = Air; }//空中攻撃
-			if (in.R1.down) { nm = Airshoot; }
-			if (in.B4.down) { nm = Stomp; }
+			if (in.R1.on) { nm = Fallshoot; }
+			if (in.B1.down) { nm = AirStomp; }
 			break;
 		case  Landing:	//着地
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = Jump; }
+			if (in.B1.down) { nm = PreStomp; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
-			if (this->moveCnt >= 3) { nm = Stand; }
-			break;
-		case Punch1:
-			if (this->moveCnt >= 20) { nm = Stand; }
-			if (in.B2.down) { nm = Jump; }
-			if (!this->CheckFoot()) { nm = Fall; }
-			if (in.B1.down) { nm = Punch2; }
-			break;
-		case Punch2:
-			if (this->moveCnt >= 20) { nm = Stand; }
-			if (in.B2.down) { nm = Jump; }
-			if (!this->CheckFoot()) { nm = Fall; }
+			if (this->moveCnt >= 6) { nm = Stand; }
 			break;
 		case  Shoot:
-			if (this->moveCnt >= 8) {nm = Stand;}
+			if (in.R1.off) {nm = Stand;}
+			if (in.B2.down) { nm = TakeOff; }
+			if (!this->CheckFoot()) { nm = Fallshoot; }
+			break;
+		case Jumpshoot:
+			if (in.R1.off) { nm = Fall; }
+			if (this->moveVec.y >= 0) { nm = Fallshoot; }
+			break;
+		case Fallshoot:
+			if (in.R1.off) { nm = Fall; }
+			if (this->CheckFoot()) { nm = Shoot; }
+			break;
+		case PreStomp:
+			if (this->moveCnt > 24) { nm = LandStomp; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
-		case Air:
-			if (this->moveCnt >= 8 && this->moveVec.y >= 0) { nm = Fall; }
+		case LandStomp:
+			if (this->moveCnt > 12) { nm = Stand; }
+			if (!this->CheckFoot()) { nm = Fall; }
 			break;
-		case Airshoot:
-			if (this->moveCnt >= 8 && this->moveVec.y >= 0) { nm = Fall; }
-			break;
-		case Stomp:
+		case AirStomp:
 			if (this->CheckFoot()) { nm = StompLanding; }
 			if (!this->CheckFoot() && this->moveCnt >= 60) { nm = Fall; }
 			break;
@@ -285,22 +282,6 @@ namespace  Player
 			if (this->moveCnt >= this->stompHoldTime) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
-		/*case Bunker1:
-			if (this->moveCnt >= 8 && in.B1.off) { nm = Bunker2; }
-			if (in.B1.down) { nm = Jump; }
-			if (in.B4.down) { nm = Shoot; }
-			if (in.B3.down) { nm = Punch1; }
-			if (!this->CheckFoot()) { nm = Fall; }
-			if (this->moveCnt < 30 && in.B1.off) { nm = Stand; }
-			break;
-		case Bunker2:
-			if (this->moveCnt >= 20) { nm = Bunker3; }
-			if (!this->CheckFoot()) { nm = Fall; }
-			break;
-		case Bunker3:
-			if (this->moveCnt >= 20) { nm = Stand; }
-			if (!this->CheckFoot()) { nm = Fall; }
-			break;*/
 		case	Damage:	//ダメージを受けて吹き飛んでいる
 			if (this->moveCnt >= 12 && this->CheckFoot()) 
 			{
@@ -406,6 +387,15 @@ namespace  Player
 			{
 				this->moveVec.y = this->jumpPow;//初速設定
 			}
+			//向きの変更は倒した瞬間
+			if (this->moveCnt<12&&in.LStick.L.down)
+			{
+				this->angle_LR = Left;
+			}
+			if (this->moveCnt<12 && in.LStick.R.down)
+			{
+				this->angle_LR = Right;
+			}
 			if (in.LStick.L.on)
 			{
 				this->moveVec.x = -this->maxSpeed;
@@ -418,9 +408,17 @@ namespace  Player
 			if (this->CheckHead() == true) { this->moveVec.y = 0; }
 			break;
 		case  Fall:		//落下中
+			if (in.LStick.L.down)
+			{
+				this->angle_LR = Left;
+			}
 			if (in.LStick.L.on) 
 			{
 				this->moveVec.x = -this->maxSpeed;
+			}
+			if (in.LStick.R.down)
+			{
+				this->angle_LR = Right;
 			}
 			if (in.LStick.R.on)
 			{
@@ -435,53 +433,33 @@ namespace  Player
 				this->moveVec.x = 0.0f;
 			}
 			break;
-		case Punch1:
-		case Punch2:
-			//目の前にパンチ矩形を生成
-			if (this->moveCnt == 0) 
+		case PreStomp:
+			break;
+		case LandStomp:
+			if (this->moveCnt == 0)
 			{
-				auto punch1 = Shot00::Object::Create(true);
-				//呼び出した判定矩形に思考させるため状態を指定
-				punch1->state = Punch1;
+				//足元に攻撃矩形を生成
+				auto stompLandingRect = Shot00::Object::Create(true);
+				stompLandingRect->state = StompLanding;
 				//攻撃毎に攻撃範囲を生成時に指定
-				punch1->hitBase = ML::Box2D(-64, -32, 128, 64);
-				punch1->Set_Limit(this->meleeCnt);
-				punch1->Set_Erase(0);
-				punch1->Set_Power(2);
-				punch1->angle_LR = this->angle_LR;
-				//エフェクトの呼び出し
-				auto punch1Effect = Effect::Object::Create(true);
-				punch1Effect->state = Punch1;
-				punch1Effect->Set_Limit(18);
-				punch1Effect->pos = this->pos;
-				punch1Effect->angle_LR = this->angle_LR;
-				//以下プレイヤの左右によって変化する
-				if (this->angle_LR == Left)
-				{
-					//初期座標をプレイヤの目の前に指定
-					punch1->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					//ふっとび量を指定する
-					punch1->moveBack = ML::Vec2(-6, -4);
-					//攻撃時に前進する
-					this->moveVec.x = -this->slide;
-				}
-				else 
-				{
-					//初期座標をプレイヤの目の前に指定
-					punch1->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					//ふっとび量を指定する
-					punch1->moveBack = ML::Vec2(+6, -4);
-					//攻撃時に前進する
-					this->moveVec.x = +this->slide;
-				}
-			}
-			//目の前に足場がなければ前進をやめる(足場から落下しない)
-			if (!this->CheckFrontFoot_LR())
-			{
-				this->moveVec.x = 0.0f;
+				stompLandingRect->hitBase = ML::Box2D(-128, -32, 256, 64);
+				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
+				stompLandingRect->Set_Limit(this->meleeCnt);
+				stompLandingRect->Set_Erase(0);
+				stompLandingRect->Set_Power(0);
+				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
+				stompLandingRect->moveBack = ML::Vec2(12, -4);
+				//範囲攻撃であることを知らせるフラグをtrue
+				stompLandingRect->wideRange = true;
+				//エフェクトの生成
+				//タスクキルはエフェクト側で行う
+				auto stompLandingEffect = Effect::Object::Create(true);
+				stompLandingEffect->pos = this->pos;
+				stompLandingEffect->Set_Limit(18);
+				stompLandingEffect->state = StompLanding;
 			}
 			break;
-		case Stomp:
+		case AirStomp:
 			//出だしだけ少し浮かせる
 			if (this->moveCnt == 0)
 			{
@@ -512,9 +490,9 @@ namespace  Player
 				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
 				stompLandingRect->Set_Limit(this->meleeCnt);
 				stompLandingRect->Set_Erase(0);
-				stompLandingRect->Set_Power(5);
+				stompLandingRect->Set_Power(0);
 				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
-				stompLandingRect->moveBack = ML::Vec2(10, -9);
+				stompLandingRect->moveBack = ML::Vec2(12, -4);
 				//範囲攻撃であることを知らせるフラグをtrue
 				stompLandingRect->wideRange = true;
 				//エフェクトの生成
@@ -559,116 +537,14 @@ namespace  Player
 		case Bunker3:
 			break;
 		case  Shoot:	//射撃
-			//射撃中も移動できる
-			if (in.LStick.L.on) 
-			{
-				this->moveVec.x = -this->maxSpeed;
-			}
-			if (in.LStick.R.on)
-			{
-				this->moveVec.x = +this->maxSpeed;
-			}
-			//4フレーム目で弾を発射
-			if (this->moveCnt == 4)
-			{
-				auto shot = Shot00::Object::Create(true);
-				shot->state = Shoot;
-				//攻撃毎に攻撃範囲を生成時に指定
-				shot->hitBase = ML::Box2D(-32, -32, 64, 64);
-				shot->Set_Limit(30);
-				shot->Set_Erase(1);
-				shot->Set_Power(1);
-				shot->angle_LR = this->angle_LR;
-				shot->tip = true;
-				if (this->angle_LR == Right)
-				{
-					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					shot->moveBack = ML::Vec2(+2, -1);
-					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
-				}
-				else
-				{
-					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					shot->moveBack = ML::Vec2(-2, -1);
-					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
-				}
-			}
+			this->Shot_Appear();
 			break;
-		case Air:
-			//空中制動
-			if (in.LStick.L.on)
-			{
-				this->moveVec.x = -this->maxSpeed;
-			}
-			if (in.LStick.R.on)
-			{
-				this->moveVec.x = +this->maxSpeed;
-			}
-			//空中攻撃(目の前に弾を生成)
-			if (this->moveCnt == 4) {//4フレーム目で弾を発射
-				auto air = Shot00::Object::Create(true);
-				air->state = Air;
-				//攻撃毎に攻撃範囲を生成時に指定
-				air->hitBase = ML::Box2D(-64, -32, 128, 64);
-				air->Set_Limit(this->meleeCnt);
-				air->Set_Erase(0);
-				air->Set_Power(3);
-				air->angle_LR = this->angle_LR;
-				//以下プレイヤの左右によって変化する
-				if (this->angle_LR == Right) 
-				{
-					air->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					air->moveBack = ML::Vec2(+6, -4);
-				}
-				else
-				{
-					air->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					air->moveBack = ML::Vec2(-6, -4);
-				}
-				//エフェクトの呼び出し
-				auto airEffect = Effect::Object::Create(true);
-				airEffect->state = Punch1;
-				airEffect->Set_Limit(18);
-				airEffect->pos = this->pos;
-				airEffect->angle_LR = this->angle_LR;
-			}
+		case Jumpshoot:
+			this->Shot_Appear();
+			if (this->CheckHead() == true) { this->moveVec.y = 0; }	
 			break;
-		case Airshoot:
-			//空中制動
-			if (in.LStick.L.on)
-			{
-				this->moveVec.x = -this->maxSpeed;
-			}
-			if (in.LStick.R.on)
-			{
-				this->moveVec.x = this->maxSpeed;
-			}
-			//空中射撃
-			//4フレーム目で弾を発射
-			if (this->moveCnt == 4)
-			{
-				auto shot = Shot00::Object::Create(true);
-				//攻撃毎に攻撃範囲を生成時に指定
-				shot->hitBase = ML::Box2D(-32, -32, 64, 64);
-				shot->state = Airshoot;
-				shot->Set_Limit(30);
-				shot->Set_Erase(1);
-				shot->Set_Power(1);
-				shot->angle_LR = this->angle_LR;
-				shot->tip = true;
-				if (this->angle_LR == Left)
-				{
-					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					shot->moveBack = ML::Vec2(-2, -1);
-					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
-				}
-				else
-				{
-					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					shot->moveBack = ML::Vec2(+2, -1);
-					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
-				}
-			}
+		case Fallshoot:
+			this->Shot_Appear();
 			break;
 		}
 	}
@@ -729,15 +605,15 @@ namespace  Player
 			break;
 		//	歩行----------------------------------------------------------------------------
 		case  Walk:
-			//切り替わるフレーム数
 			walkAnim = this->animCnt / 8;
-			//パターン数
 			walkAnim %= 3;
-			//出た値に一枚目の要素番号を足す
 			rtv = imageTable[walkAnim + 5];
 			break;
 		//	減速----------------------------------------------------------------------------
-		case SlowDown:		rtv = imageTable[8];	break;
+		case SlowDown:
+		case PreStomp:
+			rtv = imageTable[8];
+			break;
 		//	パンチ1-------------------------------------------------------------------------
 		case Punch1:		rtv = imageTable[9];	break;
 		//	パンチ2-------------------------------------------------------------------------
@@ -745,13 +621,17 @@ namespace  Player
 		//	空中攻撃-------------------------------------------------------------------------
 		case Air:			rtv = imageTable[11];	break;
 		//	ストンプ-------------------------------------------------------------------------
-		case Stomp:			rtv = imageTable[12];	break;
+		case AirStomp:			rtv = imageTable[12];	break;
 		//	ストンプ着地---------------------------------------------------------------------
-		case StompLanding:	rtv = imageTable[13];	break;
+		case StompLanding:
+		case LandStomp:
+			rtv = imageTable[13];
+			break;
 		//	地上射撃-------------------------------------------------------------------------
 		case Shoot:			rtv = imageTable[14];	break;
 		//	空中射撃-------------------------------------------------------------------------
-		case Airshoot:		rtv = imageTable[15];	break;
+		case Jumpshoot:
+		case Fallshoot:		rtv = imageTable[15];	break;
 		//	バンカー1-------------------------------------------------------------------------
 		case Bunker1:		rtv = imageTable[16];	break;
 		//	バンカー2-------------------------------------------------------------------------
@@ -778,6 +658,66 @@ namespace  Player
 			//rtv.src.w = -rtv.src.w;
 		}
 		return rtv;
+	}
+	//ショット生成スタンダード
+	void Object::Shot_Appear()
+	{
+		auto in = DI::GPad_GetState(this->controllerName);
+		ML::Vec2 angle = in.RStick.axis;
+		//小数点以下
+		if (angle.x > 0.0f&&angle.x < +1.0f) { angle.x = +1.0f; }
+		if (angle.x < 0.0f&&angle.x > -1.0f) { angle.x = -1.0f; }
+		//射撃中も移動できる
+		if (in.LStick.L.on)
+		{
+			this->moveVec.x = -this->maxSpeed / 2.0f;
+		}
+		if (in.LStick.R.on)
+		{
+			this->moveVec.x = +this->maxSpeed / 2.0f;
+		}
+		//一定間隔で弾を生成
+		if (this->moveCnt % this->shotInterval == 0)
+		{
+			auto shot = Shot00::Object::Create(true);
+			shot->state = Shoot;
+			//攻撃毎に攻撃範囲を生成時に指定
+			shot->hitBase = ML::Box2D(-8, -8, 16, 16);
+			shot->Set_Limit(40);
+			shot->Set_Erase(1);
+			shot->Set_Power(1);
+			shot->angle_LR = this->angle_LR;
+			shot->tip = true;
+			//右スティックが入力されていなければ一定の軌道を描く
+			if (in.RStick.axis == ML::Vec2(0.0f, 0.0f))
+			{
+				if (this->angle_LR == Right)
+				{
+					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
+				}
+				else
+				{
+					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
+				}
+			}
+			//スティックの入力方向へ発射
+			else
+			{
+				shot->pos = this->pos + angle * this->reach;
+				shot->moveVec = angle * this->shotSpeed;
+			}
+		}
+		//発射方向によって向きを変える
+		if (in.RStick.axis.x > 0)
+		{
+			this->angle_LR = Right;
+		}
+		else if (in.RStick.axis.x<0)
+		{
+			this->angle_LR = Left;
+		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

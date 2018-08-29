@@ -99,6 +99,8 @@ namespace  Sprite
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		//デバッグモードのみ表示
+		if (!ge->debugMode) { return; }
 		ML::Box2D  draw(-16, -16, 32, 32);
 		draw.Offset(this->pos);
 		ML::Box2D  src(0, 0, 32, 32);

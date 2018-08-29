@@ -89,8 +89,6 @@ namespace  Shot00
 					}
 					else
 					{
-						//対応したヒット時のエフェクトを生成
-						//現状、引数には対象の敵の座標をいれる
 						//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
 						if ((*it)->moveCnt == 0)
 						{
@@ -129,10 +127,22 @@ namespace  Shot00
 	{
 		ML::Box2D draw = this->hitBase;
 		draw.Offset(this->pos);
-		ML::Box2D src(0, 0, 32, 32);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src,ML::Color(0.5f,1.0f,0.0f,0.0f));
+		//ショットとして呼ばれたとき、弾の描画
+		if (this->state == Shoot ||
+			this->state == Jumpshoot ||
+			this->state == Fallshoot)
+		{
+			ML::Box2D src(0, 224, 32, 32);
+			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
+		}
+		//以下攻撃範囲表示
+		if (ge->debugMode)
+		{
+			ML::Box2D srcDebug(0, 0, 32, 32);
+			DG::Image_Draw(this->res->imageName, draw, srcDebug, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
+		}
 	}
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)
@@ -204,7 +214,8 @@ namespace  Shot00
 				return;
 			}
 			break;
-		case Airshoot:
+		case Jumpshoot:
+		case Fallshoot:
 			//敵に衝突したとき消えるか否か
 			this->eraseFlag = true;
 			break;
@@ -274,7 +285,8 @@ namespace  Shot00
 			AirHitEffect->angle_LR = this->angle_LR;
 			break;
 		}
-		case Airshoot:
+		case Jumpshoot:
+		case Fallshoot:
 		{
 			auto AirshootHitEffect = Effect::Object::Create(true);
 			AirshootHitEffect->pos = pos_;

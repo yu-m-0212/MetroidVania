@@ -200,7 +200,8 @@ namespace  Effect
 			break;
 		case Shoot:
 			break;
-		case Airshoot:
+		case Jumpshoot:
+		case Fallshoot:
 			break;
 		case Heal:
 			this->moveVec = pl->moveVec;

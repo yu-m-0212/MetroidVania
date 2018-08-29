@@ -23,10 +23,13 @@ public:
 		Punch1,			//	パンチ1
 		Punch2,			//	パンチ2
 		Air,			//	空中攻撃
-		Stomp,			//	ストンプ
+		PreStomp,		//	ストンプの予備動作
+		LandStomp,		//	ストンプ
+		AirStomp,		//	空中からの降下
 		StompLanding,	//	ストンプ着地
 		Shoot,			//	射撃(地上)
-		Airshoot,		//	射撃(空中)
+		Jumpshoot,		//	射撃(空中上昇)
+		Fallshoot,		//	射撃(空中降下)
 		Bunker1,		//	バンカー構え
 		Bunker2,		//	バンカー射出
 		Bunker3,		//	バンカー腕戻し

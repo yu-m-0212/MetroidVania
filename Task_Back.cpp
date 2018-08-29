@@ -12,7 +12,7 @@ namespace  Back
 	bool  Resource::Initialize()
 	{
 		this->image01 = "image01";
-		DG::Image_Create(this->image01, "./data/image/back.png");
+		DG::Image_Create(this->image01, "./data/image/back02.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -62,7 +62,7 @@ namespace  Back
 	void  Object::Render2D_AF()
 	{
 		Box2D draw(0, 0, 1920, 1080);
-		Box2D  src(0, 0, 827, 270);
+		Box2D  src(0, 0, 1920, 1080);
 		DG::Image_Draw(this->res->image01, draw, src);
 	}
 
