@@ -231,24 +231,6 @@ namespace  Shot00
 		{
 		default:
 			break;
-		case Punch1:
-		{
-			auto ImpactPunchEffect1 = Effect::Object::Create(true);
-			ImpactPunchEffect1->pos = this->pos;
-			ImpactPunchEffect1->Set_Limit(18);
-			ImpactPunchEffect1->state = ImpactPunch;
-			ImpactPunchEffect1->angle_LR = this->angle_LR;
-			break;
-		}
-		case Punch2:
-		{
-			auto ImpactPunchEffect2 = Effect::Object::Create(true);
-			ImpactPunchEffect2->pos = this->pos;
-			ImpactPunchEffect2->Set_Limit(18);
-			ImpactPunchEffect2->state = ImpactPunch;
-			ImpactPunchEffect2->angle_LR = this->angle_LR;
-			break;
-		}
 		case StompLanding:
 		{
 			auto StompLandingHitEffect = Effect::Object::Create(true);
@@ -274,15 +256,6 @@ namespace  Shot00
 			ShootHitEffect->Set_Limit(18);
 			ShootHitEffect->state = ImpactPunch;
 			ShootHitEffect->angle_LR = this->angle_LR;
-			break;
-		}
-		case Air:
-		{
-			auto AirHitEffect = Effect::Object::Create(true);
-			AirHitEffect->pos = pos_;
-			AirHitEffect->Set_Limit(18);
-			AirHitEffect->state = ImpactPunch;
-			AirHitEffect->angle_LR = this->angle_LR;
 			break;
 		}
 		case Jumpshoot:

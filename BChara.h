@@ -71,7 +71,6 @@ public:
 	float		addSpeed;		//左右方向への移動の加算量
 	float		decSpeed;		//左右方向への移動の減衰量
 	float		reach;			//パンチの射程
-	float		slide;			//パンチ時に前進する
 	bool		wideRange;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
 	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
 
@@ -96,7 +95,6 @@ public:
 		, addSpeed(0)
 		, decSpeed(0)
 		, reach(0)
-		, slide(0)
 		, wideRange(false)
 		, tip(false)
 	{

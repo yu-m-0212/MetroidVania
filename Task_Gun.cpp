@@ -1,29 +1,26 @@
 //-------------------------------------------------------------------
-//UI
+//ガン
 //-------------------------------------------------------------------
 #include	"MyPG.h"
-#include	"Task_UI.h"
+#include	"Task_Gun.h"
 #include	"Task_Player.h"
-#include	"Task_Enemy01.h"
 
-namespace  UI
+namespace  Gun
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->hpImageName = "hpImage";
-		DG::Image_Create(this->hpImageName, "./data/image/ui.png");
-		DG::Font_Create("fontUI", "ＭＳ ゴシック", 16, 32);
+		this->imageName = "GunImage";
+		DG::Image_Create(this->imageName, "./data/image/chara(仮)01.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->hpImageName);
-		DG::Font_Erase("fontUI");
+		DG::Image_Erase(this->imageName);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -36,17 +33,13 @@ namespace  UI
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.2f;
-		this->controllerName = "P1";
-		//HPボタン表示用
+		this->render2D_Priority[1] = 0.4f;
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		for (int i = 0; i < pl->max_Hp; ++i)
-		{
-			this->playerHp[i].active = true;
-			this->playerHp[i].x = 0;
-			this->playerHp[i].y = 32;
-		}
-		
+		this->pos = pl->pos;
+		this->hitBase = ML::Box2D(-64, -32, 128, 64);
+		this->controllerName = "P1";
+		this->tremor = 3.0f;
+
 		//★タスクの生成
 
 		return  true;
@@ -68,78 +61,116 @@ namespace  UI
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		//HPのボタン表示
-		//auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		//for (int i = 0; i < pl->Get_HP(); ++i)
-		//{
-		//	this->playerHp[i].active = true;
-		//}
-		//for (int j = pl->Get_Max_HP(); j > pl->Get_HP(); --j)
-		//{
-		//	this->playerHp[j].active = false;
-		//}
+		this->moveCnt++;
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto in = DI::GPad_GetState(this->controllerName);
+		this->angle_LR = pl->angle_LR;
+		
+		this->pos = pl->pos;
+		this->Think();
+		this->Move();
+		this->angle = atan2(in.RStick.axis.y, in.RStick.axis.x);
+		if (this->angle_LR == Right)
+		{
+			if (ML::ToDegree(this->angle) > 45.0)
+			{
+				this->angle = ML::ToRadian(45.0f);
+			}
+			else if (ML::ToDegree(this->angle) < -45.0f)
+			{
+				this->angle = ML::ToRadian(-45.0f);
+			}
+		}
+		else
+		{
+			if (in.RStick.axis != ML::Vec2(0, 0))
+			{
+				this->angle += ML::ToRadian(180.0f);
+				if (ML::ToDegree(this->angle) > 45.0f && ML::ToDegree(this->angle)<180.0f)
+				{
+					this->angle = ML::ToRadian(45.0f);
+				}
+				else if (ML::ToDegree(this->angle) < 315.0f &&
+					!(ML::ToDegree(this->angle) > 0.0f && ML::ToDegree(this->angle)<45.0f))
+				{
+					this->angle = ML::ToRadian(315.0f);
+				}
+			}
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		auto es = ge->GetTask_One_G<Enemy01::Object>("敵");
-		auto in = DI::GPad_GetState(this->controllerName);
-		if (ge->debugMode)
+		ML::Box2D draw = this->hitBase.OffsetCopy(this->pos);
+		ML::Box2D  src(1216, 0, 64, 32);
+		if (this->angle_LR == Left)
 		{
-			ML::Box2D debugBox01(850, 50, 600, 600);
-			string debugText01 =
-				"state = " + to_string(pl->state) + "\n" +
-				"pos.x = " + to_string(pl->pos.x) + "\n" +
-				"pos.y = " + to_string(pl->pos.y) + "\n" +
-				"moveVec.x = " + to_string(pl->moveVec.x) + "\n" +
-				"moveVec.y = " + to_string(pl->moveVec.y) + "\n" +
-				"angle = " + to_string(pl->angle_LR) + "\n"
-				"moveCnt = " + to_string(pl->moveCnt) + "\n" +
-				"unHitTime = " + to_string(pl->unHitTime) + "\n" +
-				"hp=" + to_string(pl->hp) + "\n" +
-				"ge->clear = " + to_string(ge->clear) + "\n" +
-				"ge->failure = " + to_string(ge->failure) + "\n" +
-				"Search_Player() = " + to_string(es->Search_Player()) + "\n" +
-				"BackSpace/Selectボタンでデバッグモード切替";
-			DG::Font_Draw("fontUI", debugBox01, debugText01, ML::Color(1, 1, 1, 1));
-			ML::Box2D debugBox02(1450, 150, 600, 600);
-			string debugText02 =
-				"RStick.axis.x = " + to_string(in.RStick.axis.x) + "\n" +
-				"RStick.axis.y = " + to_string(in.RStick.axis.y);
-			DG::Font_Draw("fontUI", debugBox02, debugText02, ML::Color(1, 1, 1, 1));
+			src.y = 32;
 		}
-		//以上デバッグ----------------------------------------------------
-		//プレイヤのHP表示
-		//ボタン表示
-		for (int i = 0; i < pl->Get_HP(); ++i)
+		DG::Image_Rotation(this->res->imageName, this->angle, 
+			ML::Vec2(float(this->hitBase.w/2), float(this->hitBase.h/2)));
+		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+		DG::Image_Draw(this->res->imageName, draw, src);
+	}
+	//プレイヤが消滅したとき、プレイヤ側からKill
+	void Object::Gun_Kill()
+	{
+		this->Kill();
+	}
+	//
+	float Object::Get_Angle()
+	{
+		return this->angle;
+	}
+	//思考
+	void Object::Think()
+	{
+		BChara::State nm = this->state; //とりあえず今の状態を指定
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		//思考（入力）や状況に応じてモーションを変更することを目的としている。
+		//モーションの変更以外の処理は行わない
+		//モーション更新
+		switch (nm)
 		{
-			if (this->playerHp[i].active)
-			{
-				ML::Box2D draw(64 + 64 * i, 64, 64, 64);
-				//デバッグ時は表示をずらす
-				if (ge->debugMode)
-				{
-					draw.x += 100;
-				}
-				ML::Box2D src(0, 0, 32, 32);
-				//残り体力によって色を指定する
-				float red = 1.0f - 0.1f * i;
-				float blue = 0.1f + 0.1f * i;
-				DG::Image_Draw(this->res->hpImageName, draw, src, ML::Color(1.0f, red, 0.0f, blue));
-			}
+		default:
+			break;
+		case Stand:
+			if (pl->state == Shoot) { nm = Shoot; }
+			if (pl->state == Jumpshoot) { nm = Jumpshoot; }
+			if (pl->state == Fallshoot) { nm = Fallshoot; }
+			break;
+		case Shoot:
+			if (!(pl->state==Shoot)) { nm = Stand; }
+			break;
+		case Jumpshoot:
+			if (!(pl->state==Jumpshoot)) { nm = Stand; }
+			break;
+		case Fallshoot:
+			if (!(pl->state==Fallshoot)) { nm = Stand; }
+			break;
 		}
-		//プレイヤのHP表示
-		//バーで表示
-		//ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
-		////デバッグ時は表示をずらす
-		//if (ge->debugMode)
-		//{
-		//	draw.x += 100;
-		//}
-		//ML::Box2D  src(32, 0, 32, 32);
-		//DG::Image_Draw(this->res->hpImageName, draw, src);
+		this->UpdateMotion(nm);
+	}
+	//モーションに対応した処理
+	//(モーションは変更しない)
+	void Object::Move()
+	{
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		switch (this->state) 
+		{
+		default:
+			break;
+		case Stand:
+			break;
+		case Shoot:
+		case Jumpshoot:
+		case Fallshoot:
+			//発砲中は上下に揺らす
+			this->pos.y = float(pl->pos.y + sin(this->moveCnt) * this->tremor);
+			break;
+		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

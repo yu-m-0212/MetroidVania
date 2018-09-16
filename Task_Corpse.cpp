@@ -92,6 +92,8 @@ namespace  Corpse
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		Box2D  src(1088, 0, 128, 128);
+		DG::Image_Rotation(this->res->imageName, 0.0f,
+			ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
 		DG::Image_Draw(this->res->imageName, draw, src);
 	}
 	//接触時の応答処理（必ず受け身の処理として実装する）

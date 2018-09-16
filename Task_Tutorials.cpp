@@ -38,9 +38,10 @@ namespace  Tutorials
 		//★データ初期化
 		this->render2D_Priority[1] = 0.6f;
 		this->message = "このメッセージが見れるのはおかしいよ";
+		this->recieveBase = ML::Box2D(-128, -64, 256, 128);
 		
 		//★タスクの生成
-
+		
 		return  true;
 	}
 	//-------------------------------------------------------------------

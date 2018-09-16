@@ -46,19 +46,22 @@ namespace  Player
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	//追加変数
-		string		controllerName;
-		//ストンプ時の最大効果速度
-		float max_StompFallSpeed;
-		//ストンプ着地時の硬直時間
-		int stompHoldTime;
-		//ショット速度
-		float shotSpeed;
-		//格闘攻撃判定継続時間
-		int meleeCnt;
-		//被弾時に得られる無敵時間
-		int addUnHitTime;
-		//射撃の発射間隔（フレーム）
-		int shotInterval;
+		string controllerName;
+		float max_StompFallSpeed;	//ストンプ時の最大効果速度
+		float shotSpeed;			//ショット速度
+		int addUnHitTime;			//被弾時に得られる無敵時間
+		int interval_Shot;			//射撃の発射間隔（フレーム）
+		int limit_JumpAngleChange;	//ジャンプ時、スティックを倒したとき一定時間内なら向きを変えられる
+		int limit_Stomp;			//継続時間ストンプ
+		int limit_StompEffect;		//継続時間ストンプ効果
+		int limit_StompHoldTime;	//硬直時間ストンプ
+		int limit_Shot;				//継続時間ショット
+		int limit_HealEffect;		//継続時間回復効果
+		int power_Stomp;			//攻撃力ストンプ
+		int power_Shot;				//攻撃力ショット
+		ML::Box2D range_Stomp;		//範囲ストンプ
+		ML::Box2D range_Shot;		//範囲ショット
+		ML::Vec2 moveBack_Stomp;	//ふっとび量ストンプ
 	public:
 		//思考＆状況判断(ステータス決定）
 		void  Think();
@@ -75,5 +78,7 @@ namespace  Player
 		BChara::DrawInfo  Anim();
 		//ショット生成スタンダード
 		void Shot_Appear();
+		//行動ショット中
+		void Move_Shot();
 	};
 }

@@ -64,121 +64,40 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		pl->pos.x = 770;
-		pl->pos.y = 2400;
+		pl->pos = ML::Vec2(383.0f, 1100.0f);
 		//妖精の生成
 		auto  spr = Sprite::Object::Create(true);
 		spr->pos = pl->pos;
 		spr->target = pl;
-		//デバッグ用
-		//敵の生成
-		auto ene0 = Enemy01::Object::Create(true);
+		//エネミー00の生成
+		/*this->Create_Enemy(ML::Vec2(5535.0f, 3712.0f), 0.0f, 5);
+		this->Create_Enemy(ML::Vec2(4769.0f, 3712.0f), 0.0f, 5);
+		this->Create_Enemy(ML::Vec2(3299.0f, 3712.0f), 0.0f, 5);
+		this->Create_Enemy(ML::Vec2(2339.0f, 3456.0f), 0.0f, 5);
+		this->Create_Enemy(ML::Vec2(1340.0f, 3072.0f), 0.0f, 5);*/
+		//エネミー01の生成
+		/*auto ene0 = Enemy01::Object::Create(true);
 		ene0->pos.x = 550.0f;
 		ene0->pos.y = 4200.0f;
-		ene0->hp = 30;
-		//敵の生成
-		auto ene1 = Enemy00::Object::Create(true);
-		ene1->pos.x = 5535.0f;
-		ene1->pos.y = 3712.0f;
-		ene1->addSpeed = 0.0f;
-		ene1->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene1->hp = 5;
-		//敵の生成
-		auto ene2 = Enemy00::Object::Create(true);
-		ene2->pos.x = 4769.0f;
-		ene2->pos.y = 3712.0f;
-		ene2->addSpeed = 0.0f;
-		ene2->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene2->hp = 5;
-		//敵の生成
-		auto ene3 = Enemy00::Object::Create(true);
-		ene3->pos.x = 3299.0f;
-		ene3->pos.y = 3712.0f;
-		ene3->addSpeed = 0.0f;
-		ene3->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene3->hp = 5;
-		//敵の生成
-		auto ene4 = Enemy00::Object::Create(true);
-		ene4->pos.x = 2339.0f;
-		ene4->pos.y = 3456.0f;
-		ene4->addSpeed = 0.0f;
-		ene4->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene4->hp = 5;
-		//敵の生成
-		auto ene5 = Enemy00::Object::Create(true);
-		ene5->pos.x = 1340.0f;
-		ene5->pos.y = 3072.0f;
-		ene5->addSpeed = 0.0f;
-		ene5->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene5->hp = 5;
-		//敵の生成
-		auto ene6 = Enemy00::Object::Create(true);
-		ene6->pos.x =  836.0f;
-		ene6->pos.y = 3392.0f;
-		ene6->addSpeed = 0.0f;
-		ene6->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene6->hp = 5;
-		//敵の生成
-		auto ene7 = Enemy00::Object::Create(true);
-		ene7->pos.x =  966.0f;
-		ene7->pos.y = 3776.0f;
-		ene7->addSpeed = 0.0f;
-		ene7->hitBase = ML::Box2D(-56, -48, 102, 96);
-		ene7->hp = 5;
+		ene0->hp = 30;*/
 		//UIの生成
 		auto ui = UI::Object::Create(true);
-		//チュートリアル01の生成
-		auto tutorials01 = Tutorials::Object::Create(true);
-		tutorials01->pos = ML::Vec2(770, 2624);
-		tutorials01->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials01->Set_Message("左スティックを横に倒すと移動");
-		//チュートリアル02の生成
-		auto tutorials02 = Tutorials::Object::Create(true);
-		tutorials02->pos = ML::Vec2(1857, 2624);
-		tutorials02->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials02->Set_Message("×ボタンでジャンプ");
-		//チュートリアル03の生成
-		auto tutorials03 = Tutorials::Object::Create(true);
-		tutorials03->pos = ML::Vec2(4032, 2624);
-		tutorials03->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials03->Set_Message("×ボタン長押しで高くジャンプ");
-		//チュートリアル04の生成
-		auto tutorials04 = Tutorials::Object::Create(true);
-		tutorials04->pos = ML::Vec2(5570, 1920);
-		tutorials04->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials04->Set_Message("遺体に触れると回復する");
-		//チュートリアル05の生成
-		auto tutorials05 = Tutorials::Object::Create(true);
-		tutorials05->pos = ML::Vec2(6210, 3648);
-		tutorials05->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials05->Set_Message("□ボタンでパンチ");
-		//チュートリアル06の生成
-		auto tutorials06 = Tutorials::Object::Create(true);
-		tutorials06->pos = ML::Vec2(3774, 3648);
-		tutorials06->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials06->Set_Message("R1ボタンでショット");
-		//チュートリアル07の生成
-		auto tutorials07 = Tutorials::Object::Create(true);
-		tutorials07->pos = ML::Vec2(2688, 3648);
-		tutorials07->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials07->Set_Message("空中にいるとき□ボタンで空中攻撃");
-		//チュートリアル08の生成
-		auto tutorials08 = Tutorials::Object::Create(true);
-		tutorials08->pos = ML::Vec2(1600, 3136);
-		tutorials08->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials08->Set_Message("空中にいるときR1ボタンで空中ショット");
-		//チュートリアル09の生成
-		auto tutorials09 = Tutorials::Object::Create(true);
-		tutorials09->pos = ML::Vec2(1088, 3008);
-		tutorials09->recieveBase = ML::Box2D(-256, -128, 512, 256);
-		tutorials09->Set_Message("△ボタンで踏みつけ");
+		//チュートリアルの生成
+		this->Create_Message(ML::Vec2( 389, 1312), "左スティックを横に倒すと移動");
+		this->Create_Message(ML::Vec2( 929, 1312), "×ボタンでジャンプ");
+		this->Create_Message(ML::Vec2(2016, 1312), "×ボタン長押しで高くジャンプ");
+		this->Create_Message(ML::Vec2(2787,  800), "遺体に触れると回復する");
+		this->Create_Message(ML::Vec2(3040, 1888), "R1ボタンでショット");
+		this->Create_Message(ML::Vec2(1440, 1888), "右スティックで銃口を傾ける");
+		this->Create_Message(ML::Vec2( 384, 2272), "□ボタンで近接攻撃");
+
 		//背景の生成
 		auto back = Back::Object::Create(true);
 		//ゴールの生成
 		auto goal = Goal::Object::Create(true);
 		//チュートリアル用の遺体を配置
-		auto corpse = Corpse::Object::Create(true);
-		corpse->pos = ML::Vec2(5955, 1984);
+		/*auto corpse = Corpse::Object::Create(true);
+		corpse->pos = ML::Vec2(5955, 1984);*/
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -258,6 +177,23 @@ namespace  Game
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+	}
+	//チュートリアル表示キャラクタの生成
+	//引数	：	（座標,メッセージ）
+	void Object::Create_Message(const ML::Vec2& pos_, const string& message_)
+	{
+		auto tutorials = Tutorials::Object::Create(true);
+		tutorials->pos = pos_;
+		tutorials->Set_Message(message_);
+	}
+	//エネミーの生成
+	//引数	：	（初期座標,移動速度,HP）
+	void Object::Create_Enemy(const ML::Vec2& pos_, const float& addSpeed_, const int&hp_)
+	{
+		auto ene = Enemy00::Object::Create(true);
+		ene->pos = pos_;
+		ene->addSpeed = addSpeed_;
+		ene->hp = hp_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

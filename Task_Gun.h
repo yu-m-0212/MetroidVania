@@ -1,15 +1,15 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//UI表示
+//ガン
 //-------------------------------------------------------------------
 #include "BChara.h"
 
-namespace  UI
+namespace  Gun
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("UI");	//グループ名
-	const  string  defName("NoName");	//タスク名
+	const  string  defGroupName("ガン");	//グループ名
+	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -22,13 +22,13 @@ namespace  UI
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
-		string hpImageName;
+		string imageName;
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
 	{
-	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
 		virtual  ~Object();
 		typedef  shared_ptr<Object>		SP;
@@ -37,26 +37,30 @@ namespace  UI
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
+
 		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
-		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
-		void  UpDate();		//「実行」１フレーム毎に行う処理
+		bool  Initialize();		//「初期化」タスク生成時に１回だけ行う処理
+		void  UpDate();			//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	
-	//追加変数
-		BChara* pl;
-		struct Hp
-		{
-			int x,				//HPバーの横位置
-				y;				//HPバーの縦位置
-			bool active;		//trueの時描画
-		};
-		Hp playerHp[10];
-		string controllerName;	//
-	//追加したい変数・メソッドはここに追加する
+
+	private:
+		//描画角度
+		float angle;
+		//発砲時の揺れ幅
+		float tremor;
+		//
+		string controllerName;
 	public:
+		//プレイヤが消滅したとき、プレイヤ側からKill
+		void Gun_Kill();
+		//角度を返す
+		float Get_Angle();
+		//思考
+		void Think();
+		//行動
+		void Move();
 	};
 }

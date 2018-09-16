@@ -189,6 +189,9 @@
     <ClCompile Include="Task_Tutorials.cpp">
       <Filter>MyPG\Chara_Tutorials</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Gun.cpp">
+      <Filter>MyPG\Chara_Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -310,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="Task_Tutorials.h">
       <Filter>MyPG\Chara_Tutorials</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Gun.h">
+      <Filter>MyPG\Chara_Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

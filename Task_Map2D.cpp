@@ -31,7 +31,7 @@ namespace  Map2D
 		//★データ初期化
 		this->render2D_Priority[1] = 0.9f;
 		this->imageName = "MapChipImg";
-		this->chipSize = 64;
+		this->chipSize = 32;
 		//マップのゼロクリア
 		for (int y = 0; y < 100; ++y) {
 			for (int x = 0; x < 100; ++x) {

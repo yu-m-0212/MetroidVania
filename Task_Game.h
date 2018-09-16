@@ -51,10 +51,18 @@ namespace  Game
 		//前回の死亡地点
 		ML::Vec2 deadPos;
 	public:
-		//追加したい変数・メソッドはここに追加する
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;
 		Shot01::Resource::SP	shot01_Resource;
 		Effect::Resource::SP	effect_Resource;
+		
+		//メソッド
+
+		//チュートリアル表示キャラクタの生成
+		//引数	：	（座標,メッセージ）
+		void Create_Message(const ML::Vec2&, const string&);
+		//エネミーの生成
+		//引数	：	（初期座標,移動速度,HP）
+		void Create_Enemy(const ML::Vec2&,const float&,const int&);
 	};
 }
