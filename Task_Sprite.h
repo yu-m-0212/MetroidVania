@@ -45,10 +45,8 @@ namespace  Sprite
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	public:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		//追加変数
-
-		//追加メソッド
+	private:
+	public:
 	};
 }

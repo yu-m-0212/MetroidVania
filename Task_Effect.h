@@ -46,19 +46,11 @@ namespace  Effect
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		//追加変数
-
-		//消滅までの時間
-		int cntLimit;
-		//撃破エフェクトの中心からの距離
-		float dist;
-		//表示する角度
-		float angle;
-		//回転軸
-		Vec2 center;
+		int cntLimit;	//消滅までの時間
+		float dist;		//撃破エフェクトの中心からの距離
+		float angle;	//表示する角度
+		Vec2 center;	//回転軸
 	public:
-		//追加したい変数・メソッドはここに追加する
-
 		//呼び出す際に消滅までの時間を指定する
 		//引数	：	（消滅までの時間）
 		void Set_Limit(const int&);

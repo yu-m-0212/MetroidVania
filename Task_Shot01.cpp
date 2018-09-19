@@ -37,9 +37,9 @@ namespace  Shot01
 		//★データ初期化
 		this->render2D_Priority[1] = 0.4f;
 		this->recieveBase = this->hitBase;
-		this->eraseFlag = true;
+		this->flag_Erase = true;
 		this->power = 0;
-		this->cntLimit = 0;			//消滅するまでの時間
+		this->limit_Erase = 0;			//消滅するまでの時間
 									//★タスクの生成
 
 		return  true;
@@ -80,7 +80,7 @@ namespace  Shot01
 					(*it)->Received(this, at);
 					//ショットのみ消滅
 					//格闘は複数体にあたる
-					if (this->eraseFlag)
+					if (this->flag_Erase)
 					{
 						//対応したヒット時のエフェクトを生成
 						//現状、引数には対象の敵の座標をいれる
@@ -102,7 +102,7 @@ namespace  Shot01
 			}
 		}
 		//射撃は壁に当たると消滅する
-		if (this->eraseFlag)
+		if (this->flag_Erase)
 		{
 			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ"))
 			{
@@ -116,7 +116,7 @@ namespace  Shot01
 			}
 		}
 		//限界の時間を迎えたら消滅
-		if (this->moveCnt >= this->cntLimit)
+		if (this->moveCnt >= this->limit_Erase)
 		{
 			//消滅申請
 			this->Kill();
@@ -137,12 +137,12 @@ namespace  Shot01
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)
 	{
-		this->cntLimit = cl_;
+		this->limit_Erase = cl_;
 	}
 	//壁や敵に衝突したとき、消えるか否かを指定する
 	void Object::Set_Erase(const int& erase_)
 	{
-		this->eraseFlag = erase_;
+		this->flag_Erase = erase_;
 	}
 	//外部から生成する際、攻撃力を指定
 	//引数	：	（整数値）
@@ -159,7 +159,7 @@ namespace  Shot01
 			break;
 		case Shoot:
 			//敵に衝突したとき消えるか否か
-			this->eraseFlag = true;
+			this->flag_Erase = true;
 			break;
 		}
 	}

@@ -45,25 +45,23 @@ namespace  Enemy01
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	//追加変数
-
-		//プレイヤが視界から外れた後、再度警戒に入るまでの時間
-		int interval_Caution;
-		//弾を生成する間隔
-		int interval_Attack;
-		//視認矩形
-		ML::Box2D searchBase;
-		//弾の生成時、自身の座標に足す値
-		ML::Vec2 shot_Init;
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		int interval_Caution;	//プレイヤが視界から外れた後、再度警戒に入るまでの時間
+		int interval_Attack;	//弾を生成する間隔
+		ML::Box2D searchBase;	//視認矩形
+		ML::Vec2 shot_Init;		//弾の生成時、自身の座標に足す値
 	public:
-		void Think();	//思考&状況判断(ステータス決定)
-		void Move();	//モーションに対応した処理		
+		//思考&状況判断(ステータス決定)
+		void Think();	
+		//モーションに対応した処理
+		void Move();		
 		//プレイヤを発見したら警戒モードに入る
 		bool Search_Player();
 		//探知矩形を取得する
 		ML::Box2D Get_Search();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		void Received(BChara* from_, AttackInfo at_);
-		BChara::DrawInfo Anim();	//アニメーション制御
+		//アニメーション制御
+		BChara::DrawInfo Anim();	
 	};
 }

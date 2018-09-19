@@ -43,19 +43,11 @@ namespace  Shot01
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-		//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		//変数
-
-		//壁や敵に衝突したとき、消滅するか否か
-		//shotは消える、meleeは消えない
-		bool eraseFlag;
-		//消滅するまでの時間
-		int cntLimit;
-		//攻撃力
-		int power;
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		bool flag_Erase;	//壁や敵に衝突したとき、消滅するか否か
+		int limit_Erase;	//消滅するまでの時間
+		int power;			//攻撃力
 	public:
-		//追加したい変数・メソッドはここに追加する
-
 		//攻撃毎に寿命を設ける際に使用
 		//引数	：	（寿命）
 		void Set_Limit(const int&);

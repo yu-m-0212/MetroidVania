@@ -460,6 +460,7 @@ namespace  Player
 				stompLandingRect->Set_Limit(this->limit_Stomp);
 				stompLandingRect->Set_Erase(0);
 				stompLandingRect->Set_Power(this->power_Stomp);
+				stompLandingRect->Set_Angle(0.0f);
 				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
 				stompLandingRect->moveBack = this->moveBack_Stomp;
 				//範囲攻撃であることを知らせるフラグをtrue
@@ -504,6 +505,7 @@ namespace  Player
 				stompLandingRect->Set_Limit(this->limit_Stomp);
 				stompLandingRect->Set_Erase(0);
 				stompLandingRect->Set_Power(this->power_Stomp);
+				stompLandingRect->Set_Angle(0.0f);
 				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
 				stompLandingRect->moveBack = this->moveBack_Stomp;
 				//範囲攻撃であることを知らせるフラグをtrue
@@ -549,29 +551,29 @@ namespace  Player
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw							src
-			{ this->hitBase, ML::Box2D(   0,   0, 64, 128), dc },//停止1			[0]
-			{ this->hitBase, ML::Box2D(   0, 128, 64, 128), dc },//停止2			[1]
-			{ this->hitBase, ML::Box2D(   0, 256, 64, 128), dc },//停止3			[2]
-			{ this->hitBase, ML::Box2D(   0, 384, 64, 128), dc },//停止4			[3]
-			{ this->hitBase, ML::Box2D(   0, 512, 64, 128), dc },//停止5			[4]
-			{ this->hitBase, ML::Box2D(  64,   0, 64, 128), dc },//歩行1			[5]
-			{ this->hitBase, ML::Box2D(  64, 128, 64, 128), dc },//歩行2			[6]
-			{ this->hitBase, ML::Box2D(  64, 256, 64, 128), dc },//歩行3			[7]
-			{ this->hitBase, ML::Box2D( 128,   0, 64, 128), dc },//減速			[8]
-			{ this->hitBase, ML::Box2D( 192,   0, 64, 128), dc },//パンチ1		[9]
-			{ this->hitBase, ML::Box2D( 256,   0, 64, 128), dc },//パンチ2		[10]
-			{ this->hitBase, ML::Box2D( 320,   0, 64, 128), dc },//空中攻撃		[11]
-			{ this->hitBase, ML::Box2D( 384,   0, 64, 128), dc },//ストンプ		[12]
-			{ this->hitBase, ML::Box2D( 448,   0, 64, 128), dc },//ストンプ着地	[13]
-			{ this->hitBase, ML::Box2D( 512,   0, 64, 128), dc },//射撃			[14]
-			{ this->hitBase, ML::Box2D( 576,   0, 64, 128), dc },//空中射撃		[15]
-			{ this->hitBase, ML::Box2D( 640,   0, 64, 128), dc },//バンカー1		[16]
-			{ this->hitBase, ML::Box2D( 704,   0, 64, 128), dc },//バンカー2		[17]
-			{ this->hitBase, ML::Box2D( 768,   0, 64, 128), dc },//バンカー3		[18]
-			{ this->hitBase, ML::Box2D( 832,   0, 64, 128), dc },//ジャンプ		[19]
-			{ this->hitBase, ML::Box2D( 896,   0, 64, 128), dc },//落下			[20]
-			{ this->hitBase, ML::Box2D( 960,   0, 64, 128), dc },//着地			[21]
-			{ this->hitBase, ML::Box2D(1024,   0, 64, 128), dc },//ダメージ		[22]
+			{ this->hitBase, ML::Box2D(  0,  0, 48, 96), dc },//停止1			[0]
+			{ this->hitBase, ML::Box2D(  0, 96, 48, 96), dc },//停止2			[1]
+			{ this->hitBase, ML::Box2D(  0,192, 48, 96), dc },//停止3			[2]
+			{ this->hitBase, ML::Box2D(  0,288, 48, 96), dc },//停止4			[3]
+			{ this->hitBase, ML::Box2D(  0,384, 48, 96), dc },//停止5			[4]
+			{ this->hitBase, ML::Box2D( 48,  0, 48, 96), dc },//歩行1			[5]
+			{ this->hitBase, ML::Box2D( 48, 96, 48, 96), dc },//歩行2			[6]
+			{ this->hitBase, ML::Box2D( 48,192, 48, 96), dc },//歩行3			[7]
+			{ this->hitBase, ML::Box2D(96,   0, 48, 96), dc },//減速				[8]
+			{ this->hitBase, ML::Box2D(144,  0, 48, 96), dc },//パンチ1			[9]
+			{ this->hitBase, ML::Box2D(192,  0, 48, 96), dc },//パンチ2			[10]
+			{ this->hitBase, ML::Box2D(240,  0, 48, 96), dc },//空中攻撃			[11]
+			{ this->hitBase, ML::Box2D(288,  0, 48, 96), dc },//ストンプ			[12]
+			{ this->hitBase, ML::Box2D(336,  0, 48, 96), dc },//ストンプ着地		[13]
+			{ this->hitBase, ML::Box2D(384,  0, 48, 96), dc },//射撃				[14]
+			{ this->hitBase, ML::Box2D(432,  0, 48, 96), dc },//空中射撃			[15]
+			{ this->hitBase, ML::Box2D(480,  0, 48, 96), dc },//バンカー1		[16]
+			{ this->hitBase, ML::Box2D(528,  0, 48, 96), dc },//バンカー2		[17]
+			{ this->hitBase, ML::Box2D(576,  0, 48, 96), dc },//バンカー3		[18]
+			{ this->hitBase, ML::Box2D(624,  0, 48, 96), dc },//ジャンプ			[19]
+			{ this->hitBase, ML::Box2D(672,  0, 48, 96), dc },//落下				[20]
+			{ this->hitBase, ML::Box2D(720,  0, 48, 96), dc },//着地				[21]
+			{ this->hitBase, ML::Box2D(768,  0, 48, 96), dc },//ダメージ			[22]
 		};
 		BChara::DrawInfo  rtv;
 		int  standAnim,walkAnim;
@@ -597,10 +599,6 @@ namespace  Player
 		case PreStomp:
 			rtv = imageTable[8];
 			break;
-		//	パンチ1-------------------------------------------------------------------------
-		case Punch1:		rtv = imageTable[9];	break;
-		//	パンチ2-------------------------------------------------------------------------
-		case Punch2:		rtv = imageTable[10];	break;
 		//	空中攻撃-------------------------------------------------------------------------
 		case Air:			rtv = imageTable[11];	break;
 		//	ストンプ-------------------------------------------------------------------------
@@ -615,12 +613,6 @@ namespace  Player
 		//	空中射撃-------------------------------------------------------------------------
 		case Jumpshoot:
 		case Fallshoot:		rtv = imageTable[15];	break;
-		//	バンカー1-------------------------------------------------------------------------
-		case Bunker1:		rtv = imageTable[16];	break;
-		//	バンカー2-------------------------------------------------------------------------
-		case Bunker2:		rtv = imageTable[17];	break;
-		//	バンカー3-------------------------------------------------------------------------
-		case Bunker3:		rtv = imageTable[18];	break;
 		//	ジャンプ------------------------------------------------------------------------
 		case  Jump:			rtv = imageTable[19];	break;
 		//	落下----------------------------------------------------------------------------
@@ -646,10 +638,7 @@ namespace  Player
 	void Object::Shot_Appear()
 	{
 		auto in = DI::GPad_GetState(this->controllerName);
-		ML::Vec2 angle = in.RStick.axis;
-		//小数点以下
-		if (angle.x > 0.0f&&angle.x < +1.0f) { angle.x = +1.0f; }
-		if (angle.x < 0.0f&&angle.x > -1.0f) { angle.x = -1.0f; }
+		float angle=atan2(in.RStick.axis.y,in.RStick.axis.x);
 		//一定間隔で弾を生成
 		if (this->moveCnt % this->interval_Shot == 0)
 		{
@@ -665,6 +654,7 @@ namespace  Player
 			//右スティックが入力されていなければ一定の軌道を描く
 			if (in.RStick.axis == ML::Vec2(0.0f, 0.0f))
 			{
+				shot->Set_Angle(0.0f);
 				if (this->angle_LR == Right)
 				{
 					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
@@ -679,8 +669,9 @@ namespace  Player
 			//スティックの入力方向へ発射
 			else
 			{
-				shot->pos = this->pos + angle * this->reach;
-				shot->moveVec = angle * this->shotSpeed;
+				shot->pos = this->pos + ML::Vec2(cos(angle),sin(angle)) * this->reach;
+				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->shotSpeed;
+				shot->Set_Angle(angle);
 			}
 		}
 	}

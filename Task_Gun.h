@@ -45,14 +45,10 @@ namespace  Gun
 		void  UpDate();			//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-
-	private:
-		//描画角度
-		float angle;
-		//発砲時の揺れ幅
-		float tremor;
-		//
-		string controllerName;
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		float angle;			//描画角度
+		float tremor;			//発砲時の揺れ幅
+		string controllerName;	//コントローラー宣言
 	public:
 		//プレイヤが消滅したとき、プレイヤ側からKill
 		void Gun_Kill();

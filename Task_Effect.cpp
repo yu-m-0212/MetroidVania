@@ -127,16 +127,6 @@ namespace  Effect
 		//effectCntに対象の要素番号を足して返す
 		case Unnon:
 			break;
-		case Punch1:
-			effectCnt = this->animCnt / 6;
-			effectCnt %= 3;
-			rtv = imageTable[effectCnt + 3];
-			break;
-		case Punch2:
-			effectCnt = this->animCnt / 6;
-			effectCnt %= 3;
-			rtv = imageTable[effectCnt + 3];
-			break;
 		case ImpactPunch:
 			effectCnt = this->animCnt / 6;
 			effectCnt %= 3;
@@ -179,22 +169,6 @@ namespace  Effect
 		switch (this->state)
 		{
 		default:
-			break;
-		case Punch1:
-			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
-			this->moveVec = pl->moveVec;
-			//プレイヤが壁に衝突したら移動量を0に
-			if (pl->CheckFront_LR())
-			{
-				this->moveVec.x = 0.0f;
-			}
-			break;
-		case Punch2:
-			this->moveVec = pl->moveVec;
-			if (pl->CheckFront_LR())
-			{
-				this->moveVec.x = 0.0f;
-			}
 			break;
 		case StompLanding:
 			break;

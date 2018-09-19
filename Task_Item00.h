@@ -46,8 +46,7 @@ namespace  Item00
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	public:
-		//追加したい変数・メソッドはここに追加する
-		//追加メソッド：
+		//アニメーション制御
 		BChara::DrawInfo Anim();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		void Received(BChara* from_, AttackInfo at_);

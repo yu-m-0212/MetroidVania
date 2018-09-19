@@ -37,9 +37,9 @@ namespace  Shot00
 		//★データ初期化
 		this->render2D_Priority[1] = 0.4f;
 		this->recieveBase = this->hitBase;
-		this->eraseFlag = true;
+		this->flag_Erase = true;
 		this->power = 0;			
-		this->cntLimit = 0;			//消滅するまでの時間
+		this->limit_Erase = 0;			//消滅するまでの時間
 		//★タスクの生成
 
 		return  true;
@@ -80,7 +80,7 @@ namespace  Shot00
 					(*it)->Received(this, at);
 					//ショットのみ消滅
 					//格闘は複数体にあたる
-					if (this->eraseFlag)
+					if (this->flag_Erase)
 					{
 						//対応したヒット時のエフェクトを生成
 						//現状、引数には対象の敵の座標をいれる
@@ -100,7 +100,7 @@ namespace  Shot00
 			}
 		}
 		//射撃は壁に当たると消滅する
-		if (this->eraseFlag)
+		if (this->flag_Erase)
 		{
 			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) 
 			{
@@ -114,7 +114,7 @@ namespace  Shot00
 			}
 		}
 		//限界の時間を迎えたら消滅
-		if (this->moveCnt >= this->cntLimit)
+		if (this->moveCnt >= this->limit_Erase)
 		{
 			//消滅申請
 			this->Kill();
@@ -129,36 +129,43 @@ namespace  Shot00
 		draw.Offset(this->pos);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		//ショットとして呼ばれたとき、弾の描画
+		ML::Box2D src(0, 224, 32, 32);
 		if (this->state == Shoot ||
 			this->state == Jumpshoot ||
 			this->state == Fallshoot)
 		{
-			ML::Box2D src(0, 224, 32, 32);
+			DG::Image_Rotation(this->res->imageName, this->angle, ML::Vec2(this->hitBase.w / 2, this->hitBase.h / 2));
 			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
 		}
 		//以下攻撃範囲表示
 		if (ge->debugMode)
 		{
 			ML::Box2D srcDebug(0, 0, 32, 32);
+			DG::Image_Rotation(this->res->imageName, this->angle, ML::Vec2(this->hitBase.w / 2, this->hitBase.h / 2));
 			DG::Image_Draw(this->res->imageName, draw, srcDebug, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
 		}
 	}
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)
 	{
-		this->cntLimit = cl_;
+		this->limit_Erase = cl_;
 	}
 	//壁や敵に衝突したとき、消えるか否かを指定する
 	void Object::Set_Erase(const int& erase_)
 	{
-		this->eraseFlag = erase_;
+		this->flag_Erase = erase_;
 	}
 	//外部から生成する際、攻撃力を指定
 	//引数	：	（整数値）
 	void Object::Set_Power(const int& pow_)
 	{
 		this->power = pow_;
+	}
+	//外部から描画角度を指定
+	//引数	：	（角度）
+	void Object::Set_Angle(const float& angle_)
+	{
+		this->angle = angle_;
 	}
 	//状態ごとに行動を指定する
 	void Object::Move()
@@ -168,26 +175,8 @@ namespace  Shot00
 		{
 		default:
 			break;
-		case Punch1:
-		case Punch2:
-			//敵に衝突したとき消えるか否か
-			this->eraseFlag = false;
-			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
-			this->moveVec = pl->moveVec;
-			//プレイヤが壁に衝突したら移動量を0に
-			if (pl->CheckFront_LR() || pl->CheckBack_LR())
-			{
-				this->moveVec.x = 0.0f;
-			}
-			//プレイヤがダメージを受ける(状態が変わる)と消滅
-			if (pl->state == Damage)
-			{
-				this->Kill();
-				return;
-			}
-			break;
 		case StompLanding:
-			this->eraseFlag = false;
+			this->flag_Erase = false;
 			if (pl->state == Damage)
 			{
 				this->Kill();
@@ -195,11 +184,11 @@ namespace  Shot00
 			break;
 		case Shoot:
 			//敵に衝突したとき消えるか否か
-			this->eraseFlag = true;
+			this->flag_Erase = true;
 			break;
 		case Air:
 			//敵に衝突したとき消えるか否か
-			this->eraseFlag = false;
+			this->flag_Erase = false;
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
@@ -217,7 +206,7 @@ namespace  Shot00
 		case Jumpshoot:
 		case Fallshoot:
 			//敵に衝突したとき消えるか否か
-			this->eraseFlag = true;
+			this->flag_Erase = true;
 			break;
 		}
 	}

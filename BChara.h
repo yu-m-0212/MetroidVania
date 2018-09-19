@@ -20,8 +20,6 @@ public:
 		Stand,			//	停止
 		Dash,			//	ダッシュ
 		SlowDown,		//	減速
-		Punch1,			//	パンチ1
-		Punch2,			//	パンチ2
 		Air,			//	空中攻撃
 		PreStomp,		//	ストンプの予備動作
 		LandStomp,		//	ストンプ
@@ -30,9 +28,6 @@ public:
 		Shoot,			//	射撃(地上)
 		Jumpshoot,		//	射撃(空中上昇)
 		Fallshoot,		//	射撃(空中降下)
-		Bunker1,		//	バンカー構え
-		Bunker2,		//	バンカー射出
-		Bunker3,		//	バンカー腕戻し
 		Jump,Jump2,		//	ジャンプ
 		Fall,Fall2,		//	落下
 		Landing,		//	着地

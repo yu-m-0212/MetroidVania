@@ -35,9 +35,9 @@ namespace  Corpse
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.6f;
-		this->hitBase = Box2D(-64, -64, 128, 128);
+		this->hitBase = Box2D(-48, -24, 96, 48);
 		this->recieveBase = this->hitBase;
-		this->gravity = ML::Gravity(64);			//重力加速度＆時間速度による加算量
+		this->gravity = ML::Gravity(32);			//重力加速度＆時間速度による加算量
 		this->maxFallSpeed = 15.0f;					//最大落下速度
 		
 		//★タスクの生成
@@ -87,11 +87,11 @@ namespace  Corpse
 				"corpse->pos.y = " + to_string(this->pos.y);
 			DG::Font_Draw("fontCorpse", textBox, text, Color(1.0f, 1.0f, 1.0f, 1.0f));
 		}
-		Box2D draw(-64, -64, 128, 128);
+		Box2D draw(-48, -24, 96, 48);
 		draw.Offset(this->pos);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		Box2D  src(1088, 0, 128, 128);
+		Box2D  src(816, 0, 96, 48);
 		DG::Image_Rotation(this->res->imageName, 0.0f,
 			ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
 		DG::Image_Draw(this->res->imageName, draw, src);
