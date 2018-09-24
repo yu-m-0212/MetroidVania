@@ -38,14 +38,6 @@ namespace  UI
 		//★データ初期化
 		this->render2D_Priority[1] = 0.2f;
 		this->controllerName = "P1";
-		//HPボタン表示用
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		for (int i = 0; i < pl->max_Hp; ++i)
-		{
-			this->playerHp[i].active = true;
-			this->playerHp[i].x = 0;
-			this->playerHp[i].y = 32;
-		}
 		
 		//★タスクの生成
 
@@ -68,27 +60,19 @@ namespace  UI
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		//HPのボタン表示
-		//auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		//for (int i = 0; i < pl->Get_HP(); ++i)
-		//{
-		//	this->playerHp[i].active = true;
-		//}
-		//for (int j = pl->Get_Max_HP(); j > pl->Get_HP(); --j)
-		//{
-		//	this->playerHp[j].active = false;
-		//}
+		
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		auto es = ge->GetTask_One_G<Enemy01::Object>("敵");
 		auto in = DI::GPad_GetState(this->controllerName);
 		if (ge->debugMode)
 		{
-			ML::Box2D debugBox01(850, 50, 600, 600);
+			ML::Box2D debugBox01(825, 0, 625, 450);
 			string debugText01 =
 				"state = " + to_string(pl->state) + "\n" +
 				"pos.x = " + to_string(pl->pos.x) + "\n" +
@@ -102,44 +86,27 @@ namespace  UI
 				"ge->clear = " + to_string(ge->clear) + "\n" +
 				"ge->failure = " + to_string(ge->failure) + "\n" +
 				"Search_Player() = " + to_string(es->Search_Player()) + "\n" +
-				"BackSpace/Selectボタンでデバッグモード切替";
+				"BackSpace/Selectボタンでデバッグモード";
+			DG::Image_Draw(this->res->hpImageName, debugBox01, ML::Box2D(32, 0, 32, 32), ML::Color(0.7, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox01, debugText01, ML::Color(1, 1, 1, 1));
-			ML::Box2D debugBox02(1450, 150, 600, 600);
+			ML::Box2D debugBox02(1450, 75, 600, 75);
 			string debugText02 =
 				"RStick.axis.x = " + to_string(in.RStick.axis.x) + "\n" +
 				"RStick.axis.y = " + to_string(in.RStick.axis.y);
+			DG::Image_Draw(this->res->hpImageName, debugBox02, ML::Box2D(32, 0, 32, 32), ML::Color(0.7, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox02, debugText02, ML::Color(1, 1, 1, 1));
 		}
 		//以上デバッグ----------------------------------------------------
 		//プレイヤのHP表示
-		//ボタン表示
-		for (int i = 0; i < pl->Get_HP(); ++i)
-		{
-			if (this->playerHp[i].active)
-			{
-				ML::Box2D draw(64 + 64 * i, 64, 64, 64);
-				//デバッグ時は表示をずらす
-				if (ge->debugMode)
-				{
-					draw.x += 100;
-				}
-				ML::Box2D src(0, 0, 32, 32);
-				//残り体力によって色を指定する
-				float red = 1.0f - 0.1f * i;
-				float blue = 0.1f + 0.1f * i;
-				DG::Image_Draw(this->res->hpImageName, draw, src, ML::Color(1.0f, red, 0.0f, blue));
-			}
-		}
-		//プレイヤのHP表示
 		//バーで表示
-		//ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
-		////デバッグ時は表示をずらす
-		//if (ge->debugMode)
-		//{
-		//	draw.x += 100;
-		//}
-		//ML::Box2D  src(32, 0, 32, 32);
-		//DG::Image_Draw(this->res->hpImageName, draw, src);
+		ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
+		//デバッグ時は表示をずらす
+		if (ge->debugMode)
+		{
+			draw.x += 100;
+		}
+		ML::Box2D  src(32, 0, 32, 32);
+		DG::Image_Draw(this->res->hpImageName, draw, src);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

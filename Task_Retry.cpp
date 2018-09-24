@@ -66,7 +66,6 @@ namespace  Retry
 				auto nextTask = Title::Object::Create(true);
 			}
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------

@@ -8,8 +8,8 @@ using namespace ML;
 namespace  Retry
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("シーン");	//グループ名
-	const  string  defName("リトライ");		//タスク名
+	const  string  defGroupName("リトライ");	//グループ名
+	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{

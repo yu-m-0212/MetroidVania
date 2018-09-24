@@ -1,9 +1,10 @@
 //-------------------------------------------------------------------
-//
+//カメラ
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Sprite.h"
 #include  "Task_Map2D.h"
+#include  "Task_Player.h"
 
 namespace  Sprite
 {
@@ -33,7 +34,10 @@ namespace  Sprite
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.5f;
+		this->render2D_Priority[1] = 0.5f;	//描画順
+		this->controllerName = "P1";		//コントローラー名初期化
+		this->speed_to_Vec = 0.05f;			//目標への移動量
+		this->dist_to_Vec = 150.0f;			//プレイヤからの距離
 
 		//★タスクの生成
 
@@ -58,25 +62,22 @@ namespace  Sprite
 	{
 		//ポーズ
 		if (ge->pause) { return; }
-		//ターゲットが存在するか調べてからアクセス
-		if (auto  tg = this->target.lock()) {
-			//ターゲットへの相対座標を求める
+		//プレイヤとの相対距離を取得
+		//対象が存在するか確認してからアクセス
+		if (auto tg = this->target.lock())
+		{
 			ML::Vec2  toVec = tg->pos - this->pos;
-			//ターゲットの向きに合わせて自分の移動先を変更
-			if (tg->angle_LR == BChara::Left) {
-				ML::Vec2  adjust(-100, 0);
-				toVec += adjust;
+			//右スティックの向きに合わせて自分の移動先を変更
+			auto in = DI::GPad_GetState(this->controllerName);
+			float angle = atan2(in.RStick.axis.y, in.RStick.axis.x);
+			//スティックが入力されている場合のみ
+			if (!angle == 0.0f)
+			{
+				toVec += ML::Vec2(cos(angle)*this->dist_to_Vec, sin(angle)*this->dist_to_Vec);
 			}
-			else {
-				ML::Vec2  adjust(+100, 0);
-				toVec += adjust;
-			}
-
-			//ターゲットに５％近づく
-			this->pos += toVec * 0.05f;
+			//ターゲットに近づく
+			this->pos += toVec * this->speed_to_Vec;
 		}
-
-
 		//カメラの位置を再調整
 		{
 			//自分を画面の何処に置くか（今回は画面中央）
@@ -108,7 +109,11 @@ namespace  Sprite
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1, 1, 1));
 	}
-
+	//追従対象を指定
+	void Object::Set_Target(const weak_ptr<BChara> pl_)
+	{
+		this->target = pl_;
+	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

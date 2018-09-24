@@ -45,14 +45,6 @@ namespace  UI
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		BChara* pl;
-		struct Hp
-		{
-			int x,				//HPバーの横位置
-				y;				//HPバーの縦位置
-			bool active;		//trueの時描画
-		};
-		Hp playerHp[10];
 		string controllerName;
 	public:
 	};

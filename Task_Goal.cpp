@@ -33,8 +33,7 @@ namespace  Goal
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.1f;
-		this->pos = Vec2(64, 2560);
-		this->hitBase = Box2D(-32, -192, 64, 384);
+		this->hitBase = Box2D(-16,-16,32,32);
 		
 		//★タスクの生成
 
@@ -62,12 +61,12 @@ namespace  Goal
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		//表示しない
-		/*Box2D draw = this->hitBase;
+		if (!ge->debugMode) { return; }
+		Box2D draw = this->hitBase;
 		draw.Offset(this->pos);
 		Box2D src(0, 0, 792, 792);
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src);*/
+		DG::Image_Draw(this->res->imageName, draw, src);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

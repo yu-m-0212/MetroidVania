@@ -38,13 +38,14 @@ namespace  Enemy00
 		this->hitBase = ML::Box2D(-56, -48, 102, 96);
 		this->recieveBase = this->hitBase;
 		this->state = Stand;
-		this->hp = 20;							//hp初期値
+		this->hp = 5;							//hp初期値
 		this->maxSpeed = 2.0f;					//最大移動速度(横)
 		this->addSpeed = 0.7f;					//歩行加速度(地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;					//接地状態の時の速度減衰量(摩擦
 		this->maxFallSpeed = 10.0f;				//最大落下速度
 		this->jumpPow = -6.0f;					//ジャンプ力(初速)
 		this->gravity = ML::Gravity(32) * 5;	//重力加速度&時間速度による加算量
+		this->interval_Flash = 4;				//点滅間隔
 		
 		//★タスクの生成
 		
@@ -55,7 +56,6 @@ namespace  Enemy00
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
@@ -91,6 +91,7 @@ namespace  Enemy00
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
+			if (nullptr == targets) { return; }
 			for (auto it = targets->begin();
 				it != targets->end();
 				++it) 
@@ -112,12 +113,17 @@ namespace  Enemy00
 		{
 			this->Kill();
 		}
-
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		//無敵時間中は点滅
+		if (this->unHitTime > 0) {
+			if (this->unHitTime %this->interval_Flash == 0) {
+				return;
+			}
+		}
 		BChara::DrawInfo di = this->Anim();
 		di.draw.Offset(this->pos);
 		//スクロール対応
@@ -178,8 +184,7 @@ namespace  Enemy00
 		switch (nm) {
 		case	Stand:	//立っている
 			if (this->CheckFoot() == false) { nm = Fall; }
-			//チュートリアルでは行動しない
-			//else							{ nm = Walk; }//接地で歩きに移行
+			else							{ nm = Walk; }//接地で歩きに移行
 			break;
 		case	Walk:	//歩いている
 			if (this->CheckFront_LR() == true) { nm = Turn; }//壁に衝突
@@ -229,7 +234,6 @@ namespace  Enemy00
 			//重力加速を無効化する必要があるモーションは下にcaseを書く（現在対象無し）
 		case Unnon:	break;
 		}
-
 		//移動速度減衰
 		switch (this->state) {
 		default:
@@ -311,7 +315,6 @@ namespace  Enemy00
 		}
 		return rtv;
 	}
-
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

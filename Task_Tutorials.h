@@ -5,6 +5,9 @@
 //-------------------------------------------------------------------
 #include "BChara.h"
 
+#define	FONT_WIDTH 16
+#define FONT_HIGHT 32
+
 namespace  Tutorials
 {
 	//タスクに割り当てるグループ名と固有名
@@ -46,9 +49,7 @@ namespace  Tutorials
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	private:
-		//表示するメッセージを格納する
-		string message;
+		string message;	//表示するメッセージを格納する
 	public:
 		//外部から状態を指定する際使用
 		//引数	：	（対応する番号）

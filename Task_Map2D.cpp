@@ -3,6 +3,7 @@
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Map2D.h"
+#include  "Task_Player.h"
 
 namespace  Map2D
 {
@@ -29,12 +30,15 @@ namespace  Map2D
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.9f;
-		this->imageName = "MapChipImg";
-		this->chipSize = 32;
+		this->render2D_Priority[1] = 0.9f;	//描画順
+		this->imageName = "MapChipImg";		//イメージ名の初期化
+		this->cnt_Quake = 0;				//画面を揺らす周期
+		this->dist_Quake = 0;				//画面揺れ幅
+		this->limit_Quake = 0;				//画面を揺らす時間
 		//マップのゼロクリア
 		for (int y = 0; y < 100; ++y) {
-			for (int x = 0; x < 100; ++x) {
+			for (int x = 0; x < 100; ++x) 
+			{
 				this->arr[y][x] = 0;
 			}
 		}
@@ -44,11 +48,12 @@ namespace  Map2D
 
 		//マップチップ情報の初期化
 		//画像リソースに番号を振る
-		for (int c = 0; c < 16; ++c) {
+		for (int c = 0; c < 16; ++c) 
+		{
 			int  x = (c % 8);
 			int  y = (c / 8);
 			//src
-			this->chip[c] = ML::Box2D(x * 32, y * 32, 32, 32);
+			this->chip[c] = ML::Box2D(x * CHIP_SIZE, y * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE);
 		}
 
 		//★タスクの生成
@@ -81,7 +86,6 @@ namespace  Map2D
 		if (false == this->hitBase.Hit(ge->camera2D)) {
 			return; //完全に外に出ていたらその時点で描画処理を取りやめる
 		}
-
 		//カメラとマップが重なっている範囲だけの矩形を作る
 		RECT  c = {
 			ge->camera2D.x,
@@ -99,23 +103,32 @@ namespace  Map2D
 		isr.top = max(c.top, m.top);
 		isr.right = min(c.right, m.right);
 		isr.bottom = min(c.bottom, m.bottom);
-
 		//ループ範囲を決定
 		int sx, sy, ex, ey;
-		sx = isr.left / this->chipSize;
-		sy = isr.top / this->chipSize;
-		ex = (isr.right - 1) / this->chipSize;
-		ey = (isr.bottom - 1) / this->chipSize;
+		sx = isr.left / CHIP_SIZE;
+		sy = isr.top / CHIP_SIZE;
+		ex = (isr.right - 1) / CHIP_SIZE;
+		ey = (isr.bottom - 1) / CHIP_SIZE;
 
 		//画面内の範囲だけ描画
 		for (int y = sy; y <= ey; ++y) {
 			for (int x = sx; x <= ex; ++x) {
-				ML::Box2D  draw(x * this->chipSize, y * this->chipSize, this->chipSize, this->chipSize);
+				ML::Box2D  draw(x * CHIP_SIZE, y * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE);
+				//画面揺れ処理（マップチップの縦軸を揺らす）
+				if (this->limit_Quake > 0)
+				{
+					draw.y += int(sin(this->cnt_Quake)*this->dist_Quake);
+				}
 				//スクロール対応
 				draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-
 				DG::Image_Draw(this->imageName, draw, this->chip[this->arr[y][x]]);
 			}
+		}
+		//各カウンタ増減
+		if (this->limit_Quake > 0)
+		{
+			this->cnt_Quake++;
+			this->limit_Quake--;
 		}
 	}
 	//-------------------------------------------------------------------
@@ -125,9 +138,7 @@ namespace  Map2D
 		//ファイルを開く（読み込み）
 		ifstream   fin(fpath_);
 		if (!fin) { return  false; }//読み込み失敗
-
-
-									//チップファイル名の読み込みと、画像のロード
+		//チップファイル名の読み込みと、画像のロード
 		string   chipFileName, chipFilePath;
 		fin >> chipFileName;
 		chipFilePath = "./data/image/" + chipFileName;
@@ -136,7 +147,7 @@ namespace  Map2D
 
 		//マップ配列サイズの読み込み
 		fin >> this->sizeX >> this->sizeY;
-		this->hitBase = ML::Box2D(0, 0, this->sizeX * this->chipSize, this->sizeY * this->chipSize);
+		this->hitBase = ML::Box2D(0, 0, this->sizeX * CHIP_SIZE, this->sizeY * CHIP_SIZE);
 
 		//マップ配列データの読み込み
 		for (int y = 0; y < this->sizeY; ++y) {
@@ -166,10 +177,10 @@ namespace  Map2D
 
 		//ループ範囲調整
 		int sx, sy, ex, ey;
-		sx = r.left / this->chipSize;
-		sy = r.top / this->chipSize;
-		ex = (r.right - 1) / this->chipSize;
-		ey = (r.bottom - 1) / this->chipSize;
+		sx = r.left / CHIP_SIZE;
+		sy = r.top / CHIP_SIZE;
+		ex = (r.right - 1) / CHIP_SIZE;
+		ey = (r.bottom - 1) / CHIP_SIZE;
 
 		//範囲内の障害物を探す
 		for (int y = sy; y <= ey; ++y) {
@@ -205,6 +216,16 @@ namespace  Map2D
 		//マップがカメラより小さい場合
 		if (this->hitBase.w < ge->camera2D.w) { ge->camera2D.x = m.left; }
 		if (this->hitBase.h < ge->camera2D.h) { ge->camera2D.y = m.top; }
+	}
+	//画面の揺れ幅を指定する
+	void Object::Set_Dist_Quake(const int& dist_)
+	{
+		this->dist_Quake = dist_;
+	}
+	//画面を揺らす時間を指定する
+	void Object::Set_Limit_Quake(const int& limit_)
+	{
+		this->limit_Quake = limit_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

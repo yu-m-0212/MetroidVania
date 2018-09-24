@@ -15,7 +15,7 @@ namespace  Tutorials
 		this->imageName = "imageName";
 		DG::Image_Create(this->imageName, "./data/image/UI.png");
 		this->fontName = "tutorialsFont";
-		DG::Font_Create(this->fontName, "ＭＳ ゴシック", 16,32);
+		DG::Font_Create(this->fontName, "ＭＳ ゴシック", FONT_WIDTH,FONT_HIGHT);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -36,7 +36,7 @@ namespace  Tutorials
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.6f;
+		this->render2D_Priority[1] = 0.5f;
 		this->message = "このメッセージが見れるのはおかしいよ";
 		this->recieveBase = ML::Box2D(-128, -64, 256, 128);
 		
@@ -68,20 +68,23 @@ namespace  Tutorials
 	{
 		//プレイヤと接触したら画面下にメッセージを表示
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		ML::Box2D you = pl->recieveBase;
-		you.Offset(pl->pos);
-		if (this->CheckHit(you))
+		if (nullptr != pl)
 		{
-			//判定矩形の下に表示
-			ML::Box2D draw(int(this->pos.x - this->message.length()*16/2),
-				int(this->pos.y + this->recieveBase.h / 2), 
-				this->message.length()*16, 32);
-			draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-			//メッセージボックスを表示
-			ML::Box2D  src(32, 0, 32, 32);
-			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
-			//メッセージを表示
-			DG::Font_Draw(this->res->fontName, draw, this->message,ML::Color(1.0f,1.0f,1.0f,1.0f));
+			ML::Box2D you = pl->recieveBase;
+			you.Offset(pl->pos);
+			if (this->CheckHit(you))
+			{
+				//判定矩形の下に表示
+				ML::Box2D draw(int(this->pos.x - this->message.length()*FONT_WIDTH / 2),
+					int(this->pos.y + this->recieveBase.h / 2),
+					this->message.length()*FONT_WIDTH, FONT_HIGHT);
+				draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+				//メッセージボックスを表示
+				ML::Box2D  src(32, 0, 32, 32);
+				DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
+				//メッセージを表示
+				DG::Font_Draw(this->res->fontName, draw, this->message, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
+			}
 		}
 		if (!ge->debugMode) { return; }
 		//デバッグモードの時、判定矩形を表示

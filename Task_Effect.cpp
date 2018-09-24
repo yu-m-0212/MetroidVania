@@ -166,6 +166,7 @@ namespace  Effect
 	void Object::Move()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("ƒvƒŒƒCƒ„");
+		if (nullptr == pl) { return; }
 		switch (this->state)
 		{
 		default:

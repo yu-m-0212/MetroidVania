@@ -47,6 +47,12 @@ namespace  Sprite
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
+		string controllerName;		//コントローラー宣言
+		float speed_to_Vec;			//目標への移動量
+		float dist_to_Vec;			//プレイヤからの距離
+		weak_ptr<BChara> target;	//プレイヤを指すスマートポインター
 	public:
+		//追従対象を指定
+		void Set_Target(const weak_ptr<BChara>);
 	};
 }

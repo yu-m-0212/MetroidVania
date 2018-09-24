@@ -153,9 +153,6 @@
     <ClCompile Include="Task_Goal.cpp">
       <Filter>MyPG</Filter>
     </ClCompile>
-    <ClCompile Include="Task_Sprite.cpp">
-      <Filter>MyPG</Filter>
-    </ClCompile>
     <ClCompile Include="Task_Item00.cpp">
       <Filter>MyPG\Chara_Item</Filter>
     </ClCompile>
@@ -189,7 +186,7 @@
     <ClCompile Include="Task_Tutorials.cpp">
       <Filter>MyPG\Chara_Tutorials</Filter>
     </ClCompile>
-    <ClCompile Include="Task_Gun.cpp">
+    <ClCompile Include="Task_Sprite.cpp">
       <Filter>MyPG\Chara_Player</Filter>
     </ClCompile>
   </ItemGroup>
@@ -278,9 +275,6 @@
     <ClInclude Include="Task_Goal.h">
       <Filter>MyPG</Filter>
     </ClInclude>
-    <ClInclude Include="Task_Sprite.h">
-      <Filter>MyPG</Filter>
-    </ClInclude>
     <ClInclude Include="Task_Item00.h">
       <Filter>MyPG\Chara_Item</Filter>
     </ClInclude>
@@ -314,7 +308,7 @@
     <ClInclude Include="Task_Tutorials.h">
       <Filter>MyPG\Chara_Tutorials</Filter>
     </ClInclude>
-    <ClInclude Include="Task_Gun.h">
+    <ClInclude Include="Task_Sprite.h">
       <Filter>MyPG\Chara_Player</Filter>
     </ClInclude>
   </ItemGroup>

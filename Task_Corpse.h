@@ -23,7 +23,8 @@ namespace  Corpse
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//‹¤—L‚·‚é•Ï”‚Í‚±‚±‚É’Ç‰Á‚·‚é
-		string imageName;
+		string corpseImage;
+		string uiImage;
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara

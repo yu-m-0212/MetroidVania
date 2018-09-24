@@ -27,7 +27,7 @@ namespace  Map2D
 	//-------------------------------------------------------------------
 	class  Object : public  BTask
 	{
-	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
+		//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
 		virtual  ~Object();
 		typedef  shared_ptr<Object>		SP;
@@ -44,21 +44,24 @@ namespace  Map2D
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		int					cnt_Quake;		//カウンタ画面揺れ
+		int					dist_Quake;		//画面揺れ幅
+		int					limit_Quake;	//画面を揺らす時間
 	public:
-		//追加したい変数・メソッドはここに追加する
-		string				imageName;	//	マップはリソース共有しない
-		int					arr[100][100];
-		int					sizeY, sizeX;
-		ML::Box2D			hitBase;//ピクセル単位のマップサイズを持つ
+		string				imageName;		//マップはリソース共有しない
+		int					arr[100][100];	//マップ配列
+		int					sizeY, sizeX;	//マップサイズ
+		ML::Box2D			hitBase;		//ピクセル単位のマップサイズを持つ
 		ML::Box2D			chip[16];
-		//チップサイズ
-		int chipSize;
-
 		//マップファイル読み込み(今は仮処理）
 		bool Load(const  string&  fpath_);
 		//あたり判定
 		bool CheckHit(const  ML::Box2D&  h_);
 		//マップ外を見せないようにカメラを位置調整する
 		void  AjastCameraPos();
+		//画面の揺れ幅を指定する
+		void Set_Dist_Quake(const int&);
+		//画面を揺らす時間を指定する
+		void Set_Limit_Quake(const int&);
 	};
 }

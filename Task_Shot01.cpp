@@ -60,6 +60,7 @@ namespace  Shot01
 		//ポーズ
 		if (ge->pause) { return; }
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		this->moveCnt++;
 		//各状態ごとの処理
 		this->Move();
@@ -70,6 +71,7 @@ namespace  Shot01
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
+			if (nullptr == pl) { return; }
 			for (auto it = targets->begin();
 				it != targets->end();
 				++it) {

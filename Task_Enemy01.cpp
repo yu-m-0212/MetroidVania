@@ -39,8 +39,8 @@ namespace  Enemy01
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.6f;
-		this->hitBase = ML::Box2D(-96,-96,192,192);
-		this->recieveBase = ML::Box2D(-32, -46, 64, 92);
+		this->hitBase = ML::Box2D(-52,-48,102,96);
+		this->recieveBase = this->hitBase;
 		this->angle_LR = Left;
 		this->state = Stand;
 		this->maxSpeed = 2.0f;							//最大移動速度(横)
@@ -49,13 +49,12 @@ namespace  Enemy01
 		this->maxFallSpeed = 10.0f;						//最大落下速度
 		this->jumpPow = -6.0f;							//ジャンプ力(初速)
 		this->gravity = ML::Gravity(32) * 5;			//重力加速度&時間速度による加算量
-		this->interval_Caution = 180;
-		this->interval_Attack = 120;
+		this->interval_Caution = 60;					//プレイヤが視界から外れた後、再度警戒に入るまでの時間
+		this->interval_Attack = 120;					//弾を生成する間隔
+		this->interval_Flash = 4;						//点滅間隔
 		this->searchBase = ML::Box2D(-192, -96, 384, 192);
 		this->shot_Init = ML::Vec2(0, -45);
 		//★タスクの生成
-		//視認表示矩形の生成
-		auto es = EnemySearch::Object::Create(true);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -98,6 +97,7 @@ namespace  Enemy01
 		{
 			ML::Box2D me = this->recieveBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
+			if (nullptr == targets) { return; }
 			for (auto it = targets->begin();
 				it != targets->end();
 				++it) {
@@ -123,9 +123,8 @@ namespace  Enemy01
 	void  Object::Render2D_AF()
 	{
 		//無敵時間中は点滅
-		//8フレーム中4フレーム画像を表示しない
 		if (this->unHitTime > 0) {
-			if ((this->unHitTime / 4) % 2 == 0) {
+			if (this->unHitTime %this->interval_Flash == 0) {
 				return;
 			}
 		}
@@ -319,6 +318,7 @@ namespace  Enemy01
 		case Caution:
 		{
 			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			if (nullptr == pl) { break; }
 			//プレイヤに向きを変える
 			if (this->pos.x - pl->pos.x > 0)
 			{
@@ -334,6 +334,7 @@ namespace  Enemy01
 			if (this->moveCnt == 0)
 			{
 				auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+				if (nullptr == pl) { break; }
 				auto shot = Shot01::Object::Create(true);
 				//呼び出した判定矩形に思考させるため状態を指定
 				shot->state = Shoot;
@@ -355,21 +356,22 @@ namespace  Enemy01
 	//アニメーション制御
 	BChara::DrawInfo Object::Anim()
 	{
+		ML::Box2D dd(-48, -48, 96, 96);
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
 			//draw						src
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(  0,  0,192,192),dc },	//待機		[0]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,  0,192,192),dc },	//歩行1		[1]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,192,192,192),dc },	//歩行2		[2]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,384,192,192),dc },	//歩行3		[3]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(192,576,192,192),dc },	//歩行4		[4]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(384,  0,192,192),dc },	//ターン		[5]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(576,  0,192,192),dc },	//射撃01		[6]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(576,192,192,192),dc },	//射撃02		[7]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(768,  0,192,192),dc },	//見失う01	[8]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(768,192,192,192),dc },	//見失う02	[9]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(960,  0,192,192),dc },	//警戒01		[10]
-			{ ML::Box2D(-96,-96,192,192),ML::Box2D(960,192,192,192),dc }	//警戒02		[11]
+			{ dd,ML::Box2D(  0,  0,192,192),dc },	//待機		[0]
+			{ dd,ML::Box2D(192,  0,192,192),dc },	//歩行1		[1]
+			{ dd,ML::Box2D(192,192,192,192),dc },	//歩行2		[2]
+			{ dd,ML::Box2D(192,384,192,192),dc },	//歩行3		[3]
+			{ dd,ML::Box2D(192,576,192,192),dc },	//歩行4		[4]
+			{ dd,ML::Box2D(384,  0,192,192),dc },	//ターン		[5]
+			{ dd,ML::Box2D(576,  0,192,192),dc },	//射撃01		[6]
+			{ dd,ML::Box2D(576,192,192,192),dc },	//射撃02		[7]
+			{ dd,ML::Box2D(768,  0,192,192),dc },	//見失う01	[8]
+			{ dd,ML::Box2D(768,192,192,192),dc },	//見失う02	[9]
+			{ dd,ML::Box2D(960,  0,192,192),dc },	//警戒01		[10]
+			{ dd,ML::Box2D(960,192,192,192),dc }	//警戒02		[11]
 		};
 		BChara::DrawInfo rtv;
 		int anim = 0;

@@ -8,8 +8,8 @@
 namespace  Title
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("シーン");	//グループ名
-	const  string  defName("タイトル");		//タスク名
+	const  string  defGroupName("タイトル");	//グループ名
+	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{

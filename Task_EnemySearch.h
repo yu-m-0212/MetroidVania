@@ -37,7 +37,6 @@ namespace  EnemySearch
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-
 		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
@@ -45,8 +44,11 @@ namespace  EnemySearch
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	public:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-
+		weak_ptr<BChara> target;	//追従対象
+	public:
+		//追従対象を初期化
+		//引数	：	（追従対象）
+		void Set_Target(const weak_ptr<BChara>);
 	};
 }

@@ -46,7 +46,6 @@ public:
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };
 	Angle_LR	angle_LR;
-	WP			target;
 	//キャラクタ共通メンバ変数
 	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置

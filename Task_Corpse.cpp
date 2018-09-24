@@ -11,8 +11,10 @@ namespace  Corpse
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "corpseImage";
-		DG::Image_Create(this->imageName,"./data/image/chara(仮)01.png");
+		this->corpseImage = "corpseImage";
+		DG::Image_Create(this->corpseImage,"./data/image/chara(仮)01.png");
+		this->uiImage = "uiImage";
+		DG::Image_Create(this->uiImage, "./data/image/ui.png");
 		DG::Font_Create("fontCorpse", "ＭＳ ゴシック", 16, 32);
 		return true;
 	}
@@ -20,7 +22,8 @@ namespace  Corpse
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->imageName);
+		DG::Image_Erase(this->corpseImage);
+		DG::Image_Erase(this->uiImage);
 		DG::Font_Erase("fontCorpse");
 		return true;
 	}
@@ -81,20 +84,21 @@ namespace  Corpse
 		if(ge->debugMode)
 		{
 			//情報表示
-			Box2D textBox(1450, 50, 500, 500);
+			Box2D textBox(1450, 0, 500, 75);
 			string text =
 				"corpse->pos.x = " + to_string(this->pos.x) + "\n" +
 				"corpse->pos.y = " + to_string(this->pos.y);
+			DG::Image_Draw(this->res->uiImage, textBox, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
 			DG::Font_Draw("fontCorpse", textBox, text, Color(1.0f, 1.0f, 1.0f, 1.0f));
 		}
 		Box2D draw(-48, -24, 96, 48);
 		draw.Offset(this->pos);
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		Box2D  src(816, 0, 96, 48);
-		DG::Image_Rotation(this->res->imageName, 0.0f,
+		Box2D  src(816, 48, 96, 48);
+		DG::Image_Rotation(this->res->corpseImage, 0.0f,
 			ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
-		DG::Image_Draw(this->res->imageName, draw, src);
+		DG::Image_Draw(this->res->corpseImage, draw, src);
 	}
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)

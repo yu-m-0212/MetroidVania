@@ -11,8 +11,8 @@
 namespace  Game
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("シーン");	//グループ名
-	const  string  defName("ゲーム");	//タスク名
+	const  string  defGroupName("本編");	//グループ名
+	const  string  defName("NoName");	//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -48,21 +48,18 @@ namespace  Game
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
-		//前回の死亡地点
-		ML::Vec2 deadPos;
+		ML::Vec2 deadPos;	//前回の死亡地点
+		int cnt_Scenes;		//カウンタ遷移用
 	public:
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;
 		Shot01::Resource::SP	shot01_Resource;
 		Effect::Resource::SP	effect_Resource;
-		
-		//メソッド
-
 		//チュートリアル表示キャラクタの生成
 		//引数	：	（座標,メッセージ）
 		void Create_Message(const ML::Vec2&, const string&);
 		//エネミーの生成
 		//引数	：	（初期座標,移動速度,HP）
-		void Create_Enemy(const ML::Vec2&,const float&,const int&);
+		void Create_Enemy01(const ML::Vec2&);
 	};
 }

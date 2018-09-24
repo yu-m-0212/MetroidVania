@@ -32,8 +32,6 @@ namespace  EnemySearch
 		this->res = Resource::Create();
 
 		//★データ初期化
-		auto en = ge->GetTask_One_G<Enemy01::Object>("敵");
-		this->hitBase = en->Get_Search();
 		this->recieveBase = this->hitBase;
 		
 		//★タスクの生成
@@ -57,26 +55,25 @@ namespace  EnemySearch
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		auto en = ge->GetTask_One_G<Enemy01::Object>("敵");
-		//エネミーが消滅すると自動的に消滅する
-		if (en==nullptr)
+		//追従対象がいればアクセスする
+		if (auto tg = this->target.lock())
 		{
-			this->Kill();
-		}
-		//自身かエネミーがいなければ処理しない
-		if (this == nullptr || en == nullptr) { return; }
-		this->pos = en->pos;
-		this->state = en->state;
-		this->angle_LR = en->angle_LR;
-		this->hitBase = en->Get_Search();
-		//エネミーの向きで座標を更新
-		if (this->angle_LR == Left)
-		{
-			this->pos.x -= this->hitBase.w / 2;
+			this->pos = tg->pos;
+			this->state = tg->state;
+			this->angle_LR = tg->angle_LR;
+			//エネミーの向きで座標を更新
+			if (this->angle_LR == Left)
+			{
+				this->pos.x -= this->hitBase.w / 2;
+			}
+			else
+			{
+				this->pos.x += this->hitBase.w / 2;
+			}
 		}
 		else
 		{
-			this->pos.x += this->hitBase.w / 2;
+			this->Kill();
 		}
 	}
 	//-------------------------------------------------------------------
@@ -111,6 +108,11 @@ namespace  EnemySearch
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1.0f, 1.0f, 1.0f));
+	}
+	//追従対象を初期化
+	void Object::Set_Target(const weak_ptr<BChara> target_)
+	{
+		this->target = target_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

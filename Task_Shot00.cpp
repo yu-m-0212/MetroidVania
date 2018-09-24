@@ -60,6 +60,7 @@ namespace  Shot00
 		//ポーズ
 		if (ge->pause) { return; }
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		this->moveCnt++;
 		//各状態ごとの処理
 		this->Move();
@@ -70,32 +71,35 @@ namespace  Shot00
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("敵");
-			for (auto it = targets->begin();
-				it != targets->end();
-				++it) {
-				//相手に接触の有無を確認させる
-				if ((*it)->CheckHit(me)) {
-					//相手にダメージの処理を行わせる
-					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at);
-					//ショットのみ消滅
-					//格闘は複数体にあたる
-					if (this->flag_Erase)
-					{
-						//対応したヒット時のエフェクトを生成
-						//現状、引数には対象の敵の座標をいれる
-						this->Effect_Hit((*it)->pos);
-						this->Kill();
-					}
-					else
-					{
-						//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
-						if ((*it)->moveCnt == 0)
+			if (nullptr != targets)
+			{
+				for (auto it = targets->begin();
+					it != targets->end();
+					++it) {
+					//相手に接触の有無を確認させる
+					if ((*it)->CheckHit(me)) {
+						//相手にダメージの処理を行わせる
+						BChara::AttackInfo at = { this->power,0,0 };
+						(*it)->Received(this, at);
+						//ショットのみ消滅
+						//格闘は複数体にあたる
+						if (this->flag_Erase)
 						{
+							//対応したヒット時のエフェクトを生成
+							//現状、引数には対象の敵の座標をいれる
 							this->Effect_Hit((*it)->pos);
+							this->Kill();
 						}
+						else
+						{
+							//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
+							if ((*it)->moveCnt == 0)
+							{
+								this->Effect_Hit((*it)->pos);
+							}
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}
@@ -104,12 +108,15 @@ namespace  Shot00
 		{
 			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) 
 			{
-				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
-				if (true == map->CheckHit(hit))
+				if (nullptr != map)
 				{
-					//対応したヒット時のエフェクトを生成し消滅する
-					this->Effect_Hit(this->pos);
-					this->Kill();
+					ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
+					if (true == map->CheckHit(hit))
+					{
+						//対応したヒット時のエフェクトを生成し消滅する
+						this->Effect_Hit(this->pos);
+						this->Kill();
+					}
 				}
 			}
 		}
@@ -134,14 +141,14 @@ namespace  Shot00
 			this->state == Jumpshoot ||
 			this->state == Fallshoot)
 		{
-			DG::Image_Rotation(this->res->imageName, this->angle, ML::Vec2(this->hitBase.w / 2, this->hitBase.h / 2));
+			DG::Image_Rotation(this->res->imageName, this->angle, ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
 			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
 		}
 		//以下攻撃範囲表示
 		if (ge->debugMode)
 		{
 			ML::Box2D srcDebug(0, 0, 32, 32);
-			DG::Image_Rotation(this->res->imageName, this->angle, ML::Vec2(this->hitBase.w / 2, this->hitBase.h / 2));
+			DG::Image_Rotation(this->res->imageName, this->angle, ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
 			DG::Image_Draw(this->res->imageName, draw, srcDebug, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
 		}
 	}
@@ -171,6 +178,7 @@ namespace  Shot00
 	void Object::Move()
 	{
 		auto pl = ge->GetTask_One_G <Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		switch (this->state)
 		{
 		default:

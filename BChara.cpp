@@ -19,7 +19,6 @@ bool  BChara::UpdateMotion(State  nm_)
 		return  true;
 	}
 }
-
 //-----------------------------------------------------------------------------
 //“ªãÚG”»’è
 bool  BChara::CheckHead()

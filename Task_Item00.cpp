@@ -32,9 +32,10 @@ namespace  Item00
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.7f;
-		this->hitBase = ML::Box2D(-16, -16, 32, 32);
-		this->recieveBase = this->hitBase;
+		this->render2D_Priority[1] = 0.7f;				//描画順
+		this->hitBase = ML::Box2D(-16, -16, 32, 32);	//マップとの判定矩形
+		this->recieveBase = this->hitBase;				//キャラクタとの判定矩形
+		this->add_Hp = 5;								//プレイヤのHP増加量
 		//★タスクの生成
 		return  true;
 	}
@@ -59,15 +60,12 @@ namespace  Item00
 		this->animCnt++;
 		if (this->unHitTime > 0) { this->unHitTime--; }
 
-		State nm = this->state;
 		switch (this->state) {
 		case Stand:
+			this->pos.y += float(sin(this->moveCnt/12));
 			break;
 		case Lose:
-			this->pos.y -= 3;
-			if (this->moveCnt > 20) {
-				this->Kill();//一定時間経過後、消滅
-			}
+			this->Kill();
 			break;
 		}
 	}
@@ -89,7 +87,9 @@ namespace  Item00
 			return;
 		}
 		this->UpdateMotion(Lose);
-		from_->hp += 5;
+		//体力上限を増加し、回復する
+		from_->max_Hp += this->add_Hp;
+		from_->hp = from_->max_Hp;
 	}
 	//-------------------------------------------------------------------
 	//アニメーション制御
@@ -97,8 +97,7 @@ namespace  Item00
 	{
 		BChara::DrawInfo imageTable[] = {
 			//draw					src						color
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,32,32),ML::Color(  1 ,1,1,1)},	//Stand
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,32,32),ML::Color(0.3f,1,1,1) },//Lose
+			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,32,32),ML::Color(1,1,1,1)},	//Stand[0]
 		};
 		BChara::DrawInfo  rtv;
 		switch (this->state) {

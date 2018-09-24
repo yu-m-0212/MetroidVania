@@ -45,12 +45,16 @@ namespace  Enemy00
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	public:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		void Think();	//思考&状況判断(ステータス決定)
-		void Move();	//モーションに対応した処理
+		int interval_Flash;		//点滅間隔
+	public:
+		//思考&状況判断(ステータス決定)
+		void Think();		
+		//モーションに対応した処理
+		void Move();				
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		void Received(BChara* from_, AttackInfo at_);
-		BChara::DrawInfo Anim();	//アニメーション制御
+		//アニメーション制御
+		BChara::DrawInfo Anim();	
 	};
 }

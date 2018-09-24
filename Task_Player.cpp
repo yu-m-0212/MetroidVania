@@ -53,19 +53,22 @@ namespace  Player
 		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量（摩擦
 		this->maxFallSpeed = 15.0f;							//最大落下速度
 		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
-		this->jumpPow = -10.0f;								//ジャンプ力（初速）
+		this->height_Jump = -10.0f;							//ジャンプ力（初速）
 		this->gravity = ML::Gravity(32);					//重力加速度＆時間速度による加算量
 		this->reach = 32.0;									//射程
-		this->shotSpeed = 10;								//ショット速度
+		this->speed_Shot = 10;								//ショット速度
 		this->limit_StompHoldTime = 30;						//ストンプ着地時の硬直時間
 		this->limit_Stomp = 15;								//ストンプ継続時間
 		this->limit_StompEffect = 18;						//継続時間ストンプ効果
+		this->limit_Quake = 15;								//画面揺れ時間
 		this->limit_Shot = 40;								//継続時間ショット
-		this->limit_JumpAngleChange = 12;					//ジャンプ時、スティックを倒したとき一定時間内なら向きを変えられる
+		this->limit_JumpAngleChange = 24;					//ジャンプから一定時間内なら向きを変えられる
 		this->limit_HealEffect = 24;						//継続時間回復エフェクト
-		this->addUnHitTime = 120;							//被弾時に得られる無敵時間
+		this->dist_Quake = 5;								//画面揺れ幅
+		this->lv_Stomp = 1;									//ストンプアップグレードレベル
+		this->addUnHitTime = 30;							//被弾時に得られる無敵時間
 		this->interval_Shot = 12;							//射撃の発射間隔（フレーム）
-		this->range_Stomp = ML::Box2D(-64, -16, 128, 32);	//範囲ショット
+		this->range_Stomp = ML::Box2D(-96, -24, 192, 46);	//範囲ストンプ
 		this->range_Shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
 		this->power_Stomp = 3;								//攻撃力ストンプ
 		this->power_Shot = 1;								//攻撃力ショット
@@ -80,20 +83,18 @@ namespace  Player
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-		auto gun = ge->GetTask_One_G<Gun::Object>("ガン");
-		gun->Gun_Kill();
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
-			
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//クリア、敗北時
+		if (ge->clear || ge->failure) { return; }
 		//ポーズ
 		if (ge->pause) { return; }
 		this->moveCnt++;
@@ -111,15 +112,18 @@ namespace  Player
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("アイテム");
-			for (auto it = targets->begin();
-				it != targets->end();
-				++it) {
-				//相手に接触の有無を確認させる
-				if ((*it)->CheckHit(me)) {
-					//相手にダメージの処理を行わせる
-					BChara::AttackInfo at = { 0,0,0 };
-					(*it)->Received(this, at);
-					break;
+			if (nullptr != targets)
+			{
+				for (auto it = targets->begin();
+					it != targets->end();
+					++it) {
+					//相手に接触の有無を確認させる
+					if ((*it)->CheckHit(me)) {
+						//相手にダメージの処理を行わせる
+						BChara::AttackInfo at = { 0,0,0 };
+						(*it)->Received(this, at);
+						break;
+					}
 				}
 			}
 		}
@@ -127,20 +131,23 @@ namespace  Player
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("遺体");
-			for (auto it = targets->begin();
-				it != targets->end();
-				++it) {
-				//相手に接触の有無を確認させる
-				if ((*it)->CheckHit(me)) {
-					//相手にダメージの処理を行わせる
-					BChara::AttackInfo at = { 1,0,0 };
-					(*it)->Received(this, at);
-					//回復エフェクトを生成
-					auto healEffect = Effect::Object::Create(true);
-					healEffect->pos = this->pos;
-					healEffect->Set_Limit(this->limit_HealEffect);
-					healEffect->state = Heal;
-					break;
+			if (nullptr != targets)
+			{
+				for (auto it = targets->begin();
+					it != targets->end();
+					++it) {
+					//相手に接触の有無を確認させる
+					if ((*it)->CheckHit(me)) {
+						//相手にダメージの処理を行わせる
+						BChara::AttackInfo at = { 1,0,0 };
+						(*it)->Received(this, at);
+						//回復エフェクトを生成
+						auto healEffect = Effect::Object::Create(true);
+						healEffect->pos = this->pos;
+						healEffect->Set_Limit(this->limit_HealEffect);
+						healEffect->state = Heal;
+						break;
+					}
 				}
 			}
 		}
@@ -169,11 +176,19 @@ namespace  Player
 		}
 		//仮ゴールとの接触判定
 		auto goal = ge->GetTask_One_G<Goal::Object>("ゴール");
-		ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
-		ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
-		if (you.Hit(me))
+		if (nullptr != goal)
 		{
-			ge->clear = true;
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
+			if (you.Hit(me))
+			{
+				ge->clear = true;
+			}
+		}
+		auto in = DI::GPad_GetState(this->controllerName);
+		if (in.R3.on&&in.L3.on)
+		{
+			this->Kill();
 		}
 	}
 	//-------------------------------------------------------------------
@@ -191,7 +206,7 @@ namespace  Player
 		//スクロール対応
 		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		//他タスクの回転が干渉しないように修正
-		DG::Image_Rotation(this->res->imageName,0,ML::Vec2(float(this->hitBase.w/2),float(this->hitBase.h/2)));
+		DG::Image_Rotation(this->res->imageName,0.0f,ML::Vec2(float(this->hitBase.w/2),float(this->hitBase.h/2)));
 		DG::Image_Draw(this->res->imageName, di.draw, di.src);
 	}
 	//-----------------------------------------------------------------------------
@@ -239,7 +254,7 @@ namespace  Player
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B1.down) { nm = LandStomp; }
+			if (in.B1.down) { nm = PreStomp; }
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
@@ -309,11 +324,10 @@ namespace  Player
 		this->UpdateMotion(nm);
 	}
 	//-----------------------------------------------------------------------------
-	//	モーションに対応した処理
+	//モーションに対応した処理
 	//(モーションの変更はThinkで行うこと）
 	void  Object::Move()
 	{
-		auto cam = ge->GetTask_One_G<Sprite::Object>("オプション");
 		//コントローラの宣言
 		auto in = DI::GPad_GetState(this->controllerName);
 		//重力加速
@@ -342,7 +356,6 @@ namespace  Player
 			//重力加速を無効化する必要があるモーションは下にcaseを書く（現在対象無し）
 		case Unnon:	break;
 		}
-
 		//移動速度減衰
 		switch (this->state) {
 		default:
@@ -352,7 +365,6 @@ namespace  Player
 			else {
 				this->moveVec.x = max(this->moveVec.x - this->decSpeed, 0);
 			}
-			//未実装
 			break;
 			//移動速度減衰を無効化する必要があるモーションは下にcaseを書く
 		case Damage:
@@ -375,6 +387,15 @@ namespace  Player
 				this->moveCnt = 0;
 				this->angle_LR = Right;
 			}
+			//右スティックによって向きを変える
+			if (in.RStick.axis.x > 0)
+			{
+				this->angle_LR = Right;
+			}
+			else if (in.RStick.axis.x<0)
+			{
+				this->angle_LR = Left;
+			}
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.on)
@@ -394,11 +415,20 @@ namespace  Player
 			{
 				this->moveVec.x = 0.0f;
 			}
+			//右スティックによって向きを変える
+			if (in.RStick.axis.x > 0)
+			{
+				this->angle_LR = Right;
+			}
+			else if (in.RStick.axis.x<0)
+			{
+				this->angle_LR = Left;
+			}
 			break;
 		case  Jump:		//上昇中
 			if (this->moveCnt == 0)
 			{
-				this->moveVec.y = this->jumpPow;//初速設定
+				this->moveVec.y = this->height_Jump;//初速設定
 			}
 			//向きの変更は倒した瞬間
 			if (this->moveCnt<this->limit_JumpAngleChange&&in.LStick.L.down)
@@ -421,17 +451,9 @@ namespace  Player
 			if (this->CheckHead() == true) { this->moveVec.y = 0; }
 			break;
 		case  Fall:		//落下中
-			if (in.LStick.L.down)
-			{
-				this->angle_LR = Left;
-			}
 			if (in.LStick.L.on) 
 			{
 				this->moveVec.x = -this->maxSpeed;
-			}
-			if (in.LStick.R.down)
-			{
-				this->angle_LR = Right;
 			}
 			if (in.LStick.R.on)
 			{
@@ -451,26 +473,7 @@ namespace  Player
 		case LandStomp:
 			if (this->moveCnt == 0)
 			{
-				//足元に攻撃矩形を生成
-				auto stompLandingRect = Shot00::Object::Create(true);
-				stompLandingRect->state = StompLanding;
-				//攻撃毎に攻撃範囲を生成時に指定
-				stompLandingRect->hitBase = this->range_Stomp;
-				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
-				stompLandingRect->Set_Limit(this->limit_Stomp);
-				stompLandingRect->Set_Erase(0);
-				stompLandingRect->Set_Power(this->power_Stomp);
-				stompLandingRect->Set_Angle(0.0f);
-				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
-				stompLandingRect->moveBack = this->moveBack_Stomp;
-				//範囲攻撃であることを知らせるフラグをtrue
-				stompLandingRect->wideRange = true;
-				//エフェクトの生成
-				//タスクキルはエフェクト側で行う
-				auto stompLandingEffect = Effect::Object::Create(true);
-				stompLandingEffect->pos = this->pos;
-				stompLandingEffect->Set_Limit(this->limit_StompEffect);
-				stompLandingEffect->state = StompLanding;
+				this->Stomp_Std();
 			}
 			break;
 		case AirStomp:
@@ -496,26 +499,7 @@ namespace  Player
 			//着地の際、自身の左中右に攻撃
 			if (this->moveCnt == 0)
 			{
-				//足元に攻撃矩形を生成
-				auto stompLandingRect = Shot00::Object::Create(true);
-				stompLandingRect->state = StompLanding;
-				//攻撃毎に攻撃範囲を生成時に指定
-				stompLandingRect->hitBase = this->range_Stomp;
-				stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
-				stompLandingRect->Set_Limit(this->limit_Stomp);
-				stompLandingRect->Set_Erase(0);
-				stompLandingRect->Set_Power(this->power_Stomp);
-				stompLandingRect->Set_Angle(0.0f);
-				//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
-				stompLandingRect->moveBack = this->moveBack_Stomp;
-				//範囲攻撃であることを知らせるフラグをtrue
-				stompLandingRect->wideRange = true;
-				//エフェクトの生成
-				//タスクキルはエフェクト側で行う
-				auto stompLandingEffect = Effect::Object::Create(true);
-				stompLandingEffect->pos = this->pos;
-				stompLandingEffect->Set_Limit(this->limit_StompEffect);
-				stompLandingEffect->state = StompLanding;
+				this->Stomp_Std();
 			}
 			break;
 		case  Shoot:
@@ -542,6 +526,11 @@ namespace  Player
 	int Object::Get_Max_HP()
 	{
 		return this->max_Hp;
+	}
+	//状態を取得する
+	int Object::Get_State()
+	{
+		return this->state;
 	}
 	//-----------------------------------------------------------------------------
 	//アニメーション制御
@@ -658,19 +647,19 @@ namespace  Player
 				if (this->angle_LR == Right)
 				{
 					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
-					shot->moveVec = ML::Vec2(+this->shotSpeed, 0);
+					shot->moveVec = ML::Vec2(+this->speed_Shot, 0);
 				}
 				else
 				{
 					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
-					shot->moveVec = ML::Vec2(-this->shotSpeed, 0);
+					shot->moveVec = ML::Vec2(-this->speed_Shot, 0);
 				}
 			}
 			//スティックの入力方向へ発射
 			else
 			{
 				shot->pos = this->pos + ML::Vec2(cos(angle),sin(angle)) * this->reach;
-				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->shotSpeed;
+				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->speed_Shot;
 				shot->Set_Angle(angle);
 			}
 		}
@@ -705,6 +694,34 @@ namespace  Player
 		{
 			this->angle_LR = Left;
 		}
+	}
+	//ストンプスタンダード
+	void Object::Stomp_Std()
+	{
+		//足元に攻撃矩形を生成
+		auto stompLandingRect = Shot00::Object::Create(true);
+		stompLandingRect->state = StompLanding;
+		//攻撃毎に攻撃範囲を生成時に指定
+		stompLandingRect->hitBase = this->range_Stomp;
+		stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
+		stompLandingRect->Set_Limit(this->limit_Stomp);
+		stompLandingRect->Set_Erase(0);
+		stompLandingRect->Set_Power(this->power_Stomp);
+		stompLandingRect->Set_Angle(0.0f);
+		//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
+		stompLandingRect->moveBack = this->moveBack_Stomp;
+		//範囲攻撃であることを知らせるフラグをtrue
+		stompLandingRect->wideRange = true;
+		//画面を揺らすための設定を行う
+		auto map = ge->GetTask_One_G<Map2D::Object>("フィールド");
+		map->Set_Dist_Quake(this->dist_Quake);
+		map->Set_Limit_Quake(this->limit_Quake);
+		//エフェクトの生成
+		//タスクキルはエフェクト側で行う
+		auto stompLandingEffect = Effect::Object::Create(true);
+		stompLandingEffect->pos = this->pos;
+		stompLandingEffect->Set_Limit(this->limit_StompEffect);
+		stompLandingEffect->state = StompLanding;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

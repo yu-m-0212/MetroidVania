@@ -45,18 +45,21 @@ namespace  Player
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	//追加変数
 		string controllerName;
 		float max_StompFallSpeed;	//ストンプ時の最大効果速度
-		float shotSpeed;			//ショット速度
+		float speed_Shot;			//ショット速度
+		float height_Jump;			//ジャンプ初速
 		int addUnHitTime;			//被弾時に得られる無敵時間
 		int interval_Shot;			//射撃の発射間隔（フレーム）
-		int limit_JumpAngleChange;	//ジャンプ時、スティックを倒したとき一定時間内なら向きを変えられる
+		int limit_JumpAngleChange;	//ジャンプから一定時間内なら向きを変えられる
 		int limit_Stomp;			//継続時間ストンプ
 		int limit_StompEffect;		//継続時間ストンプ効果
 		int limit_StompHoldTime;	//硬直時間ストンプ
+		int limit_Quake;			//画面揺れ時間
 		int limit_Shot;				//継続時間ショット
 		int limit_HealEffect;		//継続時間回復効果
+		int lv_Stomp;				//ストンプアップグレードレベル
+		int dist_Quake;				//画面揺れ幅
 		int power_Stomp;			//攻撃力ストンプ
 		int power_Shot;				//攻撃力ショット
 		ML::Box2D range_Stomp;		//範囲ストンプ
@@ -74,10 +77,14 @@ namespace  Player
 		int Get_HP();
 		//HPの最大値を取得する
 		int Get_Max_HP();
+		//状態を取得する
+		int Get_State();
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
 		//ショット生成スタンダード
 		void Shot_Appear();
+		//ストンプスタンダード
+		void Stomp_Std();
 		//行動ショット中
 		void Move_Shot();
 	};

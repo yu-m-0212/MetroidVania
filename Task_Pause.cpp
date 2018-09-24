@@ -56,6 +56,7 @@ namespace  Pause
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		auto in = DI::GPad_GetState("P1");
 		//フラグで管理
 		if (!ge->pause)
 		{

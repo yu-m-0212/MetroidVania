@@ -33,12 +33,12 @@ namespace  Gun
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;
+		/*this->render2D_Priority[1] = 0.4f;
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		this->pos = pl->pos;
 		this->hitBase = ML::Box2D(-64, -32, 128, 64);
 		this->controllerName = "P1";
-		this->tremor = 3.0f;
+		this->tremor = 3.0f;*/
 
 		//★タスクの生成
 
@@ -63,6 +63,7 @@ namespace  Gun
 	{
 		this->moveCnt++;
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		auto in = DI::GPad_GetState(this->controllerName);
 		this->angle_LR = pl->angle_LR;
 		
@@ -103,6 +104,7 @@ namespace  Gun
 	void  Object::Render2D_AF()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		ML::Box2D draw = this->hitBase.OffsetCopy(this->pos);
 		ML::Box2D  src(1216, 0, 64, 32);
 		if (this->angle_LR == Left)
@@ -129,6 +131,7 @@ namespace  Gun
 	{
 		BChara::State nm = this->state; //とりあえず今の状態を指定
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		//思考（入力）や状況に応じてモーションを変更することを目的としている。
 		//モーションの変更以外の処理は行わない
 		//モーション更新
@@ -158,6 +161,7 @@ namespace  Gun
 	void Object::Move()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		if (nullptr == pl) { return; }
 		switch (this->state) 
 		{
 		default:
