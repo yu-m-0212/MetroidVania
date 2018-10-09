@@ -1,18 +1,18 @@
 //-------------------------------------------------------------------
-//ガン
+//プレイヤ頭部表示用
 //-------------------------------------------------------------------
-#include	"MyPG.h"
-#include	"Task_Gun.h"
-#include	"Task_Player.h"
+#include  "MyPG.h"
+#include  "Task_Player.h"
+#include  "Task_Player_Head.h"
 
-namespace  Gun
+namespace  Player_Head
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "GunImage";
+		this->imageName = "PlayerHeadImg";
 		DG::Image_Create(this->imageName, "./data/image/player.png");
 		return true;
 	}
@@ -33,12 +33,12 @@ namespace  Gun
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;
-		this->hitBase = ML::Box2D(-69, -46, 138, 92);
-		this->controllerName = "P1";
-		this->tremor = 1.0f;
+		this->render2D_Priority[1] = 0.5f;
 		this->angle = 0.0f;
-
+		this->hitBase= ML::Box2D(-69, -46, 138, 92);
+		this->center_Rotate = ML::Vec2(69, 36);
+		this->controllerName = "P1";
+		
 		//★タスクの生成
 
 		return  true;
@@ -62,42 +62,56 @@ namespace  Gun
 	{
 		if (ge->pause) { return; }
 		this->moveCnt++;
+		this->animCnt++;
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		if (nullptr == pl) { return; }
 		auto in = DI::GPad_GetState(this->controllerName);
 		this->angle_LR = pl->angle_LR;
 		this->pos = pl->pos;
-		this->Think();
-		this->Move();
-
-		//角度に上下限を設ける場合
-		/*if (this->angle_LR == Right)
+		//共通の処理
+		switch (pl->state)
 		{
-			if (ML::ToDegree(this->angle) > 45.0)
+		default:
+			this->angle = atan2(in.RStick.axis.y, in.RStick.axis.x);
+			//角度に上下限を設ける場合
+			if (this->angle_LR == Right)
 			{
-				this->angle = ML::ToRadian(45.0f);
-			}
-			else if (ML::ToDegree(this->angle) < -45.0f)
-			{
-				this->angle = ML::ToRadian(-45.0f);
-			}
-		}
-		else
-		{
-			if (in.RStick.axis != ML::Vec2(0, 0))
-			{
-				this->angle += ML::ToRadian(180.0f);
-				if (ML::ToDegree(this->angle) > 45.0f && ML::ToDegree(this->angle)<180.0f)
+				if (ML::ToDegree(this->angle) > 45.0)
 				{
 					this->angle = ML::ToRadian(45.0f);
 				}
-				else if (ML::ToDegree(this->angle) < 315.0f &&
-					!(ML::ToDegree(this->angle) > 0.0f && ML::ToDegree(this->angle)<45.0f))
+				else if (ML::ToDegree(this->angle) < -45.0f)
 				{
-					this->angle = ML::ToRadian(315.0f);
+					this->angle = ML::ToRadian(-45.0f);
 				}
 			}
-		}*/
+			else
+			{
+				if (in.RStick.axis != ML::Vec2(0, 0))
+				{
+					this->angle += ML::ToRadian(180.0f);
+					if (ML::ToDegree(this->angle) > 45.0f && ML::ToDegree(this->angle) < 180.0f)
+					{
+						this->angle = ML::ToRadian(45.0f);
+					}
+					else if (ML::ToDegree(this->angle) < 315.0f &&
+						!(ML::ToDegree(this->angle) > 0.0f && ML::ToDegree(this->angle) < 45.0f))
+					{
+						this->angle = ML::ToRadian(315.0f);
+					}
+				}
+			}
+			break;
+			//例外処理（頭を動かさない）
+		case SlowDown:
+		case Landing:
+		case PreStomp:
+		case LandStomp:
+		case AirStomp:
+		case StompLanding:
+		case Damage:
+			break;
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -108,95 +122,15 @@ namespace  Gun
 		ML::Box2D draw = this->hitBase.OffsetCopy(this->pos);
 		//デフォルトの値を用意
 		int wide = 138, height = 92;
-		ML::Box2D  src(wide * 15, 0, wide, height);
-		if (this->angle_LR == Left)
-		{
-			src.y = height * 2;
+		ML::Box2D  src(wide * 16, 0, wide, height);
+		//	向きに応じて画像を左右反転する
+		if (false == this->angle_LR) {
+			src.y=height*4;
 		}
 		DG::Image_Rotation(this->res->imageName, this->angle,
-			ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
+			this->center_Rotate);
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Draw(this->res->imageName, draw, src);
-	}
-	//
-	float Object::Get_Angle()
-	{
-		return this->angle;
-	}
-	//思考
-	void Object::Think()
-	{
-		BChara::State nm = this->state; //とりあえず今の状態を指定
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		if (nullptr == pl) { return; }
-		//思考（入力）や状況に応じてモーションを変更することを目的としている。
-		//モーションの変更以外の処理は行わない
-		//モーション更新
-		switch (nm)
-		{
-		default:
-			break;
-		case Stand:
-			if (pl->state == Shoot) { nm = Shoot; }
-			if (pl->state == Jumpshoot) { nm = Jumpshoot; }
-			if (pl->state == Fallshoot) { nm = Fallshoot; }
-			break;
-		case Shoot:
-			if (!(pl->state==Shoot)) { nm = Stand; }
-			break;
-		case Jumpshoot:
-			if (!(pl->state==Jumpshoot)) { nm = Stand; }
-			break;
-		case Fallshoot:
-			if (!(pl->state==Fallshoot)) { nm = Stand; }
-			break;
-		}
-		this->UpdateMotion(nm);
-	}
-	//モーションに対応した処理
-	//(モーションは変更しない)
-	void Object::Move()
-	{
-		auto in = DI::GPad_GetState(this->controllerName);
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		//共通の処理
-		switch (pl->state)
-		{
-		default:
-			this->angle = atan2(in.RStick.axis.y, in.RStick.axis.x);
-			//左向きの時は角度を加算する
-			if (this->angle_LR == Left)
-			{
-				if (in.RStick.axis != ML::Vec2(0, 0))
-				{
-					this->angle += ML::ToRadian(180.0f);
-				}
-			}
-			break;
-		//例外処理（銃口を動かさない）
-		case SlowDown:
-		case Landing:
-		case PreStomp:
-		case LandStomp:
-		case AirStomp:
-		case StompLanding:
-		case Damage:
-			break;
-		}
-		if (nullptr == pl) { return; }
-		switch (this->state)
-		{
-		default:
-			break;
-		case Stand:
-			break;
-		case Shoot:
-		case Jumpshoot:
-		case Fallshoot:
-			//発砲中は上下に揺らす
-			this->pos.y = float(pl->pos.y + sin(this->moveCnt) * this->tremor);
-			break;
-		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

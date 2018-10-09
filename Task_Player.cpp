@@ -11,6 +11,7 @@
 #include	"Task_Retry.h"
 #include	"Task_Corpse.h"
 #include	"Task_Gun.h"
+#include	"Task_Player_Head.h"
 
 namespace  Player
 {
@@ -20,7 +21,7 @@ namespace  Player
 	bool  Resource::Initialize()
 	{
 		this->imageName = "PlayerImg";
-		DG::Image_Create(this->imageName, "./data/image/chara(仮)01.png");
+		DG::Image_Create(this->imageName, "./data/image/player.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -55,7 +56,7 @@ namespace  Player
 		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
 		this->height_Jump = -10.0f;							//ジャンプ力（初速）
 		this->gravity = ML::Gravity(32);					//重力加速度＆時間速度による加算量
-		this->reach = 32.0;									//射程
+		this->reach = 48.0;									//射程
 		this->speed_Shot = 10;								//ショット速度
 		this->limit_StompHoldTime = 30;						//ストンプ着地時の硬直時間
 		this->limit_Stomp = 15;								//ストンプ継続時間
@@ -75,6 +76,10 @@ namespace  Player
 		this->moveBack_Stomp = ML::Vec2(12, -4);			//ストンプふっとび量
 
 		//★タスクの生成
+		auto gun = Gun::Object::Create(true);
+		gun->pos = this->pos;
+		auto plHead = Player_Head::Object::Create(true);
+		plHead->pos = this->pos;
 
 		return  true;
 	}
@@ -371,6 +376,29 @@ namespace  Player
 		case Unnon:
 			break;
 		}
+		//右スティックのX軸の値によって方向を変える
+		switch (this->state)
+		{
+		default:
+			if (in.RStick.axis.x < 0.0f)
+			{
+				this->angle_LR = Left;
+			}
+			else if (in.RStick.axis.x > 0.0f)
+			{
+				this->angle_LR = Right;
+			}
+			break;
+			//例外
+		case SlowDown:
+		case Landing:
+		case PreStomp:
+		case LandStomp:
+		case AirStomp:
+		case StompLanding:
+		case Damage:
+			break;
+		}
 		//-----------------------------------------------------------------
 		//モーション毎に固有の処理
 		switch (this->state) 
@@ -387,26 +415,53 @@ namespace  Player
 				this->moveCnt = 0;
 				this->angle_LR = Right;
 			}
-			//右スティックによって向きを変える
-			if (in.RStick.axis.x > 0)
-			{
-				this->angle_LR = Right;
-			}
-			else if (in.RStick.axis.x<0)
-			{
-				this->angle_LR = Left;
-			}
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.on)
 			{
-				this->angle_LR = Left;
-				this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
+				//右スティックが倒されているときは歩き始めた瞬間のみ、向きを変える
+				if (in.RStick.axis != ML::Vec2(0.0f, 0.0f))
+				{
+					if (this->moveCnt == 0)
+					{
+						this->angle_LR = Left;
+					}
+				}
+				else
+				{
+					this->angle_LR = Left;
+				}
+				//後退もできるが移動速度が落ちる
+				if(this->angle_LR == Right)
+				{
+					this->moveVec.x = -this->maxSpeed / 2.0f;
+				}
+				else
+				{
+					this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
+				}
 			}
 			if (in.LStick.R.on)
 			{
-				this->angle_LR = Right;
-				this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
+				if (in.RStick.axis != ML::Vec2(0.0f, 0.0f))
+				{
+					if (this->moveCnt == 0)
+					{
+						this->angle_LR = Right;
+					}
+				}
+				else
+				{
+					this->angle_LR = Right;
+				}
+				if(this->angle_LR == Left)
+				{
+					this->moveVec.x = +this->maxSpeed / 2.0f;
+				}
+				else
+				{
+					this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
+				}
 			}
 			break;
 		case SlowDown:
@@ -414,15 +469,6 @@ namespace  Player
 			if (!this->CheckFrontFoot_LR())
 			{
 				this->moveVec.x = 0.0f;
-			}
-			//右スティックによって向きを変える
-			if (in.RStick.axis.x > 0)
-			{
-				this->angle_LR = Right;
-			}
-			else if (in.RStick.axis.x<0)
-			{
-				this->angle_LR = Left;
 			}
 			break;
 		case  Jump:		//上昇中
@@ -536,36 +582,40 @@ namespace  Player
 	//アニメーション制御
 	BChara::DrawInfo  Object::Anim()
 	{
-		//デフォルトカラーを宣言
+		//デフォルトの値を用意
+		int wide = 138, height = 92;
+		ML::Box2D dd(-wide / 2, -height / 2, wide, height);
 		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
-			//draw							src
-			{ this->hitBase, ML::Box2D(  0,  0, 48, 96), dc },//停止1			[0]
-			{ this->hitBase, ML::Box2D(  0, 96, 48, 96), dc },//停止2			[1]
-			{ this->hitBase, ML::Box2D(  0,192, 48, 96), dc },//停止3			[2]
-			{ this->hitBase, ML::Box2D(  0,288, 48, 96), dc },//停止4			[3]
-			{ this->hitBase, ML::Box2D(  0,384, 48, 96), dc },//停止5			[4]
-			{ this->hitBase, ML::Box2D( 48,  0, 48, 96), dc },//歩行1			[5]
-			{ this->hitBase, ML::Box2D( 48, 96, 48, 96), dc },//歩行2			[6]
-			{ this->hitBase, ML::Box2D( 48,192, 48, 96), dc },//歩行3			[7]
-			{ this->hitBase, ML::Box2D(96,   0, 48, 96), dc },//減速				[8]
-			{ this->hitBase, ML::Box2D(144,  0, 48, 96), dc },//パンチ1			[9]
-			{ this->hitBase, ML::Box2D(192,  0, 48, 96), dc },//パンチ2			[10]
-			{ this->hitBase, ML::Box2D(240,  0, 48, 96), dc },//空中攻撃			[11]
-			{ this->hitBase, ML::Box2D(288,  0, 48, 96), dc },//ストンプ			[12]
-			{ this->hitBase, ML::Box2D(336,  0, 48, 96), dc },//ストンプ着地		[13]
-			{ this->hitBase, ML::Box2D(384,  0, 48, 96), dc },//射撃				[14]
-			{ this->hitBase, ML::Box2D(432,  0, 48, 96), dc },//空中射撃			[15]
-			{ this->hitBase, ML::Box2D(480,  0, 48, 96), dc },//バンカー1		[16]
-			{ this->hitBase, ML::Box2D(528,  0, 48, 96), dc },//バンカー2		[17]
-			{ this->hitBase, ML::Box2D(576,  0, 48, 96), dc },//バンカー3		[18]
-			{ this->hitBase, ML::Box2D(624,  0, 48, 96), dc },//ジャンプ			[19]
-			{ this->hitBase, ML::Box2D(672,  0, 48, 96), dc },//落下				[20]
-			{ this->hitBase, ML::Box2D(720,  0, 48, 96), dc },//着地				[21]
-			{ this->hitBase, ML::Box2D(768,  0, 48, 96), dc },//ダメージ			[22]
+			//draw			src
+			{ dd, ML::Box2D(wide *  0,height * 0,wide,height),dc },	//停止1				[0]
+			{ dd, ML::Box2D(wide *  0,height * 1,wide,height),dc },	//停止2				[1]
+			{ dd, ML::Box2D(wide *  0,height * 2,wide,height),dc },	//停止3				[2]
+			{ dd, ML::Box2D(wide *  0,height * 3,wide,height),dc },	//停止4				[3]
+			{ dd, ML::Box2D(wide *  1,height * 0,wide,height),dc },	//歩行1				[4]
+			{ dd, ML::Box2D(wide *  1,height * 1,wide,height),dc },	//歩行2				[5]
+			{ dd, ML::Box2D(wide *  1,height * 2,wide,height),dc },	//歩行3				[6]
+			{ dd, ML::Box2D(wide *  1,height * 3,wide,height),dc },	//歩行4				[7]
+			{ dd, ML::Box2D(wide *  2,height * 0,wide,height),dc },	//減速				[8]
+			{ dd, ML::Box2D(wide *  3,height * 0,wide,height),dc },	//離陸				[9]
+			{ dd, ML::Box2D(wide *  4,height * 0,wide,height),dc },	//ジャンプ			[10]
+			{ dd, ML::Box2D(wide *  5,height * 0,wide,height),dc },	//降下				[11]
+			{ dd, ML::Box2D(wide *  6,height * 0,wide,height),dc },	//着地				[12]
+			{ dd, ML::Box2D(wide *  7,height * 0,wide,height),dc },	//ショット1			[13]
+			{ dd, ML::Box2D(wide *  7,height * 1,wide,height),dc },	//ショット2			[14]
+			{ dd, ML::Box2D(wide *  7,height * 2,wide,height),dc },	//ショット3			[15]
+			{ dd, ML::Box2D(wide *  7,height * 3,wide,height),dc },	//ショット4			[16]
+			{ dd, ML::Box2D(wide *  8,height * 0,wide,height),dc },	//ジャンプショット	[17]
+			{ dd, ML::Box2D(wide *  9,height * 0,wide,height),dc },	//降下ショット		[18]
+			{ dd, ML::Box2D(wide * 10,height * 0,wide,height),dc },	//ストンプ予備動作	[19]
+			{ dd, ML::Box2D(wide * 11,height * 0,wide,height),dc },	//地上ストンプ		[20]
+			{ dd, ML::Box2D(wide * 12,height * 0,wide,height),dc },	//空中ストンプ		[21]
+			{ dd, ML::Box2D(wide * 13,height * 0,wide,height),dc },	//ストンプ着地		[22]
+			{ dd, ML::Box2D(wide * 14,height * 0,wide,height),dc },	//ダメージ			[23]
+
 		};
 		BChara::DrawInfo  rtv;
-		int  standAnim,walkAnim;
+		int  standAnim,walkAnim,shootAnim;
 		switch (this->state) {
 		default:			rtv = imageTable[0];	break;
 		//	停止----------------------------------------------------------------------------
@@ -573,43 +623,54 @@ namespace  Player
 			//切り替わるフレーム数
 			standAnim = this->animCnt / 12;
 			//パターン数
-			standAnim %= 5;
+			standAnim %= 4;
 			//出た値に一枚目の要素番号を足す
 			rtv = imageTable[standAnim + 0];
 			break;
 		//	歩行----------------------------------------------------------------------------
 		case  Walk:
 			walkAnim = this->animCnt / 8;
-			walkAnim %= 3;
-			rtv = imageTable[walkAnim + 5];
+			walkAnim %= 4;
+			rtv = imageTable[walkAnim + 4];
 			break;
 		//	減速----------------------------------------------------------------------------
-		case SlowDown:
-		case PreStomp:
-			rtv = imageTable[8];
-			break;
-		//	空中攻撃-------------------------------------------------------------------------
-		case Air:			rtv = imageTable[11];	break;
-		//	ストンプ-------------------------------------------------------------------------
-		case AirStomp:			rtv = imageTable[12];	break;
-		//	ストンプ着地---------------------------------------------------------------------
-		case StompLanding:
-		case LandStomp:
-			rtv = imageTable[13];
-			break;
-		//	地上射撃-------------------------------------------------------------------------
-		case Shoot:			rtv = imageTable[14];	break;
-		//	空中射撃-------------------------------------------------------------------------
-		case Jumpshoot:
-		case Fallshoot:		rtv = imageTable[15];	break;
+		case SlowDown:		rtv = imageTable[8];	break;
+		//	離陸----------------------------------------------------------------------------
+		case TakeOff:		rtv = imageTable[9];	break;
 		//	ジャンプ------------------------------------------------------------------------
-		case  Jump:			rtv = imageTable[19];	break;
-		//	落下----------------------------------------------------------------------------
-		case  Fall:			rtv = imageTable[20];	break;
-		//着地硬直--------------------------------------------------------------------------
-		case  Landing:		rtv = imageTable[21];	break;
-		//ダメージ--------------------------------------------------------------------------
-		case  Damage:		rtv = imageTable[22];	break;
+		case Jump:			rtv = imageTable[10];	break;
+			//	降下----------------------------------------------------------------------------
+		case Fall:			rtv = imageTable[11];	break;
+			//	着地----------------------------------------------------------------------------
+		case Landing:		rtv = imageTable[12];	break;
+			//	ショット------------------------------------------------------------------------
+		case Shoot:
+			//ショットは歩いている時のみ、アニメーションする
+			if (this->moveVec.x != 0.0f)
+			{
+				shootAnim = this->animCnt / 8;
+				shootAnim %= 4;
+				rtv = imageTable[shootAnim + 13];
+			}
+			else
+			{
+				rtv = imageTable[13];
+			}
+			break;
+		//	ジャンプショット-----------------------------------------------------------------
+		case Jumpshoot:		rtv = imageTable[17];	break;
+		//	降下ショット--------------------------------------------------------------------
+		case Fallshoot:		rtv = imageTable[18];	break;
+		//	ストンプ予備動作----------------------------------------------------------------
+		case PreStomp:		rtv = imageTable[19];	break;
+		//	地上ストンプ--------------------------------------------------------------------
+		case LandStomp:		rtv = imageTable[20];	break;
+		//	空中ストンプ--------------------------------------------------------------------
+		case AirStomp:		rtv = imageTable[21];	break;
+		//	ストンプ着地--------------------------------------------------------------------
+		case StompLanding:	rtv = imageTable[22];	break;
+		//	ダメージ------------------------------------------------------------------------
+		case Damage:		rtv = imageTable[23];	break;
 		}
 		//	向きに応じて画像を左右反転する
 		if (false == this->angle_LR) {
@@ -668,7 +729,7 @@ namespace  Player
 	void Object::Move_Shot()
 	{
 		auto in = DI::GPad_GetState(this->controllerName);
-		//射撃中は後退できるが移動速度が落ちる
+		//後退もできるが移動速度が落ちる
 		if (in.LStick.L.on && this->angle_LR == Right)
 		{
 			this->moveVec.x = -this->maxSpeed / 2.0f;

@@ -21,6 +21,7 @@
 #include  "Task_Pause.h"
 #include  "Task_Tutorials.h"
 #include  "Task_Corpse.h"
+#include  "Task_Gun.h"
 
 namespace  Game
 {
@@ -110,6 +111,8 @@ namespace  Game
 		ge->KillAll_G("アイテム");
 		ge->KillAll_G("チュートリアル");
 		ge->KillAll_G("プレイヤ");
+		ge->KillAll_G("ガン");
+		ge->KillAll_G("プレイヤ頭部");
 		
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();

@@ -1,15 +1,15 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//ガン
+//プレイヤの頭部表示用
 //-------------------------------------------------------------------
 #include "BChara.h"
 
-namespace  Gun
+namespace  Player_Head
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("ガン");	//グループ名
-	const  string  defName("NoName");		//タスク名
+	const  string  defGroupName("プレイヤ頭部");	//グループ名
+	const  string  defName("NoName");			//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -41,20 +41,14 @@ namespace  Gun
 		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
-		bool  Initialize();		//「初期化」タスク生成時に１回だけ行う処理
-		void  UpDate();			//「実行」１フレーム毎に行う処理
+		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
+		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		float angle;			//描画角度
-		float tremor;			//発砲時の揺れ幅
+		float angle;			//角度
+		ML::Vec2 center_Rotate;	//画像回転時の中心
 		string controllerName;	//コントローラー宣言
 	public:
-		//角度を返す
-		float Get_Angle();
-		//思考
-		void Think();
-		//行動
-		void Move();
 	};
 }
