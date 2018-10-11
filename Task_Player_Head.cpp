@@ -33,11 +33,11 @@ namespace  Player_Head
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.5f;
-		this->angle = 0.0f;
-		this->hitBase= ML::Box2D(-69, -46, 138, 92);
-		this->center_Rotate = ML::Vec2(69, 36);
-		this->controllerName = "P1";
+		this->render2D_Priority[1] = 0.5f;				//描画順
+		this->angle = 0.0f;								//角度
+		this->hitBase= ML::Box2D(-69, -46, 138, 92);	//判定矩形
+		this->center_Rotate = ML::Vec2(69, 36);			//回転軸
+		this->controllerName = "P1";					//コントローラー宣言
 		
 		//★タスクの生成
 
@@ -122,10 +122,22 @@ namespace  Player_Head
 		ML::Box2D draw = this->hitBase.OffsetCopy(this->pos);
 		//デフォルトの値を用意
 		int wide = 138, height = 92;
-		ML::Box2D  src(wide * 16, 0, wide, height);
+		//アニメーション
+		int anim = 0;
+		switch(pl->state)
+		{
+		default:
+			break;
+		case Stand:
+		case Walk:
+			anim = this->animCnt / 12;
+			anim %= 4; 
+			break;
+		}
+		ML::Box2D  src(wide * 16, anim*height, wide, height);
 		//	向きに応じて画像を左右反転する
 		if (false == this->angle_LR) {
-			src.y=height*4;
+			src.y=src.y+height*4;
 		}
 		DG::Image_Rotation(this->res->imageName, this->angle,
 			this->center_Rotate);

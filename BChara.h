@@ -11,8 +11,9 @@ class BChara : public BTask
 public:
 	typedef shared_ptr<BChara>		SP;
 	typedef weak_ptr<BChara>		WP;
-public:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+
+	//構造体
 	//キャラクタの行動状態フラグ
 	enum State
 	{
@@ -45,8 +46,22 @@ public:
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };
-	Angle_LR	angle_LR;
+	//アニメーション情報構造体
+	//draw,src,color
+	struct DrawInfo {
+		ML::Box2D		draw, src;
+		ML::Color		color;
+	};
+	//攻撃情報
+	//(攻撃の威力,命中精度,攻撃の属性)
+	struct AttackInfo {
+		int power;	//攻撃の威力
+		int hit;	//命中精度
+		int element;//攻撃の属性
+					//その他必要に応じて
+	};
 	//キャラクタ共通メンバ変数
+	Angle_LR	angle_LR;
 	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置
 	ML::Vec2	moveVec;		//移動ベクトル
@@ -58,16 +73,17 @@ public:
 	int			animCnt;		//アニメーションカウンタ
 	int			hp;				//ヘルスポイント
 	int			max_Hp;			//HP最大値
-	float		jumpPow;		//ジャンプ初速
 	float		maxFallSpeed;	//落下最大速度
 	float		gravity;		//フレーム単位の加算量
 	float		maxSpeed;		//左右方向への移動の最大速
 	float		addSpeed;		//左右方向への移動の加算量
 	float		decSpeed;		//左右方向への移動の減衰量
 	float		reach;			//パンチの射程
-	bool		wideRange;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
 	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
-
+private:
+	bool		range_Wide;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
+public:
+	//メソッド
 	//メンバ変数に最低限の初期化を行う
 	//★★メンバ変数を追加したら必ず初期化も追加する事★★
 	BChara()
@@ -80,17 +96,16 @@ public:
 		, recieveBase(0, 0, 0, 0)
 		, moveCnt(0)
 		, unHitTime(0)
-		,animCnt(0)
+		, animCnt(0)
 		, hp(1)
-		, jumpPow(0)
 		, maxFallSpeed(0)
 		, gravity(0)
 		, maxSpeed(0)
 		, addSpeed(0)
 		, decSpeed(0)
 		, reach(0)
-		, wideRange(false)
 		, tip(false)
+		, range_Wide(false)
 	{
 	}
 	virtual  ~BChara(){}
@@ -111,24 +126,16 @@ public:
 	virtual bool CheckHit(const ML::Box2D& hit);
 	//モーションを更新（変更なしの場合	false)
 	bool  UpdateMotion(State  nm_);
-
-	//アニメーション情報構造体
-	//draw,src,color
-	struct DrawInfo {
-		ML::Box2D		draw, src;
-		ML::Color		color;
-	};
-	//攻撃情報
-	//(攻撃の威力,命中精度,攻撃の属性)
-	struct AttackInfo {
-		int power;	//攻撃の威力
-		int hit;	//命中精度
-		int element;//攻撃の属性
-		//その他必要に応じて
-	};
 	//接触時の応答処理（これ自体はダミーのようなモノ）
 	virtual	void Received(BChara* from_, AttackInfo at_)
 	{
 		ML::MsgBox("Recieved 実装されていません");
 	}
+
+	//アクセサメソッド
+	//範囲攻撃か否かを指定する
+	//引数	：	（0か1）
+	void Set_Range_Wide(const int&);
+	//範囲攻撃か否かを取得する
+	bool Get_Range_Wide();
 };

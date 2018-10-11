@@ -63,7 +63,7 @@ namespace  Player
 		this->limit_StompEffect = 18;						//継続時間ストンプ効果
 		this->limit_Quake = 15;								//画面揺れ時間
 		this->limit_Shot = 40;								//継続時間ショット
-		this->limit_JumpAngleChange = 24;					//ジャンプから一定時間内なら向きを変えられる
+		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
 		this->limit_HealEffect = 24;						//継続時間回復エフェクト
 		this->dist_Quake = 5;								//画面揺れ幅
 		this->lv_Stomp = 1;									//ストンプアップグレードレベル
@@ -772,7 +772,7 @@ namespace  Player
 		//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
 		stompLandingRect->moveBack = this->moveBack_Stomp;
 		//範囲攻撃であることを知らせるフラグをtrue
-		stompLandingRect->wideRange = true;
+		stompLandingRect->Set_Range_Wide(1);
 		//画面を揺らすための設定を行う
 		auto map = ge->GetTask_One_G<Map2D::Object>("フィールド");
 		map->Set_Dist_Quake(this->dist_Quake);

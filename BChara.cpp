@@ -138,3 +138,16 @@ bool BChara::CheckHit(const ML::Box2D& hit_)
 	ML::Box2D me = this->recieveBase.OffsetCopy(this->pos);
 	return me.Hit(hit_);
 }
+//-----------------------------------------------------------------------------
+//アクセサメソッド
+//範囲攻撃か否かを指定する
+//引数	：	（0か1）
+void BChara::Set_Range_Wide(const int& wide_)
+{
+	this->range_Wide = wide_;
+}
+//範囲攻撃か否かを取得する
+bool BChara::Get_Range_Wide()
+{
+	return this->range_Wide;
+}

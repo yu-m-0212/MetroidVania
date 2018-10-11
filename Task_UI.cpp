@@ -87,13 +87,13 @@ namespace  UI
 				"ge->failure = " + to_string(ge->failure) + "\n" +
 				"Search_Player() = " + to_string(es->Search_Player()) + "\n" +
 				"BackSpace/Selectボタンでデバッグモード";
-			DG::Image_Draw(this->res->hpImageName, debugBox01, ML::Box2D(32, 0, 32, 32), ML::Color(0.7, 0, 0, 0));
+			DG::Image_Draw(this->res->hpImageName, debugBox01, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox01, debugText01, ML::Color(1, 1, 1, 1));
 			ML::Box2D debugBox02(1450, 75, 600, 75);
 			string debugText02 =
 				"RStick.axis.x = " + to_string(in.RStick.axis.x) + "\n" +
 				"RStick.axis.y = " + to_string(in.RStick.axis.y);
-			DG::Image_Draw(this->res->hpImageName, debugBox02, ML::Box2D(32, 0, 32, 32), ML::Color(0.7, 0, 0, 0));
+			DG::Image_Draw(this->res->hpImageName, debugBox02, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox02, debugText02, ML::Color(1, 1, 1, 1));
 		}
 		//以上デバッグ----------------------------------------------------

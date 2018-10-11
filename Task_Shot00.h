@@ -49,6 +49,13 @@ namespace  Shot00
 		int power;		//攻撃力
 		float angle;	//描画方向
 	public:
+		//状態ごとに行動を指定する
+		void Move();
+		//消滅する際、状態に応じてエフェクトを生成
+		//引数	：	（エフェクトを生成する座標）
+		void Effect_Hit(const ML::Vec2&);
+
+		//アクセサメソッド
 		//攻撃毎に寿命を設ける際に使用
 		//引数	：	（寿命）
 		void Set_Limit(const int&);
@@ -61,10 +68,5 @@ namespace  Shot00
 		//外部から描画角度を指定
 		//引数	：	（角度）
 		void Set_Angle(const float&);
-		//状態ごとに行動を指定する
-		void Move();
-		//消滅する際、状態に応じてエフェクトを生成
-		//引数	：	（エフェクトを生成する座標）
-		void Effect_Hit(const ML::Vec2&);
 	};
 }

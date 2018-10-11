@@ -69,35 +69,6 @@ namespace  Gun
 		this->pos = pl->pos;
 		this->Think();
 		this->Move();
-
-		//角度に上下限を設ける場合
-		/*if (this->angle_LR == Right)
-		{
-			if (ML::ToDegree(this->angle) > 45.0)
-			{
-				this->angle = ML::ToRadian(45.0f);
-			}
-			else if (ML::ToDegree(this->angle) < -45.0f)
-			{
-				this->angle = ML::ToRadian(-45.0f);
-			}
-		}
-		else
-		{
-			if (in.RStick.axis != ML::Vec2(0, 0))
-			{
-				this->angle += ML::ToRadian(180.0f);
-				if (ML::ToDegree(this->angle) > 45.0f && ML::ToDegree(this->angle)<180.0f)
-				{
-					this->angle = ML::ToRadian(45.0f);
-				}
-				else if (ML::ToDegree(this->angle) < 315.0f &&
-					!(ML::ToDegree(this->angle) > 0.0f && ML::ToDegree(this->angle)<45.0f))
-				{
-					this->angle = ML::ToRadian(315.0f);
-				}
-			}
-		}*/
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理

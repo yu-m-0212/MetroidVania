@@ -43,7 +43,6 @@ namespace  Enemy00
 		this->addSpeed = 0.7f;					//•às‰Á‘¬“x(’n–Ê‚Ì‰e‹¿‚Å‚ ‚é’ö“x‘Å‚¿Á‚³‚ê‚é
 		this->decSpeed = 0.5f;					//Ú’nó‘Ô‚ÌŽž‚Ì‘¬“xŒ¸Š—Ê(–€ŽC
 		this->maxFallSpeed = 10.0f;				//Å‘å—Ž‰º‘¬“x
-		this->jumpPow = -6.0f;					//ƒWƒƒƒ“ƒv—Í(‰‘¬)
 		this->gravity = ML::Gravity(32) * 5;	//d—Í‰Á‘¬“x&ŽžŠÔ‘¬“x‚É‚æ‚é‰ÁŽZ—Ê
 		this->interval_Flash = 4;				//“_–ÅŠÔŠu
 		
@@ -150,7 +149,7 @@ namespace  Enemy00
 		//–³“GŽžŠÔ
 		this->unHitTime = 30;
 		//‚Ü‚¸”ÍˆÍUŒ‚‚©‚Ç‚¤‚©‚ð”»’è‚·‚é
-		if (!from_->wideRange)
+		if (!from_->Get_Range_Wide())
 		{
 			//‚«”ò‚Î‚³‚ê‚é
 			this->moveVec = from_->moveBack;
