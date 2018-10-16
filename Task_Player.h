@@ -48,6 +48,7 @@ namespace  Player
 		string controllerName;
 		float max_StompFallSpeed;	//ストンプ時の最大効果速度
 		float speed_Shot;			//ショット速度
+		float init_shot;			//生成位置ショット
 		float height_Jump;			//ジャンプ初速
 		int addUnHitTime;			//被弾時に得られる無敵時間
 		int interval_Shot;			//射撃の発射間隔（フレーム）
@@ -73,12 +74,6 @@ namespace  Player
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	(攻撃側,攻撃情報)
 		void Received(BChara* from_, AttackInfo at_);
-		//HPの値を取得する
-		int Get_HP();
-		//HPの最大値を取得する
-		int Get_Max_HP();
-		//状態を取得する
-		int Get_State();
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
 		//ショット生成スタンダード
@@ -87,5 +82,15 @@ namespace  Player
 		void Stomp_Std();
 		//行動ショット中
 		void Move_Shot();
+
+		//アクセサメソッド
+		//HPの値を取得する
+		int Get_HP();
+		//HPの最大値を取得する
+		int Get_Max_HP();
+		//状態を取得する
+		int Get_State();
+		//ショットの発射間隔を取得する
+		int Get_Interval_Shot();
 	};
 }

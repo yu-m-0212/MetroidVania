@@ -70,6 +70,43 @@ namespace  UI
 		if (nullptr == pl) { return; }
 		auto es = ge->GetTask_One_G<Enemy01::Object>("敵");
 		auto in = DI::GPad_GetState(this->controllerName);
+		//ベースの表示
+		{
+			ML::Box2D draw(0, 0, 1920, 128);
+			ML::Box2D  src(0, 64, 1920, 128);
+			DG::Image_Draw(this->res->hpImageName, draw, src);
+		}
+		//プレイヤHP枠の表示
+		{
+			for (int i = 0; i < pl->Get_Max_HP(); ++i)
+			{
+				ML::Box2D draw(128 + 64 * i, 32, 64, 64);
+				if (ge->debugMode)
+				{
+					draw.x += 120;
+				}
+				ML::Box2D  src(128, 0, 64, 64);
+				DG::Image_Draw(this->res->hpImageName, draw, src);
+			}
+		}
+		//プレイヤのHP表示
+		//バーで表示
+		//ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
+		//ボタンで表示
+		{
+			ML::Box2D draw;
+			ML::Box2D  src(0, 0, 64, 64);
+			for (int i = 0; i < pl->Get_HP(); ++i)
+			{
+				draw = ML::Box2D(128 + 64 * i, 32, 64, 64);
+				if (ge->debugMode)
+				{
+					draw.x += 120;
+				}
+				DG::Image_Draw(this->res->hpImageName, draw, src);
+			}
+		}
+		//以下デバッグ----------------------------------------------------
 		if (ge->debugMode)
 		{
 			ML::Box2D debugBox01(825, 0, 625, 450);
@@ -89,24 +126,14 @@ namespace  UI
 				"BackSpace/Selectボタンでデバッグモード";
 			DG::Image_Draw(this->res->hpImageName, debugBox01, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox01, debugText01, ML::Color(1, 1, 1, 1));
-			ML::Box2D debugBox02(1450, 75, 600, 75);
+			ML::Box2D debugBox02(1450, 75, 600, 100);
 			string debugText02 =
 				"RStick.axis.x = " + to_string(in.RStick.axis.x) + "\n" +
-				"RStick.axis.y = " + to_string(in.RStick.axis.y);
+				"RStick.axis.y = " + to_string(in.RStick.axis.y) + "\n" +
+				"angle = " + to_string(ML::ToDegree(atan2(in.RStick.axis.y, in.RStick.axis.x)));
 			DG::Image_Draw(this->res->hpImageName, debugBox02, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox02, debugText02, ML::Color(1, 1, 1, 1));
 		}
-		//以上デバッグ----------------------------------------------------
-		//プレイヤのHP表示
-		//バーで表示
-		ML::Box2D draw(32, 32, 32 * pl->Get_HP(), 16);
-		//デバッグ時は表示をずらす
-		if (ge->debugMode)
-		{
-			draw.x += 100;
-		}
-		ML::Box2D  src(32, 0, 32, 32);
-		DG::Image_Draw(this->res->hpImageName, draw, src);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

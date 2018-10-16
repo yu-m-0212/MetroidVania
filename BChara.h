@@ -78,9 +78,8 @@ public:
 	float		maxSpeed;		//左右方向への移動の最大速
 	float		addSpeed;		//左右方向への移動の加算量
 	float		decSpeed;		//左右方向への移動の減衰量
-	float		reach;			//パンチの射程
-	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
 private:
+	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
 	bool		range_Wide;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
 public:
 	//メソッド
@@ -103,7 +102,6 @@ public:
 		, maxSpeed(0)
 		, addSpeed(0)
 		, decSpeed(0)
-		, reach(0)
 		, tip(false)
 		, range_Wide(false)
 	{
@@ -136,6 +134,11 @@ public:
 	//範囲攻撃か否かを指定する
 	//引数	：	（0か1）
 	void Set_Range_Wide(const int&);
+	//ノックバックするか否かを指定する
+	//引数	：	（0か1）
+	void Set_Tip(const int&);
 	//範囲攻撃か否かを取得する
 	bool Get_Range_Wide();
+	//ノックバックするか否かを取得する
+	bool Get_Tip();
 };

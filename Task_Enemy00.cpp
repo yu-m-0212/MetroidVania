@@ -145,7 +145,7 @@ namespace  Enemy00
 			return;//–³“GŽžŠÔ’†‚Íƒ_ƒ[ƒW‚ðŽó‚¯‚È‚¢
 		}
 		this->hp -= at_.power;
-		if (from_->tip) { return; }
+		if (from_->Get_Tip()) { return; }
 		//–³“GŽžŠÔ
 		this->unHitTime = 30;
 		//‚Ü‚¸”ÍˆÍUŒ‚‚©‚Ç‚¤‚©‚ð”»’è‚·‚é

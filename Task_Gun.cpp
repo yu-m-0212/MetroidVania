@@ -76,6 +76,12 @@ namespace  Gun
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		if (nullptr == pl) { return; }
+		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
+		if (pl->unHitTime > 0) {
+			if ((pl->unHitTime / 4) % 2 == 0) {
+				return;
+			}
+		}
 		ML::Box2D draw = this->hitBase.OffsetCopy(this->pos);
 		//デフォルトの値を用意
 		int wide = 138, height = 92;
@@ -164,8 +170,8 @@ namespace  Gun
 		case Shoot:
 		case Jumpshoot:
 		case Fallshoot:
-			//発砲中は上下に揺らす
-			this->pos.y = float(pl->pos.y + sin(this->moveCnt) * this->tremor);
+			//発砲中は上下に揺らす（発射と同じ間隔でアニメーションする）
+			this->pos.y = float(pl->pos.y + sin(this->moveCnt*pl->Get_Interval_Shot()) * this->tremor);
 			break;
 		}
 	}

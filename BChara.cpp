@@ -146,8 +146,19 @@ void BChara::Set_Range_Wide(const int& wide_)
 {
 	this->range_Wide = wide_;
 }
+//ノックバックするか否かを指定する
+//引数	：	（0か1）
+void BChara::Set_Tip(const int& tip_)
+{
+	this->tip = tip_;
+}
 //範囲攻撃か否かを取得する
 bool BChara::Get_Range_Wide()
 {
 	return this->range_Wide;
+}
+//ノックバックするか否かを取得する
+bool BChara::Get_Tip()
+{
+	return this->tip;
 }

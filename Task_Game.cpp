@@ -73,6 +73,11 @@ namespace  Game
 		//エネミー（サソリ）の生成
 		this->Create_Enemy01(ML::Vec2(2582.0f, 1875.0f));
 		this->Create_Enemy01(ML::Vec2(1155.0f, 1690.0f));
+		this->Create_Enemy01(ML::Vec2(100.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2(200.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2(300.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2(400.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2(500.0f, 2200.0f));
 		//UIの生成
 		auto ui = UI::Object::Create(true);
 		//チュートリアルの生成
@@ -84,8 +89,10 @@ namespace  Game
 		this->Create_Message(ML::Vec2(1440, 1888), "右スティックで銃口を傾ける");
 		this->Create_Message(ML::Vec2( 640, 1698), "□ボタンで近接攻撃");
 		//アイテムの生成
-		auto item00 = Item00::Object::Create(true);
-		item00->pos = ML::Vec2(1727, 2200);
+		auto item00_1 = Item00::Object::Create(true);
+		item00_1->pos = ML::Vec2(1727, 2200);
+		auto item00_2 = Item00::Object::Create(true);
+		item00_2->pos = ML::Vec2(413, 1938);
 		//背景の生成
 		auto back = Back::Object::Create(true);
 		//ゴールの生成

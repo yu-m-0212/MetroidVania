@@ -80,7 +80,7 @@ namespace  Tutorials
 					this->message.length()*FONT_WIDTH, FONT_HIGHT);
 				draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 				//メッセージボックスを表示
-				ML::Box2D  src(32, 0, 32, 32);
+				ML::Box2D  src(64, 0, 64, 64);
 				DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
 				//メッセージを表示
 				DG::Font_Draw(this->res->fontName, draw, this->message, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
@@ -90,7 +90,7 @@ namespace  Tutorials
 		//デバッグモードの時、判定矩形を表示
 		{
 			ML::Box2D draw = this->recieveBase;
-			ML::Box2D  src(32, 0, 32, 32);
+			ML::Box2D  src(64, 0, 64, 64);
 			draw.Offset(this->pos);
 			draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 0.0f, 0.0f, 1.0f));

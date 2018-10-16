@@ -12,6 +12,7 @@
 #include	"Task_Corpse.h"
 #include	"Task_Gun.h"
 #include	"Task_Player_Head.h"
+#include	"Task_Enemy01.h"
 
 namespace  Player
 {
@@ -56,18 +57,18 @@ namespace  Player
 		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
 		this->height_Jump = -10.0f;							//ジャンプ力（初速）
 		this->gravity = ML::Gravity(32);					//重力加速度＆時間速度による加算量
-		this->reach = 48.0;									//射程
+		this->init_shot = 48.0f;							//生成位置ショット
 		this->speed_Shot = 10;								//ショット速度
 		this->limit_StompHoldTime = 30;						//ストンプ着地時の硬直時間
 		this->limit_Stomp = 15;								//ストンプ継続時間
-		this->limit_StompEffect = 18;						//継続時間ストンプ効果
+		this->limit_StompEffect = 15;						//継続時間ストンプ効果
 		this->limit_Quake = 15;								//画面揺れ時間
 		this->limit_Shot = 40;								//継続時間ショット
 		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
 		this->limit_HealEffect = 24;						//継続時間回復エフェクト
 		this->dist_Quake = 5;								//画面揺れ幅
 		this->lv_Stomp = 1;									//ストンプアップグレードレベル
-		this->addUnHitTime = 30;							//被弾時に得られる無敵時間
+		this->addUnHitTime = 60;							//被弾時に得られる無敵時間
 		this->interval_Shot = 12;							//射撃の発射間隔（フレーム）
 		this->range_Stomp = ML::Box2D(-96, -24, 192, 46);	//範囲ストンプ
 		this->range_Shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
@@ -185,7 +186,9 @@ namespace  Player
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
-			if (you.Hit(me))
+			auto en = ge->GetTask_One_G<Enemy01::Object>("敵");
+			//合説用に敵を掃討することを条件に追加
+			if (you.Hit(me) && nullptr==en)
 			{
 				ge->clear = true;
 			}
@@ -224,8 +227,8 @@ namespace  Player
 		this->unHitTime = this->addUnHitTime;
 		this->hp -= at_.power;	//仮処理
 		//吹き飛ばされる
-		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+2.0f, -4.5f); }
-		else							{ this->moveVec = ML::Vec2(-2.0f, -4.5f); }
+		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4.5f, -4.5f); }
+		else							{ this->moveVec = ML::Vec2(-4.5f, -4.5f); }
 		this->UpdateMotion(Damage);
 		//from_は攻撃してきた相手、カウンターなどで逆にダメージを与えたいときに使う
 	}
@@ -612,21 +615,13 @@ namespace  Player
 			{ dd, ML::Box2D(wide * 12,height * 0,wide,height),dc },	//空中ストンプ		[21]
 			{ dd, ML::Box2D(wide * 13,height * 0,wide,height),dc },	//ストンプ着地		[22]
 			{ dd, ML::Box2D(wide * 14,height * 0,wide,height),dc },	//ダメージ			[23]
-
 		};
 		BChara::DrawInfo  rtv;
-		int  standAnim,walkAnim,shootAnim;
+		int  walkAnim,shootAnim;
 		switch (this->state) {
 		default:			rtv = imageTable[0];	break;
 		//	停止----------------------------------------------------------------------------
-		case  Stand:
-			//切り替わるフレーム数
-			standAnim = this->animCnt / 12;
-			//パターン数
-			standAnim %= 4;
-			//出た値に一枚目の要素番号を足す
-			rtv = imageTable[standAnim + 0];
-			break;
+		case  Stand:		rtv = imageTable[0];	break;
 		//	歩行----------------------------------------------------------------------------
 		case  Walk:
 			walkAnim = this->animCnt / 8;
@@ -700,26 +695,28 @@ namespace  Player
 			shot->Set_Erase(1);
 			shot->Set_Power(this->power_Shot);
 			shot->angle_LR = this->angle_LR;
-			shot->tip = true;
+			shot->Set_Tip(1);
 			//右スティックが入力されていなければ一定の軌道を描く
 			if (in.RStick.axis == ML::Vec2(0.0f, 0.0f))
 			{
 				shot->Set_Angle(0.0f);
 				if (this->angle_LR == Right)
 				{
-					shot->pos = ML::Vec2(this->pos.x + this->reach, this->pos.y);
+					shot->pos = ML::Vec2(this->pos.x + this->init_shot, this->pos.y);
+					shot->Set_Angle(0.0f);
 					shot->moveVec = ML::Vec2(+this->speed_Shot, 0);
 				}
 				else
 				{
-					shot->pos = ML::Vec2(this->pos.x - this->reach, this->pos.y);
+					shot->pos = ML::Vec2(this->pos.x - this->init_shot, this->pos.y);
+					shot->Set_Angle(135.0f);
 					shot->moveVec = ML::Vec2(-this->speed_Shot, 0);
 				}
 			}
 			//スティックの入力方向へ発射
 			else
 			{
-				shot->pos = this->pos + ML::Vec2(cos(angle),sin(angle)) * this->reach;
+				shot->pos = this->pos + ML::Vec2(cos(angle),sin(angle)) * this->init_shot;
 				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->speed_Shot;
 				shot->Set_Angle(angle);
 			}
@@ -783,6 +780,11 @@ namespace  Player
 		stompLandingEffect->pos = this->pos;
 		stompLandingEffect->Set_Limit(this->limit_StompEffect);
 		stompLandingEffect->state = StompLanding;
+	}
+	//ショットの発射間隔を取得する
+	int Object::Get_Interval_Shot()
+	{
+		return this->interval_Shot;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

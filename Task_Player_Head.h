@@ -46,6 +46,8 @@ namespace  Player_Head
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		int interval_anim_def;	//アニメーション間隔デフォルト
+		int interval_anim_shot;	//アニメーション間隔ショット
 		float angle;			//角度
 		ML::Vec2 center_Rotate;	//画像回転時の中心
 		string controllerName;	//コントローラー宣言

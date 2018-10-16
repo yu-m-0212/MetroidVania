@@ -34,6 +34,8 @@ namespace  Player_Head
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.5f;				//描画順
+		this->interval_anim_def = 16;					//アニメーション間隔デフォルト
+		this->interval_anim_shot = 4;					//アニメーション間隔ショット
 		this->angle = 0.0f;								//角度
 		this->hitBase= ML::Box2D(-69, -46, 138, 92);	//判定矩形
 		this->center_Rotate = ML::Vec2(69, 36);			//回転軸
@@ -60,9 +62,9 @@ namespace  Player_Head
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		this->animCnt++;
 		if (ge->pause) { return; }
 		this->moveCnt++;
-		this->animCnt++;
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		if (nullptr == pl) { return; }
 		auto in = DI::GPad_GetState(this->controllerName);
@@ -119,25 +121,32 @@ namespace  Player_Head
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		if (nullptr == pl) { return; }
+		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
+		if (pl->unHitTime > 0) {
+			if ((pl->unHitTime / 4) % 2 == 0) {
+				return;
+			}
+		}
 		ML::Box2D draw = this->hitBase.OffsetCopy(this->pos);
 		//デフォルトの値を用意
 		int wide = 138, height = 92;
 		//アニメーション
 		int anim = 0;
-		switch(pl->state)
+		switch (pl->state)
 		{
 		default:
+			anim = this->animCnt / this->interval_anim_def;
 			break;
-		case Stand:
-		case Walk:
-			anim = this->animCnt / 12;
-			anim %= 4; 
-			break;
+		case Shoot:
+		case Jumpshoot:
+		case Fallshoot:
+			anim = this->animCnt / this->interval_anim_shot;
 		}
+		anim %= 4;
 		ML::Box2D  src(wide * 16, anim*height, wide, height);
 		//	向きに応じて画像を左右反転する
 		if (false == this->angle_LR) {
-			src.y=src.y+height*4;
+			src.y = src.y + height * 4;
 		}
 		DG::Image_Rotation(this->res->imageName, this->angle,
 			this->center_Rotate);

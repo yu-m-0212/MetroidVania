@@ -35,7 +35,7 @@ namespace  Item00
 		this->render2D_Priority[1] = 0.7f;				//描画順
 		this->hitBase = ML::Box2D(-16, -16, 32, 32);	//マップとの判定矩形
 		this->recieveBase = this->hitBase;				//キャラクタとの判定矩形
-		this->add_Hp = 5;								//プレイヤのHP増加量
+		this->add_Hp = 1;								//プレイヤのHP増加量
 		//★タスクの生成
 		return  true;
 	}
@@ -97,7 +97,7 @@ namespace  Item00
 	{
 		BChara::DrawInfo imageTable[] = {
 			//draw					src						color
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,32,32),ML::Color(1,1,1,1)},	//Stand[0]
+			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,64,64),ML::Color(1,1,1,1)},	//Stand[0]
 		};
 		BChara::DrawInfo  rtv;
 		switch (this->state) {
@@ -108,7 +108,6 @@ namespace  Item00
 		}
 		return rtv;
 	}
-
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

@@ -156,7 +156,7 @@ namespace  Enemy01
 		}
 		this->hp -= at_.power;
 		//ノックバックの発生しない攻撃の場合、以下を読まない
-		if (from_->tip) { return; }
+		if (from_->Get_Tip()) { return; }
 		//無敵時間
 		this->unHitTime = 30;
 		//まず範囲攻撃かどうかを判定する

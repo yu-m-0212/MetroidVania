@@ -247,22 +247,22 @@ namespace  Shot00
 			break;
 		}
 		case Shoot:
+		case Jumpshoot:
+		case Fallshoot:
 		{
 			auto ShootHitEffect = Effect::Object::Create(true);
 			ShootHitEffect->pos = pos_;
 			ShootHitEffect->Set_Limit(18);
 			ShootHitEffect->state = ImpactPunch;
 			ShootHitEffect->angle_LR = this->angle_LR;
-			break;
-		}
-		case Jumpshoot:
-		case Fallshoot:
-		{
-			auto AirshootHitEffect = Effect::Object::Create(true);
-			AirshootHitEffect->pos = pos_;
-			AirshootHitEffect->Set_Limit(18);
-			AirshootHitEffect->state = ImpactPunch;
-			AirshootHitEffect->angle_LR = this->angle_LR;
+			if (this->angle_LR==Right)
+			{
+				ShootHitEffect->Set_Angle(this->angle);
+			}
+			else
+			{
+				ShootHitEffect->Set_Angle(this->angle -135.0f);
+			}
 			break;
 		}
 		}
