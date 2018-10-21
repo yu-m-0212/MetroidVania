@@ -107,7 +107,7 @@ namespace  EnemySearch
 		draw.Offset(this->pos);
 		//ƒXƒNƒ[ƒ‹‘Î‰
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Rotation(this->res->imageName, 0.0f, ML::Vec2(draw.w / 2, draw.h / 2));
+		DG::Image_Rotation(this->res->imageName, 0.0f, ML::Vec2(float(draw.w / 2), float(draw.h / 2)));
 		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1.0f, 1.0f, 1.0f));
 	}
 	//’Ç]‘ÎÛ‚ğ‰Šú‰»

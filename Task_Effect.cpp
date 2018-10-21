@@ -2,10 +2,11 @@
 //エフェクト
 //-------------------------------------------------------------------
 #include  "MyPG.h"
+#include  "Effect.h"
 #include  "Task_Effect.h"
 #include  "Task_Player.h"
 using namespace ML;
-namespace  Effect
+namespace  Task_Effect
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
@@ -33,14 +34,15 @@ namespace  Effect
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->cntLimit = 0;
-		this->animCnt = 0;
-		this->moveCnt = 0;
-		this->dist = 0.0f;
-		this->angle = 0.0f;
-		this->center = Vec2(0, 0);
-		this->render2D_Priority[1] = 0.3f;
-		
+		this->cntLimit = 0;					//消滅までの時間
+		this->dist = 0.0f;					//回転する際の中心からの距離
+		this->angle = 0.0f;					//角度
+		this->center = Vec2(0, 0);			//回転軸
+		this->num_bubble = 0;				//泡の大きさ
+		this->interval_bubble = 0;			//泡の揺れ周期
+		this->wide_bubble = 0.0f;			//泡の揺れ幅
+		this->render2D_Priority[1] = 0.3f;	//描画順
+
 		//★タスクの生成
 
 		return  true;
@@ -87,7 +89,7 @@ namespace  Effect
 		//スクロール対応
 		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Rotation(this->res->effectImage, this->angle, ML::Vec2(float(di.draw.w / 2), float(di.draw.h / 2)));
-		DG::Image_Draw(this->res->effectImage, di.draw, di.src);
+		DG::Image_Draw(this->res->effectImage, di.draw, di.src,di.color);
 	}
 	//-------------------------------------------------------------------
 	BChara::DrawInfo Object::Anim()
@@ -98,26 +100,29 @@ namespace  Effect
 		//各エフェクトをテーブルで用意する
 		BChara::DrawInfo imageTable[]
 		{
-			{Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc},//ストンプ着地の衝撃1	[ 0]
-			{Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc},//ストンプ着地の衝撃2	[ 1]
-			{Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc},//ストンプ着地の衝撃3	[ 2]
-			{Box2D(-96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc},//パンチ風切り1			[ 3]
-			{Box2D(-96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc},//パンチ風切り2			[ 4]
-			{Box2D(-96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc},//パンチ風切り3			[ 5]
-			{Box2D(-96, -64, 192, 128),Box2D( 384,   0, 192, 128),dc},//パンチの衝撃1			[ 6]
-			{Box2D(-96, -64, 192, 128),Box2D( 384, 128, 192, 128),dc},//パンチの衝撃2			[ 7]
-			{Box2D(-96, -64, 192, 128),Box2D( 384, 256, 192, 128),dc},//パンチの衝撃3			[ 8]
-			{Box2D(-96, -64, 192, 128),Box2D( 576,   0, 192, 128),dc},//遺体から回復1			[ 9]
-			{Box2D(-96, -64, 192, 128),Box2D( 576, 128, 192, 128),dc},//遺体から回復2			[10]
-			{Box2D(-96, -64, 192, 128),Box2D( 576, 256, 192, 128),dc},//遺体から回復3			[11]
-			{Box2D(-96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc},//エネミー爆散1			[12]
-			{Box2D(-96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc},//エネミー爆散2			[13]
-			{Box2D(-96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc},//エネミー爆散3			[14]
-			{Box2D(-96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc},//衝撃波1				[15]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc},//衝撃波2				[16]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc},//衝撃波3				[17]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc},//衝撃波4				[18]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc},//衝撃波5				[19]
+			{Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc},//ストンプ着地の衝撃1		[ 0]
+			{Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc},//ストンプ着地の衝撃2		[ 1]
+			{Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc},//ストンプ着地の衝撃3		[ 2]
+			{Box2D(-96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc},//パンチ風切り1				[ 3]
+			{Box2D(-96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc},//パンチ風切り2				[ 4]
+			{Box2D(-96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc},//パンチ風切り3				[ 5]
+			{Box2D(-96, -64, 192, 128),Box2D( 384,   0, 192, 128),dc},//パンチの衝撃1				[ 6]
+			{Box2D(-96, -64, 192, 128),Box2D( 384, 128, 192, 128),dc},//パンチの衝撃2				[ 7]
+			{Box2D(-96, -64, 192, 128),Box2D( 384, 256, 192, 128),dc},//パンチの衝撃3				[ 8]
+			{Box2D(-96, -64, 192, 128),Box2D( 576,   0, 192, 128),dc},//遺体から回復1				[ 9]
+			{Box2D(-96, -64, 192, 128),Box2D( 576, 128, 192, 128),dc},//遺体から回復2				[10]
+			{Box2D(-96, -64, 192, 128),Box2D( 576, 256, 192, 128),dc},//遺体から回復3				[11]
+			{Box2D(-96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc},//エネミー爆散1				[12]
+			{Box2D(-96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc},//エネミー爆散2				[13]
+			{Box2D(-96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc},//エネミー爆散3				[14]
+			{Box2D(-96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc},//衝撃波1					[15]
+			{Box2D(-96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc},//衝撃波2					[16]
+			{Box2D(-96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc},//衝撃波3					[17]
+			{Box2D(-96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc},//衝撃波4					[18]
+			{Box2D(-96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc},//衝撃波5					[19]
+			{Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1	[20]
+			{Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2	[21]
+			{Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3	[22]
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -152,6 +157,9 @@ namespace  Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt + 12];
 			break;
+		case Bubble:
+			rtv = imageTable[this->num_bubble + 20];
+			break;
 		}
 		//	向きに応じて画像を左右反転する
 		if (this->angle_LR == Left)
@@ -160,6 +168,20 @@ namespace  Effect
 			rtv.draw.w = -rtv.draw.w;
 		}
 		return rtv;
+	}
+	//泡エフェクトを生成する
+	//引数	：	（番号,初期座標,揺れ周期,揺れ幅,浮上速度,角度,消滅までの時間）
+	void Object::Create_Bubble(const int& num_, const ML::Vec2& pos_, const int& interval_, const float& wide_, const float& speedY_, const float& angle_, const int& limit_)
+	{
+		auto bubble = Task_Effect::Object::Create(true);
+		bubble->Set_State(Bubble);
+		bubble->Set_Num_Bubble(num_);
+		bubble->pos = pos_;
+		bubble->Set_Interval_Bubble(interval_);
+		bubble->Set_Wide_Bubble(wide_);
+		bubble->Set_Speed_Surfacing(speedY_);
+		bubble->Set_Angle(angle_);
+		bubble->Set_Limit(limit_);
 	}
 	//呼び出す際に消滅までの時間を指定する
 	//引数	：	（消滅までの時間）
@@ -171,7 +193,6 @@ namespace  Effect
 	void Object::Move()
 	{
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		if (nullptr == pl) { return; }
 		switch (this->state)
 		{
 		default:
@@ -184,6 +205,7 @@ namespace  Effect
 		case Fallshoot:
 			break;
 		case Heal:
+			if (nullptr == pl) { return; }
 			this->moveVec = pl->moveVec;
 			if (pl->CheckFront_LR())
 			{
@@ -192,7 +214,36 @@ namespace  Effect
 			break;
 		case Lose:
 			break;
+		case Bubble:
+			//this->moveVec = eff->Move_Bubble(this->moveCnt, this->interval_bubble, this->wide_bubble, this->speed_surfacing);
+			this->moveVec.x = float(sin(this->moveCnt / this->interval_bubble)*this->wide_bubble);
+			this->moveVec.y = -this->speed_surfacing;
+			break;
 		}
+	}
+	//泡の大きさを指定する
+	//引数	：	（0~3)
+	void Object::Set_Num_Bubble(const int& num_)
+	{
+		this->num_bubble = num_;
+	}
+	//泡の揺れ周期を指定する
+	//引数	：	（揺れ周期）
+	void Object::Set_Interval_Bubble(const int& interval_)
+	{
+		this->interval_bubble = interval_;
+	}
+	//泡の浮上速度を指定する
+	//引数	：	（浮上速度）
+	void Object::Set_Speed_Surfacing(const float& speedY_)
+	{
+		this->speed_surfacing = speedY_;
+	}
+	//泡の揺れ幅を指定する
+	//引数	：	（揺れ幅）
+	void Object::Set_Wide_Bubble(const float& wide_)
+	{
+		this->wide_bubble = wide_;
 	}
 	//中心点から広がるエフェクトを呼び出す際、中心からの初期位置を指定する
 	//引数	：	（中心点からの初期位置)

@@ -4,6 +4,7 @@
 #include  "MyPG.h"
 #include  "Task_Title.h"
 #include  "Task_Game.h"
+#include  "Task_Effect.h"
 
 namespace  Title
 {
@@ -13,7 +14,7 @@ namespace  Title
 	bool  Resource::Initialize()
 	{
 		this->imageName = "TitleLogoImg";
-		DG::Image_Create(this->imageName, "./data/image/Title.bmp");
+		DG::Image_Create(this->imageName, "./data/image/Title.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -33,7 +34,13 @@ namespace  Title
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->logoPosY = -270;
+		this->render2D_Priority[1] = 1.0f;	//描画順
+		this->cnt_create_bubble = 0;		//エフェクトの生成カウンタ
+		this->cnt_anim_back = 0;			//背景アニメカウンタ
+		this->interval_anim_back = 25;		//背景アニメ周期
+		this->posY = -360.0f;				//背景Y軸座標
+		this->posY_std = -240.0f;			//背景Y軸座標基準値
+		this->height_anim_back = 25.0f;		//背景アニメ揺れ幅
 
 		//★タスクの生成
 
@@ -44,7 +51,7 @@ namespace  Title
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
+		ge->KillAll_G("エフェクト");
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
@@ -57,31 +64,39 @@ namespace  Title
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		this->cnt_create_bubble++;
+		this->cnt_anim_back++;
+
 		auto in = DI::GPad_GetState("P1");
+		//デバッグ切り替え
+		if (in.SE.down) { ge->debugMode = !ge->debugMode; }
 
-		this->logoPosY += 9;
-		if (this->logoPosY >= 0) {
-			this->logoPosY = 0;
+		//エフェクトの生成
+		if (this->cnt_create_bubble % 30 == 0)
+		{
+			float initX = float(rand() % (ge->screenWidth - 96));
+			int num = rand() % 3;
+			float ang = float(rand() % 360);
+			eff->Create_Bubble(num, ML::Vec2(initX, float(ge->screenHeight + 96)), 16, 5.0f, 2.0f, ang, 600);
 		}
-
-		if (this->logoPosY == 0) {
-			if (in.ST.down) {
-				//自身に消滅要請
-				this->Kill();
-			}
+		//自身に消滅要請
+		if (in.ST.down)
+		{
+			this->Kill();
 		}
+		//背景アニメーション
+		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
+		this->posY = y;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		ML::Box2D  draw(0, 0, 480, 270);
-		ML::Box2D  src(0, 0, 240, 135);
-
-		draw.Offset(0, this->logoPosY);
+		ML::Box2D  draw(-640, -360, 3200, 1800);
+		draw.Offset(ML::Vec2(0, this->posY));
+		ML::Box2D   src(   0,    0, 3200, 1800);
 		DG::Image_Draw(this->res->imageName, draw, src);
 	}
-
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

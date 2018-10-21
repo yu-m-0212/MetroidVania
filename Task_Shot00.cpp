@@ -230,7 +230,7 @@ namespace  Shot00
 			break;
 		case StompLanding:
 		{
-			auto StompLandingHitEffect = Effect::Object::Create(true);
+			auto StompLandingHitEffect = Task_Effect::Object::Create(true);
 			//範囲攻撃は敵の位置を基準にエフェクトを生成する
 			StompLandingHitEffect->pos = pos_;
 			StompLandingHitEffect->Set_Limit(18);
@@ -250,7 +250,7 @@ namespace  Shot00
 		case Jumpshoot:
 		case Fallshoot:
 		{
-			auto ShootHitEffect = Effect::Object::Create(true);
+			auto ShootHitEffect = Task_Effect::Object::Create(true);
 			ShootHitEffect->pos = pos_;
 			ShootHitEffect->Set_Limit(18);
 			ShootHitEffect->state = ImpactPunch;

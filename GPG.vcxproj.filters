@@ -195,6 +195,9 @@
     <ClCompile Include="Task_Player_Head.cpp">
       <Filter>MyPG\Chara_Player</Filter>
     </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>MyPG\Class</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -322,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="Task_Player_Head.h">
       <Filter>MyPG\Chara_Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>MyPG\Class</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -54,7 +54,7 @@ namespace  Game
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;
 		Shot01::Resource::SP	shot01_Resource;
-		Effect::Resource::SP	effect_Resource;
+		Task_Effect::Resource::SP	effect_Resource;
 		//チュートリアル表示キャラクタの生成
 		//引数	：	（座標,メッセージ）
 		void Create_Message(const ML::Vec2&, const string&);

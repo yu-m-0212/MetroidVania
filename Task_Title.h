@@ -4,6 +4,7 @@
 //タイトル画面
 //-------------------------------------------------------------------
 #include "GameEngine_Ver3_7.h"
+#include  "Task_Effect.h"
 
 namespace  Title
 {
@@ -45,8 +46,12 @@ namespace  Title
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	public:
-		//追加したい変数・メソッドはここに追加する
-		int				logoPosY;		//タイトル画像スクロール用カウンタ
+		int cnt_create_bubble;		//エフェクトの生成カウンタ
+		int cnt_anim_back;			//背景アニメカウンタ
+		int interval_anim_back;		//背景アニメ周期
+		float posY;					//背景Y軸座標
+		float posY_std;				//背景Y軸座標基準値
+		float height_anim_back;		//背景アニメ揺れ幅
+		Task_Effect::Object* eff;	//メソッド呼び出し
 	};
 }

@@ -57,7 +57,7 @@ namespace MyPG
 		ge->camera[3] = ge->camera[2] = ge->camera[1] = ge->camera[0];
 
 		//デバッグ用情報の表示ON/OFF
-		DebugMode(true);
+		DebugMode(false);
 
 		//キーボードとゲームパッドの入力を受け取るオブジェクトを生成する
 		//キーボードパラメータ

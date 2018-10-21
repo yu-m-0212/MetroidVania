@@ -43,6 +43,7 @@ public:
 		//以下、エフェクトタスク表示用
 		ImpactPunch,	//	パンチを当てた時の衝撃
 		Heal,			//	遺体から回復
+		Bubble			//	泡
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };
@@ -131,6 +132,10 @@ public:
 	}
 
 	//アクセサメソッド
+
+	//状態を指定する
+	//引数	：	（State型）
+	void Set_State(const State&);
 	//範囲攻撃か否かを指定する
 	//引数	：	（0か1）
 	void Set_Range_Wide(const int&);

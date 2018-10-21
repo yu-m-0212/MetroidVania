@@ -67,7 +67,7 @@ namespace  Enemy01
 			//★引き継ぎタスクの生成
 		}
 		//撃破エフェクトの生成
-		auto DefeatEffect = Effect::Object::Create(true);
+		auto DefeatEffect = Task_Effect::Object::Create(true);
 		DefeatEffect->pos = this->pos;
 		DefeatEffect->Set_Limit(24);
 		DefeatEffect->state = Lose;

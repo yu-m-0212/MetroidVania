@@ -57,7 +57,7 @@ namespace  Game
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
 		this->shot01_Resource = Shot01::Resource::Create();
-		this->effect_Resource = Effect::Resource::Create();
+		this->effect_Resource = Task_Effect::Resource::Create();
 
 		//★タスクの生成
 		//マップの生成
@@ -73,11 +73,11 @@ namespace  Game
 		//エネミー（サソリ）の生成
 		this->Create_Enemy01(ML::Vec2(2582.0f, 1875.0f));
 		this->Create_Enemy01(ML::Vec2(1155.0f, 1690.0f));
-		this->Create_Enemy01(ML::Vec2(100.0f, 2200.0f));
-		this->Create_Enemy01(ML::Vec2(200.0f, 2200.0f));
-		this->Create_Enemy01(ML::Vec2(300.0f, 2200.0f));
-		this->Create_Enemy01(ML::Vec2(400.0f, 2200.0f));
-		this->Create_Enemy01(ML::Vec2(500.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2( 100.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2( 200.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2( 300.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2( 400.0f, 2200.0f));
+		this->Create_Enemy01(ML::Vec2( 500.0f, 2200.0f));
 		//UIの生成
 		auto ui = UI::Object::Create(true);
 		//チュートリアルの生成

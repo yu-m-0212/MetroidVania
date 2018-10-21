@@ -176,7 +176,7 @@ namespace  Shot01
 		default:
 			break;
 		case Shoot:
-			auto ShootHitEffect = Effect::Object::Create(true);
+			auto ShootHitEffect = Task_Effect::Object::Create(true);
 			ShootHitEffect->pos = pos_;
 			ShootHitEffect->Set_Limit(18);
 			ShootHitEffect->state = ImpactPunch;

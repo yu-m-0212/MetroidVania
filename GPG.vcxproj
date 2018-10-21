@@ -97,6 +97,7 @@
     <ClCompile Include="DG2014\DG2014_VertexBuffer.cpp" />
     <ClCompile Include="DG2014\DG2014_VertexContainer.cpp" />
     <ClCompile Include="DI2014_Ver3_4.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="GameEngine_Ver3_7.cpp" />
     <ClCompile Include="myLib.cpp" />
     <ClCompile Include="MyPG.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="DI2014_Ver3_4.h" />
     <ClInclude Include="EFile.h" />
     <ClInclude Include="GameEngine_Ver3_7.h" />
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="myLib.h" />
     <ClInclude Include="MyPG.h" />
     <ClInclude Include="Task_Back.h" />

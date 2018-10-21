@@ -148,7 +148,7 @@ namespace  Player
 						BChara::AttackInfo at = { 1,0,0 };
 						(*it)->Received(this, at);
 						//回復エフェクトを生成
-						auto healEffect = Effect::Object::Create(true);
+						auto healEffect = Task_Effect::Object::Create(true);
 						healEffect->pos = this->pos;
 						healEffect->Set_Limit(this->limit_HealEffect);
 						healEffect->state = Heal;
@@ -776,7 +776,7 @@ namespace  Player
 		map->Set_Limit_Quake(this->limit_Quake);
 		//エフェクトの生成
 		//タスクキルはエフェクト側で行う
-		auto stompLandingEffect = Effect::Object::Create(true);
+		auto stompLandingEffect = Task_Effect::Object::Create(true);
 		stompLandingEffect->pos = this->pos;
 		stompLandingEffect->Set_Limit(this->limit_StompEffect);
 		stompLandingEffect->state = StompLanding;

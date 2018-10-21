@@ -140,6 +140,13 @@ bool BChara::CheckHit(const ML::Box2D& hit_)
 }
 //-----------------------------------------------------------------------------
 //アクセサメソッド
+
+//状態を指定する
+//引数	：	（State型）
+void BChara::Set_State(const State& state_)
+{
+	this->state = state_;
+}
 //範囲攻撃か否かを指定する
 //引数	：	（0か1）
 void BChara::Set_Range_Wide(const int& wide_)

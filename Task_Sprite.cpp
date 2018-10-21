@@ -37,7 +37,7 @@ namespace  Sprite
 		this->render2D_Priority[1] = 0.5f;	//描画順
 		this->controllerName = "P1";		//コントローラー名初期化
 		this->speed_to_Vec = 0.05f;			//目標への移動量
-		this->dist_to_Vec = 150.0f;			//プレイヤからの距離
+		this->dist_to_Vec = 200.0f;			//プレイヤからの距離
 
 		//★タスクの生成
 
