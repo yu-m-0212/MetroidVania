@@ -77,7 +77,7 @@ namespace  Title
 			float initX = float(rand() % (ge->screenWidth - 96));
 			int num = rand() % 3;
 			float ang = float(rand() % 360);
-			eff->Create_Bubble(num, ML::Vec2(initX, float(ge->screenHeight + 96)), 16, 5.0f, 2.0f, ang, 600);
+			eff->Create_Bubble(num, ML::Vec2(initX, float(ge->screenHeight + 96)), 16, 5.0f, 3.0f, ang, 600);
 		}
 		//é©êgÇ…è¡ñ≈óvêø
 		if (in.ST.down)

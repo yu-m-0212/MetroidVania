@@ -63,17 +63,19 @@ namespace  Player
 		this->limit_Stomp = 15;								//ストンプ継続時間
 		this->limit_StompEffect = 15;						//継続時間ストンプ効果
 		this->limit_Quake = 15;								//画面揺れ時間
-		this->limit_Shot = 40;								//継続時間ショット
+		this->limit_Shot = 60;								//継続時間ショット
 		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
 		this->limit_HealEffect = 24;						//継続時間回復エフェクト
 		this->dist_Quake = 5;								//画面揺れ幅
 		this->lv_Stomp = 1;									//ストンプアップグレードレベル
 		this->addUnHitTime = 60;							//被弾時に得られる無敵時間
 		this->interval_Shot = 12;							//射撃の発射間隔（フレーム）
-		this->range_Stomp = ML::Box2D(-96, -24, 192, 46);	//範囲ストンプ
+		this->range_Stomp = ML::Box2D(-96, -96, 192, 192);	//範囲ストンプ
 		this->range_Shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
-		this->power_Stomp = 3;								//攻撃力ストンプ
+		this->power_Stomp = 1;								//攻撃力ストンプ
 		this->power_Shot = 1;								//攻撃力ショット
+		this->gauge_melee_max = 100;						//近接攻撃リチャージ上限
+		this->gauge_melee = this->gauge_melee_max;			//近接攻撃のリチャージ
 		this->moveBack_Stomp = ML::Vec2(12, -4);			//ストンプふっとび量
 
 		//★タスクの生成
@@ -107,6 +109,12 @@ namespace  Player
 		this->animCnt++;
 		//無敵時間の減少
 		if (this->unHitTime > 0) { this->unHitTime--; }
+		//近接攻撃のリチャージ
+		//発生後、時間をおいて回復を始める
+		if (this->gauge_melee < 100)
+		{
+			this->gauge_melee++;
+		}
 		//思考・状況判断
 		this->Think();
 		//現モーションに対応した制御
@@ -128,6 +136,11 @@ namespace  Player
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
 						(*it)->Received(this, at);
+						//回復エフェクトを生成
+						auto healEffect = Task_Effect::Object::Create(true);
+						healEffect->pos = this->pos;
+						healEffect->Set_Limit(this->limit_HealEffect);
+						healEffect->state = Heal;
 						break;
 					}
 				}
@@ -186,17 +199,11 @@ namespace  Player
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
-			auto en = ge->GetTask_One_G<Enemy01::Object>("敵");
 			//合説用に敵を掃討することを条件に追加
-			if (you.Hit(me) && nullptr==en)
+			if (you.Hit(me))
 			{
 				ge->clear = true;
 			}
-		}
-		auto in = DI::GPad_GetState(this->controllerName);
-		if (in.R3.on&&in.L3.on)
-		{
-			this->Kill();
 		}
 	}
 	//-------------------------------------------------------------------
@@ -302,16 +309,15 @@ namespace  Player
 			if (this->CheckFoot()) { nm = Shoot; }
 			break;
 		case PreStomp:
-			if (this->moveCnt > 24) { nm = LandStomp; }
+			if (this->moveCnt > 0) { nm = LandStomp; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
 		case LandStomp:
-			if (this->moveCnt > 12) { nm = Stand; }
+			if (this->moveCnt > 0) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
 		case AirStomp:
-			if (this->CheckFoot()) { nm = StompLanding; }
-			if (!this->CheckFoot() && this->moveCnt >= 60) { nm = Fall; }
+			if (this->moveCnt > 0) { nm = Fall; }
 			break;
 		case StompLanding:
 			if (this->moveCnt >= this->limit_StompHoldTime) { nm = Stand; }
@@ -342,7 +348,8 @@ namespace  Player
 		switch (this->state) {
 		default:
 			//ジャンプボタンを押す長さでジャンプの高さが変わる
-			if (in.B2.on)
+			if ((this->state == Jump || this->state == Jumpshoot || this->state == AirStomp) 
+				&& in.B2.on)
 			{
 				this->gravity = ML::Gravity(32) * 2;
 			}
@@ -353,7 +360,7 @@ namespace  Player
 			//上昇中もしくは足元に地面が無い
 			if (this->moveVec.y < 0 ||
 				this->CheckFoot() == false) {
-				this->moveVec.y=min(this->moveVec.y + this->gravity, this->maxFallSpeed);
+				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);
 			}
 			//地面に接触している
 			else 
@@ -392,7 +399,7 @@ namespace  Player
 				this->angle_LR = Right;
 			}
 			break;
-			//例外
+		//例外
 		case SlowDown:
 		case Landing:
 		case PreStomp:
@@ -520,35 +527,13 @@ namespace  Player
 		case PreStomp:
 			break;
 		case LandStomp:
-			if (this->moveCnt == 0)
-			{
-				this->Stomp_Std();
-			}
-			break;
 		case AirStomp:
-			//出だしだけ少し浮かせる
-			if (this->moveCnt == 0)
-			{
-				//無敵時間あり
-				this->unHitTime = 60;
-			}
-			else if (this->moveCnt <= 10)
-			{
-				this->moveVec.y = -0.5f;
-			}
-			else if (this->moveCnt > 20)
-			{
-				if (this->moveVec.y <= this->maxFallSpeed)
-				{
-					this->moveVec.y += 1.5f;
-				}
-			}
-			break;
 		case StompLanding:
-			//着地の際、自身の左中右に攻撃
-			if (this->moveCnt == 0)
+			//リチャージ済みの時のみ
+			if (this->moveCnt == 0&&this->gauge_melee==this->gauge_melee_max)
 			{
 				this->Stomp_Std();
+				this->gauge_melee = 0;
 			}
 			break;
 		case  Shoot:
@@ -580,6 +565,16 @@ namespace  Player
 	int Object::Get_State()
 	{
 		return this->state;
+	}
+	//近接攻撃リチャージの値を取得する
+	int Object::Get_Gauge_Mlee()
+	{
+		return this->gauge_melee;
+	}
+	//近接攻撃リチャージ上限の値を取得する
+	int Object::Get_Gauge_Melle_Max()
+	{
+		return this->gauge_melee_max;
 	}
 	//-----------------------------------------------------------------------------
 	//アニメーション制御
@@ -726,22 +721,14 @@ namespace  Player
 	void Object::Move_Shot()
 	{
 		auto in = DI::GPad_GetState(this->controllerName);
-		//後退もできるが移動速度が落ちる
-		if (in.LStick.L.on && this->angle_LR == Right)
+		//発射中は移動速度が落ちる
+		if (in.LStick.L.on)
 		{
 			this->moveVec.x = -this->maxSpeed / 2.0f;
 		}
-		else if (in.LStick.R.on && this->angle_LR == Left)
+		else if (in.LStick.R.on)
 		{
 			this->moveVec.x = +this->maxSpeed / 2.0f;
-		}
-		if (in.LStick.L.on&&this->angle_LR == Left)
-		{
-			this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
-		}
-		else if (in.LStick.R.on&&this->angle_LR == Right)
-		{
-			this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
 		}
 		//発射方向によって向きを変える
 		if (in.RStick.axis.x > 0)
@@ -761,7 +748,7 @@ namespace  Player
 		stompLandingRect->state = StompLanding;
 		//攻撃毎に攻撃範囲を生成時に指定
 		stompLandingRect->hitBase = this->range_Stomp;
-		stompLandingRect->pos = ML::Vec2(this->pos.x, this->pos.y + this->hitBase.h / 4);
+		stompLandingRect->pos = this->pos;
 		stompLandingRect->Set_Limit(this->limit_Stomp);
 		stompLandingRect->Set_Erase(0);
 		stompLandingRect->Set_Power(this->power_Stomp);

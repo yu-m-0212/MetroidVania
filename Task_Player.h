@@ -46,6 +46,7 @@ namespace  Player
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		string controllerName;
+		float decSpeed;				//速度減衰量
 		float max_StompFallSpeed;	//ストンプ時の最大効果速度
 		float speed_Shot;			//ショット速度
 		float init_shot;			//生成位置ショット
@@ -63,6 +64,8 @@ namespace  Player
 		int dist_Quake;				//画面揺れ幅
 		int power_Stomp;			//攻撃力ストンプ
 		int power_Shot;				//攻撃力ショット
+		int gauge_melee;			//近接攻撃のリチャージ
+		int gauge_melee_max;		//近接攻撃リチャージ上限
 		ML::Box2D range_Stomp;		//範囲ストンプ
 		ML::Box2D range_Shot;		//範囲ショット
 		ML::Vec2 moveBack_Stomp;	//ふっとび量ストンプ
@@ -92,5 +95,9 @@ namespace  Player
 		int Get_State();
 		//ショットの発射間隔を取得する
 		int Get_Interval_Shot();
+		//近接攻撃リチャージの値を取得する
+		int Get_Gauge_Mlee();
+		//近接攻撃リチャージ上限の値を取得する
+		int Get_Gauge_Melle_Max();
 	};
 }

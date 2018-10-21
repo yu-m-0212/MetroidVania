@@ -36,8 +36,9 @@ namespace  UI
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.2f;
-		this->controllerName = "P1";
+		this->render2D_Priority[1] = 0.2f;	//描画順
+		this->controllerName = "P1";		//コントローラー宣言
+		this->cnt = 0;						//アニメーションカウンタ
 		
 		//★タスクの生成
 
@@ -60,7 +61,7 @@ namespace  UI
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		
+		this->cnt++;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -81,10 +82,6 @@ namespace  UI
 			for (int i = 0; i < pl->Get_Max_HP(); ++i)
 			{
 				ML::Box2D draw(128 + 64 * i, 32, 64, 64);
-				if (ge->debugMode)
-				{
-					draw.x += 120;
-				}
 				ML::Box2D  src(128, 0, 64, 64);
 				DG::Image_Draw(this->res->hpImageName, draw, src);
 			}
@@ -99,12 +96,31 @@ namespace  UI
 			for (int i = 0; i < pl->Get_HP(); ++i)
 			{
 				draw = ML::Box2D(128 + 64 * i, 32, 64, 64);
-				if (ge->debugMode)
-				{
-					draw.x += 120;
-				}
 				DG::Image_Draw(this->res->hpImageName, draw, src);
 			}
+		}
+		//近接攻撃ゲージの表示
+		{
+			ML::Box2D draw(1589, 53, pl->Get_Gauge_Mlee() * 3, 24);
+			ML::Box2D  src(64, 0, 64, 64);
+			ML::Color  clr;
+			//マックスの時、点滅する
+			if (pl->Get_Gauge_Mlee() == pl->Get_Gauge_Melle_Max())
+			{
+				if (this->cnt % 12 == 0)
+				{
+					clr = ML::Color(1, 1, 1, 1);
+				}
+				else
+				{
+					clr = ML::Color(1, 0.25f, 0.5f, 1);
+				}
+			}
+			else
+			{
+				clr = ML::Color(1, 0.25f, 0.5f, 1);
+			}
+			DG::Image_Draw(this->res->hpImageName, draw, src, clr);
 		}
 		//以下デバッグ----------------------------------------------------
 		if (ge->debugMode)

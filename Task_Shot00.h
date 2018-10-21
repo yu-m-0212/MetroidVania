@@ -8,7 +8,7 @@
 namespace  Shot00
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("弾");	//グループ名
+	const  string  defGroupName("弾(プレイヤ)");	//グループ名
 	const  string  defName("NoName");				//タスク名
 	//-------------------------------------------------------------------//リソース
 	class  Resource

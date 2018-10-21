@@ -148,6 +148,11 @@ namespace  Player_Head
 		if (false == this->angle_LR) {
 			src.y = src.y + height * 4;
 		}
+		//ƒ_ƒ[ƒW
+		if (pl->unHitTime>0)
+		{
+			src.x += wide;
+		}
 		DG::Image_Rotation(this->res->imageName, this->angle,
 			this->center_Rotate);
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);

@@ -78,7 +78,6 @@ public:
 	float		gravity;		//フレーム単位の加算量
 	float		maxSpeed;		//左右方向への移動の最大速
 	float		addSpeed;		//左右方向への移動の加算量
-	float		decSpeed;		//左右方向への移動の減衰量
 private:
 	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
 	bool		range_Wide;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
@@ -102,7 +101,6 @@ public:
 		, gravity(0)
 		, maxSpeed(0)
 		, addSpeed(0)
-		, decSpeed(0)
 		, tip(false)
 		, range_Wide(false)
 	{

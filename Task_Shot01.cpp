@@ -5,6 +5,7 @@
 #include  "Task_Map2D.h"
 #include  "Task_Shot01.h"
 #include  "Task_Player.h"
+#include  "Task_Shot00.h"
 #include  "Task_Effect.h"
 
 namespace  Shot01
@@ -101,6 +102,17 @@ namespace  Shot01
 					}
 					break;
 				}
+			}
+		}
+		//”½Ëˆ—
+		auto shot_pl = ge->GetTask_One_G<Shot00::Object>("’e(ƒvƒŒƒCƒ„)");
+		if (nullptr != shot_pl)
+		{
+			ML::Box2D  me = this->hitBase.OffsetCopy(this->pos);
+			ML::Box2D you = shot_pl->hitBase.OffsetCopy(shot_pl->pos);
+			if (you.Hit(me) && shot_pl->state == StompLanding)
+			{
+				this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
 			}
 		}
 		//ËŒ‚‚Í•Ç‚É“–‚½‚é‚ÆÁ–Å‚·‚é

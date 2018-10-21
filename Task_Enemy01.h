@@ -49,6 +49,7 @@ namespace  Enemy01
 		int interval_Caution;	//プレイヤが視界から外れた後、再度警戒に入るまでの時間
 		int interval_Attack;	//弾を生成する間隔
 		int interval_Flash;		//点滅間隔
+		float decSpeed;			//速度減衰量
 		ML::Box2D searchBase;	//視認矩形
 		ML::Vec2 shot_Init;		//弾の生成時、自身の座標に足す値
 	public:
