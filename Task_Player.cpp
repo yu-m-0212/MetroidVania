@@ -48,15 +48,15 @@ namespace  Player
 		this->angle_LR = Right;
 		this->controllerName = "P1";
 		this->state = Stand;								//キャラ初期状態
-		this->max_Hp = 10;									//HP最大値
+		this->max_Hp = 3;									//HP最大値
 		this->hp = this->max_Hp;							//HP初期値
 		this->maxSpeed = 7.5f;								//最大移動速度（横）
 		this->addSpeed = 0.75f;								//歩行加速度（地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量（摩擦
-		this->maxFallSpeed = 15.0f;							//最大落下速度
+		this->max_speed_fall = 15.0f;						//最大落下速度
 		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
 		this->height_Jump = -10.0f;							//ジャンプ力（初速）
-		this->gravity = ML::Gravity(32);					//重力加速度＆時間速度による加算量
+		this->gravity = ML::Gravity(CHIP_SIZE);				//重力加速度＆時間速度による加算量
 		this->init_shot = 48.0f;							//生成位置ショット
 		this->speed_Shot = 10;								//ショット速度
 		this->limit_StompHoldTime = 30;						//ストンプ着地時の硬直時間
@@ -68,7 +68,7 @@ namespace  Player
 		this->limit_HealEffect = 24;						//継続時間回復エフェクト
 		this->dist_Quake = 5;								//画面揺れ幅
 		this->lv_Stomp = 1;									//ストンプアップグレードレベル
-		this->addUnHitTime = 60;							//被弾時に得られる無敵時間
+		this->add_time_unhit = 60;							//被弾時に得られる無敵時間
 		this->interval_Shot = 12;							//射撃の発射間隔（フレーム）
 		this->range_Stomp = ML::Box2D(-96, -96, 192, 192);	//範囲ストンプ
 		this->range_Shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
@@ -110,7 +110,6 @@ namespace  Player
 		//無敵時間の減少
 		if (this->unHitTime > 0) { this->unHitTime--; }
 		//近接攻撃のリチャージ
-		//発生後、時間をおいて回復を始める
 		if (this->gauge_melee < 100)
 		{
 			this->gauge_melee++;
@@ -158,7 +157,7 @@ namespace  Player
 					//相手に接触の有無を確認させる
 					if ((*it)->CheckHit(me)) {
 						//相手にダメージの処理を行わせる
-						BChara::AttackInfo at = { 1,0,0 };
+						BChara::AttackInfo at = { 0,0,0 };
 						(*it)->Received(this, at);
 						//回復エフェクトを生成
 						auto healEffect = Task_Effect::Object::Create(true);
@@ -231,11 +230,17 @@ namespace  Player
 		if (this->unHitTime > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
-		this->unHitTime = this->addUnHitTime;
-		this->hp -= at_.power;	//仮処理
+		//無敵時間の発生
+		this->unHitTime = this->add_time_unhit;
+		//ダメージ処理
+		this->hp -= at_.power;
+		//画面効果
+		auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド","マップ");
+		map->Set_Dist_Quake(this->dist_Quake);
+		map->Set_Limit_Quake(limit_Quake);
 		//吹き飛ばされる
-		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+4.5f, -4.5f); }
-		else							{ this->moveVec = ML::Vec2(-4.5f, -4.5f); }
+		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+6.5f, -2.0f); }
+		else							{ this->moveVec = ML::Vec2(-6.5f, -2.0f); }
 		this->UpdateMotion(Damage);
 		//from_は攻撃してきた相手、カウンターなどで逆にダメージを与えたいときに使う
 	}
@@ -265,7 +270,7 @@ namespace  Player
 			if (in.B1.down) { nm = PreStomp; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			break;
-		case SlowDown:
+		case SlowDown:	//減速中
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
@@ -282,7 +287,7 @@ namespace  Player
 			if (in.R1.on) { nm = Jumpshoot; }
 			if (in.B1.down) { nm = AirStomp; }
 			break;
-		case  Fall:		//落下中1
+		case  Fall:		//落下中
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
 			if (in.R1.on) { nm = Fallshoot; }
 			if (in.B1.down) { nm = AirStomp; }
@@ -295,16 +300,17 @@ namespace  Player
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 6) { nm = Stand; }
 			break;
-		case  Shoot:
+		case  Shoot:	//射撃
 			if (in.R1.off) {nm = Stand;}
+			if (in.B1.down) { PreStomp; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (!this->CheckFoot()) { nm = Fallshoot; }
 			break;
-		case Jumpshoot:
+		case Jumpshoot:	//空中射撃
 			if (in.R1.off) { nm = Fall; }
 			if (this->moveVec.y >= 0) { nm = Fallshoot; }
 			break;
-		case Fallshoot:
+		case Fallshoot:	//落下射撃
 			if (in.R1.off) { nm = Fall; }
 			if (this->CheckFoot()) { nm = Shoot; }
 			break;
@@ -360,7 +366,7 @@ namespace  Player
 			//上昇中もしくは足元に地面が無い
 			if (this->moveVec.y < 0 ||
 				this->CheckFoot() == false) {
-				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);
+				this->moveVec.y = min(this->moveVec.y + this->gravity, this->max_speed_fall);
 			}
 			//地面に接触している
 			else 
@@ -369,7 +375,21 @@ namespace  Player
 			}
 			break;
 			//重力加速を無効化する必要があるモーションは下にcaseを書く（現在対象無し）
-		case Unnon:	break;
+		case Unnon:	
+		case Damage:
+			break;
+		}
+		//足場から落下してほしくない状態は以下に記述
+		switch (this->state)
+		{
+		default:
+			break;
+		case SlowDown:
+			if (!this->CheckFrontFoot_LR())
+			{
+				this->moveVec.x = 0.0f;
+			}
+			break;
 		}
 		//移動速度減衰
 		switch (this->state) {
@@ -475,11 +495,6 @@ namespace  Player
 			}
 			break;
 		case SlowDown:
-			//目の前に足場がなければ前進をやめる(足場から落下しない)
-			if (!this->CheckFrontFoot_LR())
-			{
-				this->moveVec.x = 0.0f;
-			}
 			break;
 		case  Jump:		//上昇中
 			if (this->moveCnt == 0)
@@ -517,12 +532,6 @@ namespace  Player
 			}
 			break;
 		case Landing:
-			//移動量減衰によって滑ると足場の移動が困難なので
-			//左右の移動量を0に
-			if (this->moveCnt == 0)
-			{
-				this->moveVec.x = 0.0f;
-			}
 			break;
 		case PreStomp:
 			break;

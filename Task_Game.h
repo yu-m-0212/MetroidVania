@@ -48,8 +48,11 @@ namespace  Game
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
-		ML::Vec2 deadPos;	//前回の死亡地点
-		int cnt_Scenes;		//カウンタ遷移用
+		ML::Vec2 pos_dead;				//前回の死亡地点
+		BChara::Angle_LR angle_dead;	//死亡時の向き
+		int cnt_transition;				//カウンタ遷移用
+		int time_create_next_task;		//引継ぎタスクの生成タイミング
+		int time_kill_game;				//自身を消滅させるタイミング
 	public:
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;

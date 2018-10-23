@@ -47,8 +47,8 @@ namespace  Enemy01
 		this->maxSpeed = 2.0f;							//最大移動速度(横)
 		this->addSpeed = 0.7f;							//歩行加速度(地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;							//接地状態の時の速度減衰量(摩擦
-		this->maxFallSpeed = 10.0f;						//最大落下速度
-		this->gravity = ML::Gravity(32) * 5;			//重力加速度&時間速度による加算量
+		this->max_speed_fall = 10.0f;					//最大落下速度
+		this->gravity = ML::Gravity(CHIP_SIZE) * 5;		//重力加速度&時間速度による加算量
 		this->interval_Caution = 60;					//プレイヤが視界から外れた後、再度警戒に入るまでの時間
 		this->interval_Attack = 120;					//弾を生成する間隔
 		this->interval_Flash = 4;						//点滅間隔
@@ -255,7 +255,7 @@ namespace  Enemy01
 			if (this->moveVec.y < 0 ||
 				this->CheckFoot() == false) 
 			{
-				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);
+				this->moveVec.y = min(this->moveVec.y + this->gravity, this->max_speed_fall);
 			}
 			//地面に接触している
 			else {

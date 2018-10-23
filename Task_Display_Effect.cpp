@@ -1,30 +1,28 @@
 //-------------------------------------------------------------------
-//前回死亡した地点に置かれる遺体
+//画面効果
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_Corpse.h"
-using namespace ML;
-namespace  Corpse
+#include  "Task_Display_Effect.h"
+#include  "Task_Game.h"
+#include  "Task_Ending.h"
+#include  "Task_Title.h"
+
+namespace  Display_Effect
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->corpseImage = "corpseImage";
-		DG::Image_Create(this->corpseImage,"./data/image/Player.png");
-		this->uiImage = "uiImage";
-		DG::Image_Create(this->uiImage, "./data/image/ui.png");
-		DG::Font_Create("fontCorpse", "ＭＳ ゴシック", 16, 32);
+		this->imageName = "Display_Effect";
+		DG::Image_Create(this->imageName, "./data/image/Display_Effect.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->corpseImage);
-		DG::Image_Erase(this->uiImage);
-		DG::Font_Erase("fontCorpse");
+		DG::Image_Erase(this->imageName);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -37,13 +35,13 @@ namespace  Corpse
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.6f;
-		this->hitBase = Box2D(-48, -24, 96, 48);
-		this->recieveBase = this->hitBase;
-		this->gravity = ML::Gravity(CHIP_SIZE);		//重力加速度＆時間速度による加算量
-		this->max_speed_fall = 15.0f;				//最大落下速度
-		this->flag_erase = false;					//プレイヤが触れると一定時間で消滅する
-		this->transparency = 1.0f;					//描画透明度
+		this->render2D_Priority[1] = 0.1f;	//描画順
+		this->transparency = 0.0f;			//透明度
+		this->flag_in_out = 0;				//0=in 1=out
+		this->cnt_transition = 0;			//画面遷移カウンタ
+		this->time_create_next_task = 100;	//次のタスクを生成するタイミング
+		this->time_start_fade_out = 200;	//フェードアウトを始めるタイミング
+		this->next_scene = 0;				//引継ぎタスクを指定する変数
 		
 		//★タスクの生成
 
@@ -55,8 +53,8 @@ namespace  Corpse
 	{
 		//★データ＆タスク解放
 
-
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
+		if (!ge->QuitFlag() && this->nextTaskCreate)
+		{
 			//★引き継ぎタスクの生成
 		}
 
@@ -66,24 +64,43 @@ namespace  Corpse
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		//上昇中もしくは足元に地面が無い
-		if (this->moveVec.y < 0 ||
-			this->CheckFoot() == false) {
-			this->moveVec.y = min(this->moveVec.y + this->gravity, this->max_speed_fall);
-		}
-		//地面に接触している
-		else
+		this->cnt_transition++;
+		//フェードイン
+		if (!this->flag_in_out)
 		{
-			this->moveVec.y = 0.0f;
+			this->transparency += 0.01f;
 		}
-		//移動処理
-		this->pos += this->moveVec;
-		//消滅を開始する
-		if (this->flag_erase)
+		//一定時間でフラグを反転し、引継ぎタスクを生成する
+		if (this->cnt_transition == this->time_create_next_task)
+		{
+			this->flag_in_out = !this->flag_in_out;
+			switch (this->next_scene)
+			{
+			default:
+				break;
+			//Game
+			case 0:
+				Game::Object::Create(true);
+				break;
+			//Retry
+			case 1:
+				break;
+			//Ending
+			case 2:
+				Ending::Object::Create(true);
+				break;
+			//Title
+			case 3:
+				Title::Object::Create(true);
+				break;
+			}
+		}
+		//一定時間でフェードアウトを始める
+		if (this->flag_in_out && this->cnt_transition>this->time_start_fade_out)
 		{
 			this->transparency -= 0.01f;
 		}
-		//透明度が一定以下になったとき消滅する
+		//透明になったら自身を消滅させる
 		if (this->transparency < 0.0f)
 		{
 			this->Kill();
@@ -93,43 +110,16 @@ namespace  Corpse
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		if(ge->debugMode)
-		{
-			//情報表示
-			Box2D textBox(1450, 0, 500, 75);
-			string text =
-				"corpse->pos.x = " + to_string(this->pos.x) + "\n" +
-				"corpse->pos.y = " + to_string(this->pos.y);
-			DG::Image_Draw(this->res->uiImage, textBox, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
-			DG::Font_Draw("fontCorpse", textBox, text, Color(1.0f, 1.0f, 1.0f, 1.0f));
-		}
-		Box2D draw(-69, -69, 138, 138);
-		//表示方向の逆転
-		if (false == this->angle_LR)
-		{
-			draw.x = -draw.x;
-			draw.w = -draw.w;
-		}
-		draw.Offset(this->pos);
-		//スクロール対応
-		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		Box2D  src(2484, 0, 138, 138);
-		DG::Image_Rotation(this->res->corpseImage, 0.0f,
-			ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
-		DG::Image_Draw(this->res->corpseImage, draw, src,ML::Color(this->transparency,1.0f,1.0f,1.0f));
+		ML::Box2D draw(0, 0, 1920, 1080);
+		ML::Box2D  src(0, 0, 1920, 1080);
+		DG::Image_Draw(this->res->imageName, draw, src,ML::Color(this->transparency,1,1,1));
 	}
-	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_)
+	//引継ぎタスクを指定する
+	//引数	：	（整数）
+	//0=Game	1=Retry		2=Ending	3=Title
+	void Object::Set_Next_Scene(const int& next_)
 	{
-		//一度だけプレイヤを回復する
-		from_->hp = from_->max_Hp;
-		//消滅フラグをtrueにする
-		this->flag_erase = true;
-	}
-	//消滅フラグを取得する
-	bool Object::Get_Flag_Erase()
-	{
-		return this->flag_erase;
+		this->next_scene = next_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

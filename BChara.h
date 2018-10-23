@@ -74,7 +74,6 @@ public:
 	int			animCnt;		//アニメーションカウンタ
 	int			hp;				//ヘルスポイント
 	int			max_Hp;			//HP最大値
-	float		maxFallSpeed;	//落下最大速度
 	float		gravity;		//フレーム単位の加算量
 	float		maxSpeed;		//左右方向への移動の最大速
 	float		addSpeed;		//左右方向への移動の加算量
@@ -90,14 +89,13 @@ public:
 		, angle_LR(Right)
 		, pos(0, 0)
 		, moveVec(0, 0)
-		, moveBack(0,0)
+		, moveBack(0, 0)
 		, hitBase(0, 0, 0, 0)
 		, recieveBase(0, 0, 0, 0)
 		, moveCnt(0)
 		, unHitTime(0)
 		, animCnt(0)
 		, hp(1)
-		, maxFallSpeed(0)
 		, gravity(0)
 		, maxSpeed(0)
 		, addSpeed(0)

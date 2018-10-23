@@ -42,8 +42,8 @@ namespace  Enemy00
 		this->maxSpeed = 2.0f;					//最大移動速度(横)
 		this->addSpeed = 0.7f;					//歩行加速度(地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;					//接地状態の時の速度減衰量(摩擦
-		this->maxFallSpeed = 10.0f;				//最大落下速度
-		this->gravity = ML::Gravity(32) * 5;	//重力加速度&時間速度による加算量
+		this->max_speed_fall = 10.0f;			//最大落下速度
+		this->gravity = ML::Gravity(CHIP_SIZE) * 5;	//重力加速度&時間速度による加算量
 		this->interval_Flash = 4;				//点滅間隔
 		
 		//★タスクの生成
@@ -223,7 +223,7 @@ namespace  Enemy00
 			//上昇中もしくは足元に地面が無い
 			if (this->moveVec.y < 0 ||
 				this->CheckFoot() == false) {
-				this->moveVec.y = min(this->moveVec.y + this->gravity, this->maxFallSpeed);//min( , )
+				this->moveVec.y = min(this->moveVec.y + this->gravity, this->max_speed_fall);//min( , )
 			}
 			//地面に接触している
 			else {

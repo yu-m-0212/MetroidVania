@@ -47,6 +47,7 @@ namespace  Enemy00
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		float decSpeed;			//速度減衰量
+		float max_speed_fall;	//最大速度降下
 		int interval_Flash;		//点滅間隔
 	public:
 		//思考&状況判断(ステータス決定)

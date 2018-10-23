@@ -1,15 +1,15 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//前回死亡した地点に置かれる遺体
+//画面効果
 //-------------------------------------------------------------------
-#include "BChara.h"
+#include "GameEngine_Ver3_7.h"
 
-namespace  Corpse
+namespace  Display_Effect
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("遺体");	//グループ名
-	const  string  defName("NoName");	//タスク名
+	const  string  defGroupName("画面効果");	//グループ名
+	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -23,11 +23,10 @@ namespace  Corpse
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string corpseImage;
-		string uiImage;
+		string imageName;
 	};
 	//-------------------------------------------------------------------
-	class  Object : public  BChara
+	class  Object : public  BTask
 	{
 	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
@@ -41,18 +40,21 @@ namespace  Corpse
 		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
-		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
-		void  UpDate();		//「実行」１フレーム毎に行う処理
+		bool  Initialize();		//「初期化」タスク生成時に１回だけ行う処理
+		void  UpDate();			//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		bool flag_erase;		//プレイヤが触れると一定時間で消滅する
-		float transparency;		//描画透明度
-		float max_speed_fall;	//最大速度降下
+		float transparency;			//透明度
+		bool flag_in_out;			//0=in 1=out
+		int cnt_transition;			//画面遷移カウンタ
+		int time_create_next_task;	//引継ぎタスクを生成するタイミング
+		int time_start_fade_out;	//フェードアウトを始めるタイミング
+		int next_scene;				//引継ぎタスクを指定する変数
 	public:
-		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_);
-		//消滅フラグを取得する
-		bool Get_Flag_Erase();
+		//引継ぎタスクを指定する
+		//引数	：	（整数）
+		//0=Game	1=Retry		2=Ending	3=Title
+		void Set_Next_Scene(const int&);
 	};
 }

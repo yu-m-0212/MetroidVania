@@ -50,6 +50,7 @@ namespace  Enemy01
 		int interval_Attack;	//弾を生成する間隔
 		int interval_Flash;		//点滅間隔
 		float decSpeed;			//速度減衰量
+		float max_speed_fall;	//最大速度降下
 		ML::Box2D searchBase;	//視認矩形
 		ML::Vec2 shot_Init;		//弾の生成時、自身の座標に足す値
 	public:

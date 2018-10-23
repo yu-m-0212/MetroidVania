@@ -6,6 +6,8 @@
 #include  "Task_Game.h"
 #include  "Task_Title.h"
 #include  "Task_Corpse.h"
+#include  "Task_Display_Effect.h"
+
 using namespace ML;
 
 namespace  Retry
@@ -15,7 +17,10 @@ namespace  Retry
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "retryImage";
+		this->back_retry = "back_retry";
+		DG::Image_Create(this->back_retry, "./data/image/Retry.png");
+		this->button_retry = "button_retry";
+		DG::Image_Create(this->button_retry, "./data/image/ui.png");
 		DG::Font_Create("fontRetry", "HG丸ｺﾞｼｯｸM-PRO", 8, 16);
 		return true;
 	}
@@ -23,7 +28,8 @@ namespace  Retry
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->imageName);
+		DG::Image_Erase(this->back_retry);
+		DG::Image_Erase(this->button_retry);
 		DG::Font_Erase("fontRetry");
 		return true;
 	}
@@ -37,8 +43,21 @@ namespace  Retry
 		this->res = Resource::Create();
 
 		//★データ初期化
+		this->render2D_Priority[1] = 0.4f;
 		this->controllerName = "P1";
-		
+		this->flag_transition = false;								//画面遷移用フラグ
+		this->cnt_transition = 0;									//カウンタ遷移用
+		this->title_or_game = 0;									//引継ぎタスクの選択フラグ
+		this->time_create_next_task = 100;							//引継ぎタスクの生成タイミング
+		this->time_kill_game = 200;									//自身を消滅させるタイミング
+		this->cnt_create_bubble = 0;								//エフェクトの生成カウンタ
+		this->cnt_anim_back = 0;									//背景アニメカウンタ
+		this->interval_anim_back = 25;								//背景アニメ周期
+		this->posY = -360.0f;										//背景Y軸座標
+		this->posY_std = -240.0f;									//背景Y軸座標基準値
+		this->height_anim_back = 25.0f;								//背景アニメ揺れ幅
+		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);	//泡のY軸座標初期位置
+
 		//★タスクの生成
 
 		return  true;
@@ -51,20 +70,7 @@ namespace  Retry
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
 		{
-			//★引き継ぎタスクの生成
-			//リトライ
-			if (in.ST.down)
-			{
-				auto nextTask = Game::Object::Create(true);
-				//リトライする場合は前回の死亡地点に遺体を設置
-				auto corpse = Corpse::Object::Create(true);
-				corpse->pos = this->deadPos;
-			}
-			//タイトルに戻る
-			else if (in.SE.down)
-			{
-				auto nextTask = Title::Object::Create(true);
-			}
+			ge->KillAll_G("エフェクト");
 		}
 		return  true;
 	}
@@ -72,9 +78,62 @@ namespace  Retry
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		this->cnt_create_bubble++;
+		this->cnt_anim_back++;
+
 		auto in = DI::GPad_GetState(this->controllerName);
-		//スタートセレクトボタンで自身を消滅
-		if (in.ST.down || in.SE.down)
+
+		//エフェクトの生成
+		if (this->cnt_create_bubble % 30 == 0)
+		{
+			float initX = float(rand() % (ge->screenWidth - 96));
+			int num = rand() % 3;
+			float ang = float(rand() % 360);
+			eff->Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
+		}
+		//背景アニメーション
+		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
+		this->posY = y;
+		//画面遷移
+		if (!this->flag_transition)
+		{
+			//本編を再開する場合
+			if (in.ST.down)
+			{
+				this->flag_transition = true;
+				auto display_effect = Display_Effect::Object::Create(true);
+				display_effect->Set_Next_Scene(1);
+				this->title_or_game = 1;
+			}
+			//タイトルに戻る場合
+			else if (in.SE.down)
+			{
+				this->flag_transition = true;
+				auto display_effect = Display_Effect::Object::Create(true);
+				display_effect->Set_Next_Scene(3);
+				this->title_or_game = 0;
+			}
+		}
+		//消滅カウントダウン
+		else
+		{
+			this->cnt_transition++;
+		}
+		//本編を再開する場合
+		if (this->title_or_game == 1)
+		{
+			//本編と遺体を生成する
+			if (this->cnt_transition == this->time_create_next_task)
+			{
+				Game::Object::Create(true);
+				//リトライする場合は前回の死亡地点に遺体を設置
+				auto corpse = Corpse::Object::Create(true);
+				corpse->pos = this->pos_dead;
+				corpse->angle_LR = this->angle_dead;
+			}
+		}
+		//一定時間で消滅する
+		if (this->cnt_transition > this->time_kill_game)
 		{
 			this->Kill();
 		}
@@ -83,20 +142,37 @@ namespace  Retry
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		{
+			ML::Box2D  draw(-640, -360, 3200, 1800);
+			draw.Offset(ML::Vec2(0, this->posY));
+			ML::Box2D   src(0, 0, 3200, 1800);
+			DG::Image_Draw(this->res->back_retry, draw, src);
+		}
 		Box2D textBox(ge->screenWidth / 2 - 125, ge->screenHeight / 2, 250, 250);
 		string	 textJp = "スタートボタンで続行\nセレクトボタンでタイトルへ戻る";
 		DG::Font_Draw("fontRetry", textBox, textJp, Color(1.0f, 0.0f, 0.0f, 0.0f));
 	}
 	//死亡した座標を保存する
 	//引数	：	（Vec2)
-	void Object::Set_DeadPos(const Vec2& dead_)
+	void Object::Set_Pos_Dead(const Vec2& dead_)
 	{
-		this->deadPos = dead_;
+		this->pos_dead = dead_;
 	}
 	//前回死亡した座標を返す
-	ML::Vec2 Object::Get_DeadPos()
+	ML::Vec2 Object::Get_Pos_Dead()
 	{
-		return this->deadPos;
+		return this->pos_dead;
+	}
+	//死亡時の向きを指定する
+	//引数	：	（BChara::Angle_LR)
+	void Object::Set_Angle_Dead(const BChara::Angle_LR& angle_)
+	{
+		this->angle_dead = angle_;
+	}
+	//死亡時の向きを取得する
+	BChara::Angle_LR Object::Get_Angle_Dead()
+	{
+		return this->angle_dead;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

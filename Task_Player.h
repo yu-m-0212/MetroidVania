@@ -47,11 +47,12 @@ namespace  Player
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		string controllerName;
 		float decSpeed;				//速度減衰量
-		float max_StompFallSpeed;	//ストンプ時の最大効果速度
+		float max_StompFallSpeed;	//ストンプ時の最大降下速度
+		float max_speed_fall;		//最大速度降下
 		float speed_Shot;			//ショット速度
 		float init_shot;			//生成位置ショット
 		float height_Jump;			//ジャンプ初速
-		int addUnHitTime;			//被弾時に得られる無敵時間
+		int add_time_unhit;			//被弾時に得られる無敵時間
 		int interval_Shot;			//射撃の発射間隔（フレーム）
 		int limit_JumpAngleChange;	//ジャンプから一定時間内なら向きを変えられる
 		int limit_Stomp;			//継続時間ストンプ

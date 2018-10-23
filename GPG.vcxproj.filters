@@ -198,6 +198,9 @@
     <ClCompile Include="Effect.cpp">
       <Filter>MyPG\Class</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Display_Effect.cpp">
+      <Filter>MyPG\Display</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>MyPG\Class</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Display_Effect.h">
+      <Filter>MyPG\Display</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

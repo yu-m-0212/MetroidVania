@@ -34,10 +34,11 @@ namespace  Sprite
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.5f;	//描画順
-		this->controllerName = "P1";		//コントローラー名初期化
-		this->speed_to_Vec = 0.05f;			//目標への移動量
-		this->dist_to_Vec = 200.0f;			//プレイヤからの距離
+		this->render2D_Priority[1] = 0.5f;		//描画順
+		this->controllerName = "P1";			//コントローラー名初期化
+		this->speed_to_Vec = 0.05f;				//目標への移動量
+		this->dist_to_Vec = 200.0f;				//プレイヤからの距離
+		this->dist_height = float(CHIP_SIZE*8);	//プレイヤからの上方位置
 
 		//★タスクの生成
 
@@ -66,7 +67,8 @@ namespace  Sprite
 		//対象が存在するか確認してからアクセス
 		if (auto tg = this->target.lock())
 		{
-			ML::Vec2  toVec = tg->pos - this->pos;
+			//プレイヤのやや上方を追従する
+			ML::Vec2  toVec = ML::Vec2(tg->pos.x,tg->pos.y-this->dist_height) - this->pos;
 			//右スティックの向きに合わせて自分の移動先を変更
 			auto in = DI::GPad_GetState(this->controllerName);
 			float angle = atan2(in.RStick.axis.y, in.RStick.axis.x);

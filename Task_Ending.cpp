@@ -33,6 +33,7 @@ namespace  Ending
 		this->res = Resource::Create();
 
 		//★データ初期化
+		this->render2D_Priority[1] = 1.0f;
 		this->logoPosY = 270;
 
 		//★タスクの生成

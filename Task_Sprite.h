@@ -50,6 +50,7 @@ namespace  Sprite
 		string controllerName;		//コントローラー宣言
 		float speed_to_Vec;			//目標への移動量
 		float dist_to_Vec;			//プレイヤからの距離
+		float dist_height;			//プレイヤから上方位置
 		weak_ptr<BChara> target;	//プレイヤを指すスマートポインター
 	public:
 		//追従対象を指定
