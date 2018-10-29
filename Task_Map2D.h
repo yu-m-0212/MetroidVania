@@ -59,6 +59,8 @@ namespace  Map2D
 		bool CheckHit(const  ML::Box2D&  h_);
 		//マップ外を見せないようにカメラを位置調整する
 		void  AjastCameraPos();
+
+		//アクセサ
 		//画面の揺れ幅を指定する
 		void Set_Dist_Quake(const int&);
 		//画面を揺らす時間を指定する

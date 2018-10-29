@@ -50,11 +50,13 @@ namespace  Gun
 		float tremor;			//発砲時の揺れ幅
 		string controllerName;	//コントローラー宣言
 	public:
-		//角度を返す
-		float Get_Angle();
 		//思考
 		void Think();
 		//行動
 		void Move();
+
+		//アクセサ
+		//角度を返す
+		float Get_Angle();
 	};
 }

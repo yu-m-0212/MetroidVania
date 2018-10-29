@@ -159,6 +159,12 @@ void BChara::Set_Tip(const int& tip_)
 {
 	this->tip = tip_;
 }
+//遺体の消滅フラグを指定する
+//引数	：	（0か1）
+void BChara::Set_Flag_Erase(const int& erase_)
+{
+	this->flag_erase = erase_;
+}
 //範囲攻撃か否かを取得する
 bool BChara::Get_Range_Wide()
 {
@@ -168,4 +174,9 @@ bool BChara::Get_Range_Wide()
 bool BChara::Get_Tip()
 {
 	return this->tip;
+}
+//遺体の消滅フラグを取得する
+bool BChara::Get_Flag_Erase()
+{
+	return this->flag_erase;
 }

@@ -152,28 +152,6 @@ namespace  Shot00
 			DG::Image_Draw(this->res->imageName, draw, srcDebug, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
 		}
 	}
-	//呼び出したタスクから寿命を設定する
-	void Object::Set_Limit(const int& cl_)
-	{
-		this->limit_Erase = cl_;
-	}
-	//壁や敵に衝突したとき、消えるか否かを指定する
-	void Object::Set_Erase(const int& erase_)
-	{
-		this->flag_Erase = erase_;
-	}
-	//外部から生成する際、攻撃力を指定
-	//引数	：	（整数値）
-	void Object::Set_Power(const int& pow_)
-	{
-		this->power = pow_;
-	}
-	//外部から描画角度を指定
-	//引数	：	（角度）
-	void Object::Set_Angle(const float& angle_)
-	{
-		this->angle = angle_;
-	}
 	//状態ごとに行動を指定する
 	void Object::Move()
 	{
@@ -255,17 +233,39 @@ namespace  Shot00
 			ShootHitEffect->Set_Limit(18);
 			ShootHitEffect->state = ImpactPunch;
 			ShootHitEffect->angle_LR = this->angle_LR;
-			if (this->angle_LR==Right)
+			if (this->angle_LR == Right)
 			{
 				ShootHitEffect->Set_Angle(this->angle);
 			}
 			else
 			{
-				ShootHitEffect->Set_Angle(this->angle -135.0f);
+				ShootHitEffect->Set_Angle(this->angle - 135.0f);
 			}
 			break;
 		}
 		}
+	}
+	//呼び出したタスクから寿命を設定する
+	void Object::Set_Limit(const int& cl_)
+	{
+		this->limit_Erase = cl_;
+	}
+	//壁や敵に衝突したとき、消えるか否かを指定する
+	void Object::Set_Erase(const int& erase_)
+	{
+		this->flag_Erase = erase_;
+	}
+	//外部から生成する際、攻撃力を指定
+	//引数	：	（整数値）
+	void Object::Set_Power(const int& pow_)
+	{
+		this->power = pow_;
+	}
+	//外部から描画角度を指定
+	//引数	：	（角度）
+	void Object::Set_Angle(const float& angle_)
+	{
+		this->angle = angle_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

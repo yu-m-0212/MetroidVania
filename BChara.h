@@ -80,6 +80,7 @@ public:
 private:
 	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
 	bool		range_Wide;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
+	bool		flag_erase;		//遺体に触れたとき、true
 public:
 	//メソッド
 	//メンバ変数に最低限の初期化を行う
@@ -101,6 +102,7 @@ public:
 		, addSpeed(0)
 		, tip(false)
 		, range_Wide(false)
+		, flag_erase(false)
 	{
 	}
 	virtual  ~BChara(){}
@@ -138,8 +140,13 @@ public:
 	//ノックバックするか否かを指定する
 	//引数	：	（0か1）
 	void Set_Tip(const int&);
+	//遺体の消滅フラグを指定する
+	//引数	：	（0か1）
+	void Set_Flag_Erase(const int&);
 	//範囲攻撃か否かを取得する
 	bool Get_Range_Wide();
 	//ノックバックするか否かを取得する
 	bool Get_Tip();
+	//遺体の消滅フラグを取得する
+	bool Get_Flag_Erase();
 };

@@ -48,6 +48,13 @@ namespace  Shot01
 		int limit_Erase;	//消滅するまでの時間
 		int power;			//攻撃力
 	public:
+		//状態ごとに行動を指定する
+		void Move();
+		//消滅する際、状態に応じてエフェクトを生成
+		//引数	：	（エフェクトを生成する座標）
+		void Effect_Hit(const ML::Vec2&);
+
+		//アクセサ
 		//攻撃毎に寿命を設ける際に使用
 		//引数	：	（寿命）
 		void Set_Limit(const int&);
@@ -57,10 +64,5 @@ namespace  Shot01
 		//外部から生成する際、攻撃力を指定
 		//引数	：	（整数値）
 		void Set_Power(const int&);
-		//状態ごとに行動を指定する
-		void Move();
-		//消滅する際、状態に応じてエフェクトを生成
-		//引数	：	（エフェクトを生成する座標）
-		void Effect_Hit(const ML::Vec2&);
 	};
 }

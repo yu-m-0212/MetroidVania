@@ -95,7 +95,7 @@ namespace  Gun
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Draw(this->res->imageName, draw, src);
 	}
-	//
+	//Šp“x‚ð•Ô‚·
 	float Object::Get_Angle()
 	{
 		return this->angle;

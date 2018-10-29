@@ -40,7 +40,6 @@ namespace  Task_Effect
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -57,6 +56,7 @@ namespace  Task_Effect
 		float angle;			//表示する角度
 		Vec2 center;			//回転軸
 	public:
+		Object();
 		//泡エフェクトを生成する
 		//引数	：	（番号,初期座標,揺れ周期,揺れ幅,浮上速度,角度,消滅までの時間）
 		void Create_Bubble(const int&, const ML::Vec2&, const int&, const float&, const float&, const float&, const int&);
@@ -69,7 +69,7 @@ namespace  Task_Effect
 
 		//呼び出す際に消滅までの時間を指定する
 		//引数	：	（消滅までの時間）
-		void Set_Limit(const int&);
+		inline void Set_Limit(const int&);
 		//泡の揺れ周期を指定する
 		//引数	：	（揺れ周期）
 		void Set_Interval_Bubble(const int&);
@@ -95,6 +95,6 @@ namespace  Task_Effect
 		float Get_Dist();
 
 		//エフェクトクラス
-		Effect* eff;
+		Effect eff;
 	};
 }

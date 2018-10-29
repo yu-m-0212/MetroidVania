@@ -60,11 +60,13 @@ namespace  Enemy01
 		void Move();		
 		//プレイヤを発見したら警戒モードに入る
 		bool Search_Player();
-		//探知矩形を取得する
-		ML::Box2D Get_Search();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		void Received(BChara* from_, AttackInfo at_);
 		//アニメーション制御
 		BChara::DrawInfo Anim();	
+
+		//アクセサ
+		//探知矩形を取得する
+		ML::Box2D Get_Search();
 	};
 }

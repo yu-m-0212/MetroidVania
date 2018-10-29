@@ -159,11 +159,17 @@ namespace  Player
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
 						(*it)->Received(this, at);
-						//回復エフェクトを生成
-						auto healEffect = Task_Effect::Object::Create(true);
-						healEffect->pos = this->pos;
-						healEffect->Set_Limit(this->limit_HealEffect);
-						healEffect->state = Heal;
+						//一度だけエフェクトを生成する
+						if (!(*it)->Get_Flag_Erase())
+						{
+							//回復エフェクトを生成
+							auto healEffect = Task_Effect::Object::Create(true);
+							healEffect->pos = this->pos;
+							healEffect->Set_Limit(this->limit_HealEffect);
+							healEffect->state = Heal;
+							//フラグ反転
+							(*it)->Set_Flag_Erase(1);
+						}
 						break;
 					}
 				}
@@ -560,31 +566,6 @@ namespace  Player
 			break;
 		}
 	}
-	//HPの値を取得する
-	int Object::Get_HP()
-	{
-		return this->hp;
-	}
-	//HPの最大値を取得する
-	int Object::Get_Max_HP()
-	{
-		return this->max_Hp;
-	}
-	//状態を取得する
-	int Object::Get_State()
-	{
-		return this->state;
-	}
-	//近接攻撃リチャージの値を取得する
-	int Object::Get_Gauge_Mlee()
-	{
-		return this->gauge_melee;
-	}
-	//近接攻撃リチャージ上限の値を取得する
-	int Object::Get_Gauge_Melle_Max()
-	{
-		return this->gauge_melee_max;
-	}
 	//-----------------------------------------------------------------------------
 	//アニメーション制御
 	BChara::DrawInfo  Object::Anim()
@@ -781,6 +762,31 @@ namespace  Player
 	int Object::Get_Interval_Shot()
 	{
 		return this->interval_Shot;
+	}
+	//HPの値を取得する
+	int Object::Get_HP()
+	{
+		return this->hp;
+	}
+	//HPの最大値を取得する
+	int Object::Get_Max_HP()
+	{
+		return this->max_Hp;
+	}
+	//状態を取得する
+	int Object::Get_State()
+	{
+		return this->state;
+	}
+	//近接攻撃リチャージの値を取得する
+	int Object::Get_Gauge_Mlee()
+	{
+		return this->gauge_melee;
+	}
+	//近接攻撃リチャージ上限の値を取得する
+	int Object::Get_Gauge_Melle_Max()
+	{
+		return this->gauge_melee_max;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

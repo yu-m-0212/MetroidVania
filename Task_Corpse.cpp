@@ -42,7 +42,6 @@ namespace  Corpse
 		this->recieveBase = this->hitBase;
 		this->gravity = ML::Gravity(CHIP_SIZE);		//重力加速度＆時間速度による加算量
 		this->max_speed_fall = 15.0f;				//最大落下速度
-		this->flag_erase = false;					//プレイヤが触れると一定時間で消滅する
 		this->transparency = 1.0f;					//描画透明度
 		
 		//★タスクの生成
@@ -79,7 +78,7 @@ namespace  Corpse
 		//移動処理
 		this->pos += this->moveVec;
 		//消滅を開始する
-		if (this->flag_erase)
+		if (this->Get_Flag_Erase())
 		{
 			this->transparency -= 0.01f;
 		}
@@ -122,14 +121,10 @@ namespace  Corpse
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
 		//一度だけプレイヤを回復する
-		from_->hp = from_->max_Hp;
-		//消滅フラグをtrueにする
-		this->flag_erase = true;
-	}
-	//消滅フラグを取得する
-	bool Object::Get_Flag_Erase()
-	{
-		return this->flag_erase;
+		if (!this->Get_Flag_Erase())
+		{
+			from_->hp = from_->max_Hp;
+		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

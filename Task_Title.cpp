@@ -53,7 +53,7 @@ namespace  Title
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);		//泡のY軸座標初期位置
 		this->pos_button = ML::Vec2(float(ge->screenWidth / 2), 800);	//座標ボタン
 		this->controllerName = "P1";									//コントローラー宣言
-
+		
 		//★タスクの生成
 
 		return  true;
@@ -89,7 +89,7 @@ namespace  Title
 			float initX = float(rand() % (ge->screenWidth - 96));
 			int num = rand() % 3;
 			float ang = float(rand() % 360);
-			eff->Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
+			eff.Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
 		}
 		//自身に消滅要請
 		if (in.ST.down)

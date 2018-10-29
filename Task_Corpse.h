@@ -46,13 +46,10 @@ namespace  Corpse
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		bool flag_erase;		//プレイヤが触れると一定時間で消滅する
 		float transparency;		//描画透明度
 		float max_speed_fall;	//最大速度降下
 	public:
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		void Received(BChara* from_, AttackInfo at_);
-		//消滅フラグを取得する
-		bool Get_Flag_Erase();
 	};
 }

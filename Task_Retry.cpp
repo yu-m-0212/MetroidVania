@@ -66,11 +66,10 @@ namespace  Retry
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
-		auto in = DI::GPad_GetState(this->controllerName);
+		ge->KillAll_G("エフェクト");
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
 		{
-			ge->KillAll_G("エフェクト");
 		}
 		return  true;
 	}
@@ -89,7 +88,7 @@ namespace  Retry
 			float initX = float(rand() % (ge->screenWidth - 96));
 			int num = rand() % 3;
 			float ang = float(rand() % 360);
-			eff->Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
+			eff.Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
 		}
 		//背景アニメーション
 		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);

@@ -60,7 +60,7 @@ namespace  Title
 		float cnt_anim_button;		//ボタンアニメカウンタ
 		float interval_button;		//ボタンアニメ周期
 		ML::Vec2 pos_button;		//座標ボタン
-		Task_Effect::Object* eff;	//メソッド呼び出し
+		Task_Effect::Object eff;	//メソッド呼び出し
 		string controllerName;		//コントローラー宣言
 	};
 }

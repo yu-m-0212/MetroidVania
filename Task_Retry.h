@@ -62,8 +62,8 @@ namespace  Retry
 		float posY;						//背景Y軸座標
 		float posY_std;					//背景Y軸座標基準値
 		float height_anim_back;			//背景アニメ揺れ幅
-		float init_bubble_pos_y;	//泡のY軸初期座標
-		Task_Effect::Object* eff;		//メソッド呼び出し
+		float init_bubble_pos_y;		//泡のY軸初期座標
+		Task_Effect::Object eff;		//メソッド呼び出し
 	public:
 		//死亡した座標を保存する
 		//引数	：	（Vec2)

@@ -41,7 +41,7 @@ namespace  Task_Effect
 		this->num_bubble = 0;				//泡の大きさ
 		this->interval_bubble = 0;			//泡の揺れ周期
 		this->wide_bubble = 0.0f;			//泡の揺れ幅
-		this->render2D_Priority[1] = 0.5f;	//描画順
+		this->render2D_Priority[1] = 0.5f;	//描画順\
 
 		//★タスクの生成
 
@@ -52,8 +52,6 @@ namespace  Task_Effect
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
-
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}
@@ -183,12 +181,6 @@ namespace  Task_Effect
 		bubble->Set_Angle(angle_);
 		bubble->Set_Limit(limit_);
 	}
-	//呼び出す際に消滅までの時間を指定する
-	//引数	：	（消滅までの時間）
-	void Object::Set_Limit(const int& limit_)
-	{
-		this->cntLimit = limit_;
-	}
 	//状態ごとに行動を指定する
 	void Object::Move()
 	{
@@ -215,11 +207,19 @@ namespace  Task_Effect
 		case Lose:
 			break;
 		case Bubble:
-			//this->moveVec = eff->Move_Bubble(this->moveCnt, this->interval_bubble, this->wide_bubble, this->speed_surfacing);
-			this->moveVec.x = float(sin(this->moveCnt / this->interval_bubble)*this->wide_bubble);
-			this->moveVec.y = -this->speed_surfacing;
+			this->moveVec = eff.Move_Bubble(this->moveCnt, this->interval_bubble, this->wide_bubble, this->speed_surfacing);
+			/*this->moveVec.x = float(sin(this->moveCnt / this->interval_bubble)*this->wide_bubble);
+			this->moveVec.y = -this->speed_surfacing;*/
 			break;
 		}
+	}
+	//アクセサ
+
+	//呼び出す際に消滅までの時間を指定する
+	//引数	：	（消滅までの時間）
+	void Object::Set_Limit(const int& limit_)
+	{
+		this->cntLimit = limit_;
 	}
 	//泡の大きさを指定する
 	//引数	：	（0~3)
