@@ -33,11 +33,13 @@ namespace  Map2D
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.9f;	//描画順
-		this->imageName = "MapChipImg";		//イメージ名の初期化
-		this->cnt_Quake = 0;				//画面を揺らす周期
-		this->dist_Quake = 0;				//画面揺れ幅
-		this->limit_Quake = 0;				//画面を揺らす時間
+		this->render2D_Priority[1] = 0.9f;		//描画順
+		this->imageName = "MapChipImg";			//イメージ名の初期化
+		this->cnt_Quake = 0;					//画面を揺らす周期
+		this->dist_Quake = 0;					//画面揺れ幅
+		this->limit_Quake = 0;					//画面を揺らす時間
+		this->enemy01 = new Enemy01::Object();	//ポインタエネミー
+		this->item00 = new Item00::Object();	//ポインタアイテム
 		//マップのゼロクリア
 		for (int y = 0; y < SIZE_MAP_H; ++y) {
 			for (int x = 0; x < SIZE_MAP_W; ++x) 
@@ -241,13 +243,13 @@ namespace  Map2D
 					break;
 				//アイテム00
 				case 6:
-					this->Create_Item00(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)));
+					this->item00->Create_Item00(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)));
 					//透明マスで上書き
 					no = 0;
 					break;
 				//エネミー01
 				case 7:
-					this->Create_Enemy01(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)));
+					this->enemy01->Create_Enemy01(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)));
 					no = 0;
 					break;
 				//壁の場合は隣とくっつける
@@ -281,23 +283,6 @@ namespace  Map2D
 		}
 		//マップを上書きコピー
 		memcpy(this->arr, w_map, sizeof(this->arr));
-	}
-	//エネミーの生成
-	//引数	：	（初期座標,移動速度,HP）
-	void Object::Create_Enemy01(const ML::Vec2& pos_)
-	{
-		auto ene = Enemy01::Object::Create(true);
-		ene->pos = pos_;
-		auto es = EnemySearch::Object::Create(true);
-		es->hitBase = ene->Get_Search();
-		es->Set_Target(ene);
-	}
-	//アイテム00の生成
-	//引数	：	（初期座標）
-	void Object::Create_Item00(const ML::Vec2& pos_)
-	{
-		auto item = Item00::Object::Create(true);
-		item->pos = pos_;
 	}
 	//画面の揺れ幅を指定する
 	void Object::Set_Dist_Quake(const int& dist_)

@@ -4,6 +4,7 @@
 //アイテム00(回復ポーション)
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Tutorials.h"
 
 namespace  Item00
 {
@@ -37,7 +38,6 @@ namespace  Item00
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -46,11 +46,18 @@ namespace  Item00
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
-		int add_Hp;	//プレイヤのHP増加量
+		int add_Hp;						//プレイヤのHP増加量
+		int limit_message;				//制限時間メッセージ
+		Tutorials::Object* tutrials;	//ポインタチュートリアル
 	public:
+		//コンストラクタ
+		Object();
 		//アニメーション制御
 		BChara::DrawInfo Anim();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		void Received(BChara* from_, AttackInfo at_);
+		//アイテム00の生成
+		//引数	：	（初期座標）
+		void Create_Item00(const ML::Vec2&);
 	};
 }

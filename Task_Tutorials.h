@@ -41,7 +41,6 @@ namespace  Tutorials
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -50,9 +49,18 @@ namespace  Tutorials
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		string message;	//表示するメッセージを格納する
+		int limit;		//消滅までの時間
 	public:
+		//コンストラクタ
+		Object();
 		//外部から状態を指定する際使用
 		//引数	：	（対応する番号）
 		void Set_Message(const string&);
+		//消滅時間を指定する
+		//引数	：	（消滅までの時間）
+		void Set_Limit(const int&);
+		//メッセージを生成する
+		//引数	：	（メッセージ,座標,消滅時間）
+		void Create_Message(const string&, const ML::Vec2&,const int&);
 	};
 }

@@ -37,8 +37,6 @@ namespace  Enemy01
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -54,6 +52,8 @@ namespace  Enemy01
 		ML::Box2D searchBase;	//視認矩形
 		ML::Vec2 shot_Init;		//弾の生成時、自身の座標に足す値
 	public:
+		//コンストラクタ
+		Object();
 		//思考&状況判断(ステータス決定)
 		void Think();	
 		//モーションに対応した処理
@@ -64,6 +64,9 @@ namespace  Enemy01
 		void Received(BChara* from_, AttackInfo at_);
 		//アニメーション制御
 		BChara::DrawInfo Anim();	
+		//エネミーの生成
+		//引数	：	（初期座標）
+		void Create_Enemy01(const ML::Vec2&);
 
 		//アクセサ
 		//探知矩形を取得する

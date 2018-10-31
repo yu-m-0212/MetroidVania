@@ -429,6 +429,16 @@ namespace  Enemy01
 		}
 		return you.Hit(me);
 	}
+	//エネミーの生成
+	//引数	：	（初期座標,移動速度,HP）
+	void Object::Create_Enemy01(const ML::Vec2& pos_)
+	{
+		auto ene = Enemy01::Object::Create(true);
+		ene->pos = pos_;
+		auto es = EnemySearch::Object::Create(true);
+		es->hitBase = ene->Get_Search();
+		es->Set_Target(ene);
+	}
 	//探知矩形を取得する
 	ML::Box2D Object::Get_Search()
 	{

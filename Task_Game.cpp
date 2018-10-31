@@ -56,6 +56,7 @@ namespace  Game
 		this->cnt_transition = 0;							//カウンタ遷移用
 		this->time_create_next_task = 100;					//引継ぎタスクの生成タイミング
 		this->time_kill_game = 200;							//自身を消滅させるタイミング
+		this->tutorials = new Tutorials::Object;			//ポインタメッセージ
 		
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
@@ -76,12 +77,12 @@ namespace  Game
 		//UIの生成
 		auto ui = UI::Object::Create(true);
 		//チュートリアルの生成
-		this->Create_Message(ML::Vec2( 224, 4482), "左スティックを横に倒すと移動");
-		this->Create_Message(ML::Vec2(1180, 4482), "×ボタンでジャンプ");
-		this->Create_Message(ML::Vec2(2130, 3970), "R1ボタンでショット");
-		this->Create_Message(ML::Vec2(6792, 3650), "右スティックで銃口を傾ける");
-		this->Create_Message(ML::Vec2(7192, 5122), "□ボタンで敵や敵のショットを弾く");
-		this->Create_Message(ML::Vec2(4823, 5378), "遺体に触れると回復する");
+		tutorials->Create_Message("左スティックを横に倒すと移動", ML::Vec2(224, 4482), -1);
+		tutorials->Create_Message("×ボタンでジャンプ", ML::Vec2(1180, 4482), -1);
+		tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1);
+		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6792, 3650), -1);
+		tutorials->Create_Message("□ボタンで敵や敵のショットを弾く", ML::Vec2(7192, 5122), -1);
+		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
 		//背景の生成
 		auto back = Back::Object::Create(true);
 		//チュートリアル用の遺体を配置
@@ -201,14 +202,6 @@ namespace  Game
 	{
 	}
 	//-------------------------------------------------------------------
-	//チュートリアル表示キャラクタの生成
-	//引数	：	（座標,メッセージ）
-	void Object::Create_Message(const ML::Vec2& pos_, const string& message_)
-	{
-		auto tutorials = Tutorials::Object::Create(true);
-		tutorials->pos = pos_;
-		tutorials->Set_Message(message_);
-	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

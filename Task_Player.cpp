@@ -13,6 +13,7 @@
 #include	"Task_Gun.h"
 #include	"Task_Player_Head.h"
 #include	"Task_Enemy01.h"
+#include	"Task_Tutorials.h"
 
 namespace  Player
 {
@@ -204,7 +205,6 @@ namespace  Player
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
-			//‡à—p‚É“G‚ð‘|“¢‚·‚é‚±‚Æ‚ððŒ‚É’Ç‰Á
 			if (you.Hit(me))
 			{
 				ge->clear = true;

@@ -7,6 +7,7 @@
 #include  "Task_Shot00.h"
 #include  "Task_Shot01.h"
 #include  "Task_Effect.h"
+#include  "Task_Tutorials.h"
 
 namespace  Game
 {
@@ -53,13 +54,11 @@ namespace  Game
 		int cnt_transition;				//カウンタ遷移用
 		int time_create_next_task;		//引継ぎタスクの生成タイミング
 		int time_kill_game;				//自身を消滅させるタイミング
+		Tutorials::Object* tutorials;	//ポインタメッセージ
 	public:
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;
 		Shot01::Resource::SP	shot01_Resource;
 		Task_Effect::Resource::SP	effect_Resource;
-		//チュートリアル表示キャラクタの生成
-		//引数	：	（座標,メッセージ）
-		void Create_Message(const ML::Vec2&, const string&);
 	};
 }

@@ -4,6 +4,8 @@
 //２次元配列マップ
 //-------------------------------------------------------------------
 #include "GameEngine_Ver3_7.h"
+#include "Task_Enemy01.h"
+#include "Task_Item00.h"
 
 namespace  Map2D
 {
@@ -47,6 +49,8 @@ namespace  Map2D
 		int					cnt_Quake;						//カウンタ画面揺れ
 		int					dist_Quake;						//画面揺れ幅
 		int					limit_Quake;					//画面を揺らす時間
+		Enemy01::Object*	enemy01;						//ポインタエネミー
+		Item00::Object*		item00;							//ポインタアイテム
 	public:
 		string				imageName;						//マップはリソース共有しない
 		int					arr[SIZE_MAP_H][SIZE_MAP_W];	//マップ配列
@@ -63,12 +67,6 @@ namespace  Map2D
 		//壁の向きに合わせてリソースを変える
 		//チップ番号に合わせたキャラクタを生成する
 		void Map_Adjust_Chip();
-		//エネミーの生成
-		//引数	：	（初期座標）
-		void Create_Enemy01(const ML::Vec2&);
-		//アイテム00の生成
-		//引数	：	（初期座標）
-		void Create_Item00(const ML::Vec2&);
 
 		//アクセサ
 		//画面の揺れ幅を指定する

@@ -5,6 +5,7 @@
 #include  "Effect.h"
 #include  "Task_Effect.h"
 #include  "Task_Player.h"
+
 using namespace ML;
 namespace  Task_Effect
 {
@@ -41,7 +42,7 @@ namespace  Task_Effect
 		this->num_bubble = 0;				//–A‚Ì‘å‚«‚³
 		this->interval_bubble = 0;			//–A‚Ì—h‚êüŠú
 		this->wide_bubble = 0.0f;			//–A‚Ì—h‚ê•
-		this->render2D_Priority[1] = 0.5f;	//•`‰æ‡\
+		this->render2D_Priority[1] = 0.5f;	//•`‰æ‡
 
 		//šƒ^ƒXƒN‚Ì¶¬
 

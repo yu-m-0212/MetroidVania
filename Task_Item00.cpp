@@ -37,6 +37,8 @@ namespace  Item00
 		this->hitBase = ML::Box2D(-16, -16, 32, 32);	//マップとの判定矩形
 		this->recieveBase = this->hitBase;				//キャラクタとの判定矩形
 		this->add_Hp = 1;								//プレイヤのHP増加量
+		this->limit_message = 180;						//時間制限メッセージ
+		this->tutrials = new Tutorials::Object();		//ポインタチュートリアル
 		//★タスクの生成
 		return  true;
 	}
@@ -88,7 +90,10 @@ namespace  Item00
 		{
 			return;
 		}
+		
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		//メッセージ生成
+		this->tutrials->Create_Message("HPの上限が増加した", pl->pos, this->limit_message);
 		this->UpdateMotion(Lose);
 		//体力上限を増加し、回復する
 		int max = pl->Get_Max_HP();
@@ -112,6 +117,13 @@ namespace  Item00
 		case Lose:		rtv = imageTable[1];	break;
 		}
 		return rtv;
+	}
+	//アイテム00の生成
+	//引数	：	（初期座標）
+	void Object::Create_Item00(const ML::Vec2& pos_)
+	{
+		auto item = Item00::Object::Create(true);
+		item->pos = pos_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
