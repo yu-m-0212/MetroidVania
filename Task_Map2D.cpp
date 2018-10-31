@@ -4,6 +4,9 @@
 #include  "MyPG.h"
 #include  "Task_Map2D.h"
 #include  "Task_Player.h"
+#include  "Task_Enemy01.h"
+#include  "Task_EnemySearch.h"
+#include  "Task_Item00.h"
 
 namespace  Map2D
 {
@@ -36,8 +39,8 @@ namespace  Map2D
 		this->dist_Quake = 0;				//画面揺れ幅
 		this->limit_Quake = 0;				//画面を揺らす時間
 		//マップのゼロクリア
-		for (int y = 0; y < 100; ++y) {
-			for (int x = 0; x < 100; ++x) 
+		for (int y = 0; y < SIZE_MAP_H; ++y) {
+			for (int x = 0; x < SIZE_MAP_W; ++x) 
 			{
 				this->arr[y][x] = 0;
 			}
@@ -48,12 +51,12 @@ namespace  Map2D
 
 		//マップチップ情報の初期化
 		//画像リソースに番号を振る
-		for (int c = 0; c < 16; ++c) 
+		for (int c = 0; c < 24; ++c) 
 		{
-			int  x = (c % 8);
-			int  y = (c / 8);
+			int  x = (c % 4);
+			int  y = (c / 4);
 			//src
-			this->chip[c] = ML::Box2D(x * CHIP_SIZE, y * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE);
+			this->chip[c] = ML::Box2D(x * SIZE_CHIP, y * SIZE_CHIP, SIZE_CHIP, SIZE_CHIP);
 		}
 
 		//★タスクの生成
@@ -105,15 +108,15 @@ namespace  Map2D
 		isr.bottom = min(c.bottom, m.bottom);
 		//ループ範囲を決定
 		int sx, sy, ex, ey;
-		sx = isr.left / CHIP_SIZE;
-		sy = isr.top / CHIP_SIZE;
-		ex = (isr.right - 1) / CHIP_SIZE;
-		ey = (isr.bottom - 1) / CHIP_SIZE;
+		sx = isr.left / SIZE_CHIP;
+		sy = isr.top / SIZE_CHIP;
+		ex = (isr.right - 1) / SIZE_CHIP;
+		ey = (isr.bottom - 1) / SIZE_CHIP;
 
 		//画面内の範囲だけ描画
 		for (int y = sy; y <= ey; ++y) {
 			for (int x = sx; x <= ex; ++x) {
-				ML::Box2D  draw(x * CHIP_SIZE, y * CHIP_SIZE, CHIP_SIZE, CHIP_SIZE);
+				ML::Box2D  draw(x * SIZE_CHIP, y * SIZE_CHIP, SIZE_CHIP, SIZE_CHIP);
 				//画面揺れ処理（マップチップの縦軸を揺らす）
 				if (this->limit_Quake > 0)
 				{
@@ -147,7 +150,7 @@ namespace  Map2D
 
 		//マップ配列サイズの読み込み
 		fin >> this->sizeX >> this->sizeY;
-		this->hitBase = ML::Box2D(0, 0, this->sizeX * CHIP_SIZE, this->sizeY * CHIP_SIZE);
+		this->hitBase = ML::Box2D(0, 0, this->sizeX * SIZE_CHIP, this->sizeY * SIZE_CHIP);
 
 		//マップ配列データの読み込み
 		for (int y = 0; y < this->sizeY; ++y) {
@@ -155,8 +158,10 @@ namespace  Map2D
 				fin >> this->arr[y][x];
 			}
 		}
+		//ファイルを閉じる
 		fin.close();
-
+		//チップ番号に対応した処理
+		this->Map_Adjust_Chip();
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -177,10 +182,10 @@ namespace  Map2D
 
 		//ループ範囲調整
 		int sx, sy, ex, ey;
-		sx = r.left / CHIP_SIZE;
-		sy = r.top / CHIP_SIZE;
-		ex = (r.right - 1) / CHIP_SIZE;
-		ey = (r.bottom - 1) / CHIP_SIZE;
+		sx = r.left / SIZE_CHIP;
+		sy = r.top / SIZE_CHIP;
+		ex = (r.right - 1) / SIZE_CHIP;
+		ey = (r.bottom - 1) / SIZE_CHIP;
 
 		//範囲内の障害物を探す
 		for (int y = sy; y <= ey; ++y) {
@@ -216,6 +221,83 @@ namespace  Map2D
 		//マップがカメラより小さい場合
 		if (this->hitBase.w < ge->camera2D.w) { ge->camera2D.x = m.left; }
 		if (this->hitBase.h < ge->camera2D.h) { ge->camera2D.y = m.top; }
+	}
+	//チップ番号に対応した処理
+	//壁の向きに合わせてリソースを変える
+	//チップ番号に合わせたキャラクタを生成する
+	void Object::Map_Adjust_Chip()
+	{
+		//縦横サイズの2次元配列を宣言
+		int w_map[SIZE_MAP_H][SIZE_MAP_W];
+		for (int y = 0; y < this->sizeY; ++y)
+		{
+			for (int x = 0; x < this->sizeX; ++x)
+			{
+				int no;
+				switch (this->arr[y][x])
+				{
+				default:
+					no = this->arr[y][x];
+					break;
+				//アイテム00
+				case 6:
+					this->Create_Item00(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)));
+					//透明マスで上書き
+					no = 0;
+					break;
+				//エネミー01
+				case 7:
+					this->Create_Enemy01(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)));
+					no = 0;
+					break;
+				//壁の場合は隣とくっつける
+				case 8:
+					//壁マスの基準値
+					no = 8;
+					//上が壁？
+					if (y - 1 >= 0 && this->arr[y - 1][x] == 8)
+					{
+						no += 1;
+					}
+					//右が壁？
+					if (x + 1 <= this->sizeX - 1 && this->arr[y][x + 1] == 8)
+					{
+						no += 2;
+					}
+					//下が壁？
+					if (y + 1 <= this->sizeY - 1 && this->arr[y + 1][x] == 8)
+					{
+						no += 4;
+					}
+					//左が壁？
+					if (x - 1 >= 0 && this->arr[y][x - 1] == 8)
+					{
+						no += 8;
+					}
+					break;
+				}
+				w_map[y][x] = no;
+			}
+		}
+		//マップを上書きコピー
+		memcpy(this->arr, w_map, sizeof(this->arr));
+	}
+	//エネミーの生成
+	//引数	：	（初期座標,移動速度,HP）
+	void Object::Create_Enemy01(const ML::Vec2& pos_)
+	{
+		auto ene = Enemy01::Object::Create(true);
+		ene->pos = pos_;
+		auto es = EnemySearch::Object::Create(true);
+		es->hitBase = ene->Get_Search();
+		es->Set_Target(ene);
+	}
+	//アイテム00の生成
+	//引数	：	（初期座標）
+	void Object::Create_Item00(const ML::Vec2& pos_)
+	{
+		auto item = Item00::Object::Create(true);
+		item->pos = pos_;
 	}
 	//画面の揺れ幅を指定する
 	void Object::Set_Dist_Quake(const int& dist_)

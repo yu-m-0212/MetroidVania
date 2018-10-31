@@ -134,7 +134,7 @@ namespace  UI
 				"moveVec.y = " + to_string(pl->moveVec.y) + "\n" +
 				"angle = " + to_string(pl->angle_LR) + "\n"
 				"moveCnt = " + to_string(pl->moveCnt) + "\n" +
-				"unHitTime = " + to_string(pl->unHitTime) + "\n" +
+				"time_un_hit = " + to_string(pl->time_un_hit) + "\n" +
 				"hp=" + to_string(pl->hp) + "\n" +
 				"ge->clear = " + to_string(ge->clear) + "\n" +
 				"ge->failure = " + to_string(ge->failure) + "\n" +

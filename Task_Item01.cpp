@@ -57,7 +57,7 @@ namespace  Item01
 	{
 		this->moveCnt++;
 		this->animCnt++;
-		if (this->unHitTime > 0) { this->unHitTime--; }
+		if (this->time_un_hit > 0) { this->time_un_hit--; }
 
 		State nm = this->state;
 		switch (this->state) {

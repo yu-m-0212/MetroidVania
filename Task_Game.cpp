@@ -68,39 +68,26 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		////プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		pl->pos = ML::Vec2(383.0f, 1100.0f);
+		pl->pos = ML::Vec2(224.0f, 4400.0f);
 		////妖精の生成
 		auto  spr = Sprite::Object::Create(true);
 		spr->Set_Target(pl);
-		spr->pos = pl->pos+ML::Vec2(0.0f,CHIP_SIZE*8);
-		//エネミー（サソリ）の生成
-		this->Create_Enemy01(ML::Vec2(2582.0f, 1875.0f));
-		this->Create_Enemy01(ML::Vec2(1155.0f, 1690.0f));
-		this->Create_Enemy01(ML::Vec2( 100.0f, 2200.0f));
-		this->Create_Enemy01(ML::Vec2( 300.0f, 2200.0f));
-		this->Create_Enemy01(ML::Vec2( 500.0f, 2200.0f));
+		spr->pos = pl->pos;
 		//UIの生成
 		auto ui = UI::Object::Create(true);
 		//チュートリアルの生成
-		this->Create_Message(ML::Vec2( 389, 1312), "左スティックを横に倒すと移動");
-		this->Create_Message(ML::Vec2( 929, 1312), "×ボタンでジャンプ");
-		this->Create_Message(ML::Vec2(2016, 1312), "×ボタン長押しで高くジャンプ");
-		this->Create_Message(ML::Vec2(3040, 1888), "R1ボタンでショット");
-		this->Create_Message(ML::Vec2(1440, 1888), "右スティックで銃口を傾ける");
-		this->Create_Message(ML::Vec2(1057, 1698), "遺体に触れると回復する");
-		this->Create_Message(ML::Vec2( 640, 1698), "□ボタンで敵や敵のショットを弾く");
-		this->Create_Message(ML::Vec2( 808, 2274), "アイテムを拾うとHP上限がアップ");
-		//アイテムの生成
-		auto item00_1 = Item00::Object::Create(true);
-		item00_1->pos = ML::Vec2(1085, 2285);
+		this->Create_Message(ML::Vec2( 224, 4482), "左スティックを横に倒すと移動");
+		this->Create_Message(ML::Vec2(1180, 4482), "×ボタンでジャンプ");
+		this->Create_Message(ML::Vec2(2130, 3970), "R1ボタンでショット");
+		this->Create_Message(ML::Vec2(6792, 3650), "右スティックで銃口を傾ける");
+		this->Create_Message(ML::Vec2(7192, 5122), "□ボタンで敵や敵のショットを弾く");
+		this->Create_Message(ML::Vec2(4823, 5378), "遺体に触れると回復する");
 		//背景の生成
 		auto back = Back::Object::Create(true);
-		//ゴールの生成
-		auto goal = Goal::Object::Create(true);
-		goal->pos = ML::Vec2(16, 1170);
 		//チュートリアル用の遺体を配置
 		auto corpse = Corpse::Object::Create(true);
-		corpse->pos = ML::Vec2(834,1650);
+		corpse->pos = ML::Vec2(4730,5394);
+		corpse->angle_LR = BChara::Angle_LR::Left;
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -221,16 +208,6 @@ namespace  Game
 		auto tutorials = Tutorials::Object::Create(true);
 		tutorials->pos = pos_;
 		tutorials->Set_Message(message_);
-	}
-	//エネミーの生成
-	//引数	：	（初期座標,移動速度,HP）
-	void Object::Create_Enemy01(const ML::Vec2& pos_)
-	{
-		auto ene = Enemy01::Object::Create(true);
-		ene->pos = pos_;
-		auto es = EnemySearch::Object::Create(true);
-		es->hitBase = ene->Get_Search();
-		es->Set_Target(ene);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

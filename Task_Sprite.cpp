@@ -38,7 +38,7 @@ namespace  Sprite
 		this->controllerName = "P1";			//コントローラー名初期化
 		this->speed_to_Vec = 0.05f;				//目標への移動量
 		this->dist_to_Vec = 200.0f;				//プレイヤからの距離
-		this->dist_height = float(CHIP_SIZE*8);	//プレイヤからの上方位置
+		this->dist_height = float(SIZE_CHIP*8);	//プレイヤからの上方位置
 
 		//★タスクの生成
 
@@ -115,6 +115,40 @@ namespace  Sprite
 	void Object::Set_Target(const weak_ptr<BChara> pl_)
 	{
 		this->target = pl_;
+	}
+	//マップ外と上方向のあたり判定
+	bool Object::Check_Out_OF_Map_Top()
+	{
+		RECT  r = { ge->camera2D.w / 2, ge->camera2D.y - 1, ge->camera2D.w / 2 + 1, ge->camera2D.y + 1 };
+		//矩形がマップ外に出ていたら丸め込みを行う
+		auto map = ge->GetTask_One_G<Map2D::Object>("フィールド");
+		RECT  m = {
+			map->hitBase.x,
+			map->hitBase.y,
+			map->hitBase.x + map->hitBase.w,
+			map->hitBase.y + map->hitBase.h };
+		if (r.left   < m.left) { r.left = m.left; }
+		if (r.top    < m.top) { r.top = m.top; }
+		if (r.right  > m.right) { r.right = m.right; }
+		if (r.bottom > m.bottom) { r.bottom = m.bottom; }
+
+		//ループ範囲調整
+		int sx, sy, ex, ey;
+		sx = r.left / SIZE_CHIP;
+		sy = r.top / SIZE_CHIP;
+		ex = (r.right - 1) / SIZE_CHIP;
+		ey = (r.bottom - 1) / SIZE_CHIP;
+
+		//範囲内の障害物を探す
+		//視界の範囲外は-1
+		for (int y = sy; y <= ey; ++y) {
+			for (int x = sx; x <= ex; ++x) {
+				if (0 > map->arr[y][x]) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

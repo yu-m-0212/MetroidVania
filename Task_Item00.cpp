@@ -3,6 +3,7 @@
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Item00.h"
+#include  "Task_Player.h"
 
 namespace  Item00
 {
@@ -58,7 +59,7 @@ namespace  Item00
 	{
 		this->moveCnt++;
 		this->animCnt++;
-		if (this->unHitTime > 0) { this->unHitTime--; }
+		if (this->time_un_hit > 0) { this->time_un_hit--; }
 
 		switch (this->state) {
 		case Stand:
@@ -83,13 +84,17 @@ namespace  Item00
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
-		if (this->state != Stand) {
+		if (this->state != Stand) 
+		{
 			return;
 		}
+		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		this->UpdateMotion(Lose);
 		//体力上限を増加し、回復する
-		from_->max_Hp += this->add_Hp;
-		from_->hp = from_->max_Hp;
+		int max = pl->Get_Max_HP();
+		max += this->add_Hp;
+		pl->Set_Max_HP(max);
+		pl->hp = pl->Get_Max_HP();
 	}
 	//-------------------------------------------------------------------
 	//アニメーション制御

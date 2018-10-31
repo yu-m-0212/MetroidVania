@@ -48,7 +48,7 @@ namespace  Enemy01
 		this->addSpeed = 0.7f;							//•às‰Á‘¬“x(’n–Ê‚Ì‰e‹¿‚Å‚ ‚é’ö“x‘Å‚¿Á‚³‚ê‚é
 		this->decSpeed = 0.5f;							//Ú’nó‘Ô‚Ì‚Ì‘¬“xŒ¸Š—Ê(–€C
 		this->max_speed_fall = 10.0f;					//Å‘å—‰º‘¬“x
-		this->gravity = ML::Gravity(CHIP_SIZE) * 5;		//d—Í‰Á‘¬“x&ŠÔ‘¬“x‚É‚æ‚é‰ÁZ—Ê
+		this->gravity = ML::Gravity(SIZE_CHIP) * 5;		//d—Í‰Á‘¬“x&ŠÔ‘¬“x‚É‚æ‚é‰ÁZ—Ê
 		this->interval_Caution = 60;					//ƒvƒŒƒCƒ„‚ª‹ŠE‚©‚çŠO‚ê‚½ŒãAÄ“xŒx‰ú‚É“ü‚é‚Ü‚Å‚ÌŠÔ
 		this->interval_Attack = 120;					//’e‚ğ¶¬‚·‚éŠÔŠu
 		this->interval_Flash = 4;						//“_–ÅŠÔŠu
@@ -83,7 +83,7 @@ namespace  Enemy01
 		this->moveCnt++;
 		this->animCnt++;
 		//–³“GŠÔ‚ÌŒ¸­
-		if (this->unHitTime > 0) { this->unHitTime--; }
+		if (this->time_un_hit > 0) { this->time_un_hit--; }
 		//vlEó‹µ”»’f
 		this->Think();
 		//Œ»ƒ‚[ƒVƒ‡ƒ“‚É‘Î‰‚µ‚½§Œä
@@ -123,8 +123,8 @@ namespace  Enemy01
 	void  Object::Render2D_AF()
 	{
 		//–³“GŠÔ’†‚Í“_–Å
-		if (this->unHitTime > 0) {
-			if (this->unHitTime %this->interval_Flash == 0) {
+		if (this->time_un_hit > 0) {
+			if (this->time_un_hit %this->interval_Flash == 0) {
 				return;
 			}
 		}
@@ -151,14 +151,14 @@ namespace  Enemy01
 		{
 			this->angle_LR = Right;
 		}
-		if (this->unHitTime > 0) {
+		if (this->time_un_hit > 0) {
 			return;//–³“GŠÔ’†‚Íƒ_ƒ[ƒW‚ğó‚¯‚È‚¢
 		}
 		this->hp -= at_.power;
 		//ƒmƒbƒNƒoƒbƒN‚Ì”­¶‚µ‚È‚¢UŒ‚‚Ìê‡AˆÈ‰º‚ğ“Ç‚Ü‚È‚¢
 		if (from_->Get_Tip()) { return; }
 		//–³“GŠÔ
-		this->unHitTime = 30;
+		this->time_un_hit = 30;
 		//‚Ü‚¸”ÍˆÍUŒ‚‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
 		if (!from_->Get_Range_Wide())
 		{

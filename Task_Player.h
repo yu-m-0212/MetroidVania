@@ -67,6 +67,7 @@ namespace  Player
 		int power_Shot;				//攻撃力ショット
 		int gauge_melee;			//近接攻撃のリチャージ
 		int gauge_melee_max;		//近接攻撃リチャージ上限
+		int max_hp;					//上限HP
 		ML::Box2D range_Stomp;		//範囲ストンプ
 		ML::Box2D range_Shot;		//範囲ショット
 		ML::Vec2 moveBack_Stomp;	//ふっとび量ストンプ
@@ -100,5 +101,9 @@ namespace  Player
 		int Get_Gauge_Mlee();
 		//近接攻撃リチャージ上限の値を取得する
 		int Get_Gauge_Melle_Max();
+
+		//HPの最大値を指定する
+		//引数	：	（int）
+		void Set_Max_HP(const int&);
 	};
 }

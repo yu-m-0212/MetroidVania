@@ -207,12 +207,22 @@ namespace  Task_Effect
 		case Lose:
 			break;
 		case Bubble:
-			this->moveVec = eff.Move_Bubble(this->moveCnt, this->interval_bubble, this->wide_bubble, this->speed_surfacing);
+			this->moveVec = this->Move_Bubble();
 			/*this->moveVec.x = float(sin(this->moveCnt / this->interval_bubble)*this->wide_bubble);
 			this->moveVec.y = -this->speed_surfacing;*/
 			break;
 		}
 	}
+
+	//泡の動き（泡オブジェクトの座標に加算して使用する）
+	//引数	：	（カウンタ,揺れの周期,揺れ幅,浮上速度）
+	ML::Vec2 Object::Move_Bubble()
+	{
+		float x = float(sin(this->moveCnt / this->interval_bubble) * this->wide_bubble);
+		float y = -this->speed_surfacing;
+		return ML::Vec2(x, y);
+	}
+
 	//アクセサ
 
 	//呼び出す際に消滅までの時間を指定する

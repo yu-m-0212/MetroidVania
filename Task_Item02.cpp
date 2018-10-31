@@ -57,7 +57,7 @@ namespace  Item02
 	{
 		this->moveCnt++;
 		this->animCnt++;
-		if (this->unHitTime > 0) { this->unHitTime--; }
+		if (this->time_un_hit > 0) { this->time_un_hit--; }
 
 		State nm = this->state;
 		switch (this->state) {
@@ -89,7 +89,7 @@ namespace  Item02
 			return;
 		}
 		this->UpdateMotion(Lose);
-		from_->unHitTime = 300;//プレイヤが5秒間無敵になる
+		from_->time_un_hit = 300;//プレイヤが5秒間無敵になる
 	}
 	//-------------------------------------------------------------------
 	//アニメーション制御

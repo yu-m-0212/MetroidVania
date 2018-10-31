@@ -48,15 +48,15 @@ namespace  Player
 		this->angle_LR = Right;
 		this->controllerName = "P1";
 		this->state = Stand;								//キャラ初期状態
-		this->max_Hp = 3;									//HP最大値
-		this->hp = this->max_Hp;							//HP初期値
+		this->max_hp = 3;									//HP最大値
+		this->hp = this->max_hp;							//HP初期値
 		this->maxSpeed = 7.5f;								//最大移動速度（横）
 		this->addSpeed = 0.75f;								//歩行加速度（地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量（摩擦
 		this->max_speed_fall = 15.0f;						//最大落下速度
 		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
 		this->height_Jump = -10.0f;							//ジャンプ力（初速）
-		this->gravity = ML::Gravity(CHIP_SIZE);				//重力加速度＆時間速度による加算量
+		this->gravity = ML::Gravity(SIZE_CHIP);				//重力加速度＆時間速度による加算量
 		this->init_shot = 48.0f;							//生成位置ショット
 		this->speed_Shot = 10;								//ショット速度
 		this->limit_StompHoldTime = 30;						//ストンプ着地時の硬直時間
@@ -108,7 +108,7 @@ namespace  Player
 		this->moveCnt++;
 		this->animCnt++;
 		//無敵時間の減少
-		if (this->unHitTime > 0) { this->unHitTime--; }
+		if (this->time_un_hit > 0) { this->time_un_hit--; }
 		//近接攻撃のリチャージ
 		if (this->gauge_melee < 100)
 		{
@@ -216,8 +216,8 @@ namespace  Player
 	void  Object::Render2D_AF()
 	{
 		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
-		if (this->unHitTime > 0) {
-			if ((this->unHitTime / 4) % 2 == 0) {
+		if (this->time_un_hit > 0) {
+			if ((this->time_un_hit / 4) % 2 == 0) {
 				return;
 			}
 		}
@@ -233,11 +233,11 @@ namespace  Player
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	void Object::Received(BChara* from_, AttackInfo at_)
 	{
-		if (this->unHitTime > 0) {
+		if (this->time_un_hit > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
 		//無敵時間の発生
-		this->unHitTime = this->add_time_unhit;
+		this->time_un_hit = this->add_time_unhit;
 		//ダメージ処理
 		this->hp -= at_.power;
 		//画面効果
@@ -771,7 +771,7 @@ namespace  Player
 	//HPの最大値を取得する
 	int Object::Get_Max_HP()
 	{
-		return this->max_Hp;
+		return this->max_hp;
 	}
 	//状態を取得する
 	int Object::Get_State()
@@ -787,6 +787,12 @@ namespace  Player
 	int Object::Get_Gauge_Melle_Max()
 	{
 		return this->gauge_melee_max;
+	}
+	//HPの最大値を指定する
+	//引数	：	（int）
+	void Object::Set_Max_HP(const int& max_)
+	{
+		this->max_hp = max_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

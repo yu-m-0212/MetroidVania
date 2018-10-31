@@ -77,8 +77,8 @@ namespace  Gun
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		if (nullptr == pl) { return; }
 		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
-		if (pl->unHitTime > 0) {
-			if ((pl->unHitTime / 4) % 2 == 0) {
+		if (pl->time_un_hit > 0) {
+			if ((pl->time_un_hit / 4) % 2 == 0) {
 				return;
 			}
 		}

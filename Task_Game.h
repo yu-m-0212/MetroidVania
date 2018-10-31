@@ -61,8 +61,5 @@ namespace  Game
 		//チュートリアル表示キャラクタの生成
 		//引数	：	（座標,メッセージ）
 		void Create_Message(const ML::Vec2&, const string&);
-		//エネミーの生成
-		//引数	：	（初期座標,移動速度,HP）
-		void Create_Enemy01(const ML::Vec2&);
 	};
 }

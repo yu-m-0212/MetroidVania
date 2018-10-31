@@ -70,10 +70,9 @@ public:
 	ML::Box2D   hitBase;		//マップとの判定範囲(キャラクタとの接触は別に行う)
 	ML::Box2D	recieveBase;	//キャラクタとの判定範囲(マップ用から変更がない場合はhitbaseで初期化する)
 	int			moveCnt;		//行動カウンタ
-	int			unHitTime;		//無敵時間カウンタ
+	int			time_un_hit;	//無敵時間カウンタ
 	int			animCnt;		//アニメーションカウンタ
 	int			hp;				//ヘルスポイント
-	int			max_Hp;			//HP最大値
 	float		gravity;		//フレーム単位の加算量
 	float		maxSpeed;		//左右方向への移動の最大速
 	float		addSpeed;		//左右方向への移動の加算量
@@ -94,7 +93,7 @@ public:
 		, hitBase(0, 0, 0, 0)
 		, recieveBase(0, 0, 0, 0)
 		, moveCnt(0)
-		, unHitTime(0)
+		, time_un_hit(0)
 		, animCnt(0)
 		, hp(1)
 		, gravity(0)

@@ -3,6 +3,7 @@
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Corpse.h"
+#include  "Task_Player.h"
 using namespace ML;
 namespace  Corpse
 {
@@ -40,7 +41,7 @@ namespace  Corpse
 		this->render2D_Priority[1] = 0.6f;
 		this->hitBase = Box2D(-48, -24, 96, 48);
 		this->recieveBase = this->hitBase;
-		this->gravity = ML::Gravity(CHIP_SIZE);		//重力加速度＆時間速度による加算量
+		this->gravity = ML::Gravity(SIZE_CHIP);		//重力加速度＆時間速度による加算量
 		this->max_speed_fall = 15.0f;				//最大落下速度
 		this->transparency = 1.0f;					//描画透明度
 		
@@ -123,7 +124,8 @@ namespace  Corpse
 		//一度だけプレイヤを回復する
 		if (!this->Get_Flag_Erase())
 		{
-			from_->hp = from_->max_Hp;
+			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			pl->hp = pl->Get_Max_HP();
 		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

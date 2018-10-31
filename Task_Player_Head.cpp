@@ -122,8 +122,8 @@ namespace  Player_Head
 		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
 		if (nullptr == pl) { return; }
 		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
-		if (pl->unHitTime > 0) {
-			if ((pl->unHitTime / 4) % 2 == 0) {
+		if (pl->time_un_hit > 0) {
+			if ((pl->time_un_hit / 4) % 2 == 0) {
 				return;
 			}
 		}
@@ -149,7 +149,7 @@ namespace  Player_Head
 			src.y = src.y + height * 4;
 		}
 		//ダメージ
-		if (pl->unHitTime>0)
+		if (pl->time_un_hit>0)
 		{
 			src.x += wide;
 		}

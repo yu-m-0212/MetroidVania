@@ -60,6 +60,8 @@ namespace  Task_Effect
 		//泡エフェクトを生成する
 		//引数	：	（番号,初期座標,揺れ周期,揺れ幅,浮上速度,角度,消滅までの時間）
 		void Create_Bubble(const int&, const ML::Vec2&, const int&, const float&, const float&, const float&, const int&);
+		//気泡の動き（泡オブジェクトの座標に加算して使用する）
+		ML::Vec2 Move_Bubble();
 		//状態ごとに行動を指定する
 		void Move();
 		//アニメーション

@@ -55,5 +55,10 @@ namespace  Sprite
 	public:
 		//追従対象を指定
 		void Set_Target(const weak_ptr<BChara>);
+		//マップ外を表示しない
+		bool Check_Out_OF_Map_Top();
+		bool Check_Out_OF_Map_Bottom();
+		bool Check_Out_OF_Map_Left();
+		bool Check_Out_OF_Map_Right();
 	};
 }
