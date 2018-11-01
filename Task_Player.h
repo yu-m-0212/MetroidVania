@@ -52,7 +52,6 @@ namespace  Player
 		float speed_Shot;			//ショット速度
 		float init_shot;			//生成位置ショット
 		float height_Jump;			//ジャンプ初速
-		int add_time_unhit;			//被弾時に得られる無敵時間
 		int interval_Shot;			//射撃の発射間隔（フレーム）
 		int limit_JumpAngleChange;	//ジャンプから一定時間内なら向きを変えられる
 		int limit_Stomp;			//継続時間ストンプ
@@ -77,8 +76,8 @@ namespace  Player
 		//モーションに対応した処理
 		void  Move();
 		//接触時の応答処理（必ず受け身の処理として実装する）
-		//引数	：	(攻撃側,攻撃情報)
-		void Received(BChara* from_, AttackInfo at_);
+		//引数	：	(攻撃側,攻撃情報,与無敵時間)
+		void Received(BChara* from_, AttackInfo at_,const int&);
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
 		//ショット生成スタンダード

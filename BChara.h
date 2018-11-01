@@ -123,7 +123,7 @@ public:
 	//モーションを更新（変更なしの場合	false)
 	bool  UpdateMotion(State  nm_);
 	//接触時の応答処理（これ自体はダミーのようなモノ）
-	virtual	void Received(BChara* from_, AttackInfo at_)
+	virtual	void Received(BChara* from_, AttackInfo at_,const int&)
 	{
 		ML::MsgBox("Recieved 実装されていません");
 	}

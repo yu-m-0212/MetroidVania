@@ -47,6 +47,8 @@ namespace  Enemy01
 		int interval_Caution;	//プレイヤが視界から外れた後、再度警戒に入るまでの時間
 		int interval_Attack;	//弾を生成する間隔
 		int interval_Flash;		//点滅間隔
+		int size_h_resource;	//被弾時、ホワイトアウトする際の基準値
+		int add_un_hit;		//プレイヤに与える無敵時間
 		float decSpeed;			//速度減衰量
 		float max_speed_fall;	//最大速度降下
 		ML::Box2D searchBase;	//視認矩形
@@ -61,7 +63,8 @@ namespace  Enemy01
 		//プレイヤを発見したら警戒モードに入る
 		bool Search_Player();
 		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_);
+		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
+		void Received(BChara* from_, AttackInfo at_,const int&);
 		//アニメーション制御
 		BChara::DrawInfo Anim();	
 		//エネミーの生成

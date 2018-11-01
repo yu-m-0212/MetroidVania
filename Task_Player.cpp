@@ -69,7 +69,6 @@ namespace  Player
 		this->limit_HealEffect = 24;						//継続時間回復エフェクト
 		this->dist_Quake = 5;								//画面揺れ幅
 		this->lv_Stomp = 1;									//ストンプアップグレードレベル
-		this->add_time_unhit = 60;							//被弾時に得られる無敵時間
 		this->interval_Shot = 12;							//射撃の発射間隔（フレーム）
 		this->range_Stomp = ML::Box2D(-96, -96, 192, 192);	//範囲ストンプ
 		this->range_Shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
@@ -135,7 +134,7 @@ namespace  Player
 					if ((*it)->CheckHit(me)) {
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
-						(*it)->Received(this, at);
+						(*it)->Received(this, at,0);
 						//回復エフェクトを生成
 						auto healEffect = Task_Effect::Object::Create(true);
 						healEffect->pos = this->pos;
@@ -159,7 +158,7 @@ namespace  Player
 					if ((*it)->CheckHit(me)) {
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
-						(*it)->Received(this, at);
+						(*it)->Received(this, at,0);
 						//一度だけエフェクトを生成する
 						if (!(*it)->Get_Flag_Erase())
 						{
@@ -231,13 +230,14 @@ namespace  Player
 	}
 	//-----------------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_)
+	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
+	void Object::Received(BChara* from_, AttackInfo at_,const int& un_hit_)
 	{
 		if (this->time_un_hit > 0) {
 			return;//無敵時間中はダメージを受けない
 		}
 		//無敵時間の発生
-		this->time_un_hit = this->add_time_unhit;
+		this->time_un_hit = un_hit_;
 		//ダメージ処理
 		this->hp -= at_.power;
 		//画面効果

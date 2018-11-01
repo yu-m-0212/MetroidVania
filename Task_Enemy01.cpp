@@ -52,6 +52,8 @@ namespace  Enemy01
 		this->interval_Caution = 60;					//プレイヤが視界から外れた後、再度警戒に入るまでの時間
 		this->interval_Attack = 120;					//弾を生成する間隔
 		this->interval_Flash = 4;						//点滅間隔
+		this->add_un_hit = 60;							//プレイヤに与える無敵時間
+		this->size_h_resource = 192;					//被弾時、ホワイトアウトする際の基準値
 		this->searchBase = ML::Box2D(-192, -96, 384, 192);
 		this->shot_Init = ML::Vec2(0, -45);
 		//★タスクの生成
@@ -105,7 +107,7 @@ namespace  Enemy01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 1,0,0 };
-					(*it)->Received(this, at);
+					(*it)->Received(this, at,this->add_un_hit);
 					break;
 				}
 			}
@@ -122,13 +124,18 @@ namespace  Enemy01
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		
+		BChara::DrawInfo di = this->Anim();
 		//無敵時間中は点滅
-		if (this->time_un_hit > 0) {
-			if (this->time_un_hit %this->interval_Flash == 0) {
-				return;
+		if (this->time_un_hit > 0) 
+		{
+			if (this->time_un_hit %this->interval_Flash == 0) 
+			{
+				//リソース縦サイズ*最大アニメーション数
+				//白抜きリソースの呼び出し
+				di.src.y = di.src.y + this->size_h_resource * 4;
 			}
 		}
-		BChara::DrawInfo di = this->Anim();
 		di.draw.Offset(this->pos);
 		//スクロール対応
 		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
@@ -136,7 +143,8 @@ namespace  Enemy01
 	}
 	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_)
+	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
+	void Object::Received(BChara* from_, AttackInfo at_,const int& un_hit_)
 	{
 		//仮処理
 		//hpが減ると行動が早くなる
@@ -155,10 +163,8 @@ namespace  Enemy01
 			return;//無敵時間中はダメージを受けない
 		}
 		this->hp -= at_.power;
-		//ノックバックの発生しない攻撃の場合、以下を読まない
-		if (from_->Get_Tip()) { return; }
 		//無敵時間
-		this->time_un_hit = 30;
+		this->time_un_hit = un_hit_;
 		//まず範囲攻撃かどうかを判定する
 		if (!from_->Get_Range_Wide())
 		{
@@ -180,8 +186,10 @@ namespace  Enemy01
 				this->moveVec = ML::Vec2(x, from_->moveBack.y);
 			}
 		}
+		//状態を遷移させない時、使用
+		if (from_->Get_Tip()) { return; }
+		//状態遷移
 		this->UpdateMotion(Bound);
-		//from_は攻撃してきた相手、カウンターなどで逆にダメージを与えたいときに使う
 	}
 	//-------------------------------------------------------------------
 	//思考&状況判断　モーション決定
@@ -356,22 +364,24 @@ namespace  Enemy01
 	//アニメーション制御
 	BChara::DrawInfo Object::Anim()
 	{
+		//デフォルトの値を宣言
 		ML::Box2D dd(-48, -48, 96, 96);
 		ML::Color dc(1, 1, 1, 1);
+		int size = 192;
 		BChara::DrawInfo imageTable[] = {
 			//draw						src
-			{ dd,ML::Box2D(  0,  0,192,192),dc },	//待機		[0]
-			{ dd,ML::Box2D(192,  0,192,192),dc },	//歩行1		[1]
-			{ dd,ML::Box2D(192,192,192,192),dc },	//歩行2		[2]
-			{ dd,ML::Box2D(192,384,192,192),dc },	//歩行3		[3]
-			{ dd,ML::Box2D(192,576,192,192),dc },	//歩行4		[4]
-			{ dd,ML::Box2D(384,  0,192,192),dc },	//ターン		[5]
-			{ dd,ML::Box2D(576,  0,192,192),dc },	//射撃01		[6]
-			{ dd,ML::Box2D(576,192,192,192),dc },	//射撃02		[7]
-			{ dd,ML::Box2D(768,  0,192,192),dc },	//見失う01	[8]
-			{ dd,ML::Box2D(768,192,192,192),dc },	//見失う02	[9]
-			{ dd,ML::Box2D(960,  0,192,192),dc },	//警戒01		[10]
-			{ dd,ML::Box2D(960,192,192,192),dc }	//警戒02		[11]
+			{ dd,ML::Box2D(  0,  0,size*1,size*1),dc },	//待機		[0]
+			{ dd,ML::Box2D(192,  0,size*1,size*1),dc },	//歩行1		[1]
+			{ dd,ML::Box2D(192,192,size*1,size*1),dc },	//歩行2		[2]
+			{ dd,ML::Box2D(192,384,size*1,size*1),dc },	//歩行3		[3]
+			{ dd,ML::Box2D(192,576,size*1,size*1),dc },	//歩行4		[4]
+			{ dd,ML::Box2D(384,  0,size*1,size*1),dc },	//ターン		[5]
+			{ dd,ML::Box2D(576,  0,size*1,size*1),dc },	//射撃01		[6]
+			{ dd,ML::Box2D(576,192,size*1,size*1),dc },	//射撃02		[7]
+			{ dd,ML::Box2D(768,  0,size*1,size*1),dc },	//見失う01	[8]
+			{ dd,ML::Box2D(768,192,size*1,size*1),dc },	//見失う02	[9]
+			{ dd,ML::Box2D(960,  0,size*1,size*1),dc },	//警戒01		[10]
+			{ dd,ML::Box2D(960,192,size*1,size*1),dc }	//警戒02		[11]
 		};
 		BChara::DrawInfo rtv;
 		int anim = 0;
@@ -401,6 +411,11 @@ namespace  Enemy01
 			anim %= 2;
 			rtv = imageTable[anim+10];
 			break;
+		}
+		//被弾時は白いリソースを使用する
+		if (this->state == Damage)
+		{
+			rtv.src.y = rtv.src.y + size * 4;
 		}
 		//向きに応じて画像を左右反転する
 		//アングルが変わると画像を反転

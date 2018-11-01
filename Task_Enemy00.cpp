@@ -100,7 +100,7 @@ namespace  Enemy00
 				{
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 1,0,0 };
-					(*it)->Received(this, at);
+					(*it)->Received(this, at,0);
 					break;
 				}
 			}

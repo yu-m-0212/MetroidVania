@@ -35,11 +35,12 @@ namespace  Shot00
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;
-		this->recieveBase = this->hitBase;
-		this->flag_Erase = true;
-		this->power = 0;			
-		this->limit_Erase = 0;			//消滅するまでの時間
+		this->render2D_Priority[1] = 0.4f;	//描画順
+		this->recieveBase = this->hitBase;	//キャラクタとの接触矩形
+		this->flag_Erase = true;			//接触したとき消滅するか
+		this->power = 0;					//攻撃力
+		this->un_hit = 4;					//相手に与える無敵時間
+		this->limit_Erase = 0;				//消滅するまでの時間
 		//★タスクの生成
 
 		return  true;
@@ -80,7 +81,7 @@ namespace  Shot00
 					if ((*it)->CheckHit(me)) {
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { this->power,0,0 };
-						(*it)->Received(this, at);
+						(*it)->Received(this, at, this->un_hit);
 						//ショットのみ消滅
 						//格闘は複数体にあたる
 						if (this->flag_Erase)

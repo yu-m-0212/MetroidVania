@@ -46,8 +46,9 @@ namespace  Shot00
 	//•ÏX‰Â
 		bool flag_Erase;	//•Ç‚â“G‚ÉÕ“Ë‚µ‚½‚Æ‚«AÁ–Å‚·‚é‚©”Û‚©
 		int limit_Erase;	//Á–Å‚·‚é‚Ü‚Å‚ÌŠÔ
-		int power;		//UŒ‚—Í
-		float angle;	//•`‰æ•ûŒü
+		int power;			//UŒ‚—Í
+		int un_hit;			//—^–³“GŠÔ
+		float angle;		//•`‰æ•ûŒü
 	public:
 		//ó‘Ô‚²‚Æ‚És“®‚ğw’è‚·‚é
 		void Move();

@@ -84,7 +84,8 @@ namespace  Item00
 	}
 	//-------------------------------------------------------------------
 	//ÚG‚Ì‰“šˆ—i•K‚¸ó‚¯g‚Ìˆ—‚Æ‚µ‚ÄÀ‘•‚·‚éj
-	void Object::Received(BChara* from_, AttackInfo at_)
+	//ˆø”	F	iUŒ‚‘¤‚Ìƒ|ƒCƒ“ƒ^,UŒ‚î•ñ,—^–³“GŠÔj
+	void Object::Received(BChara* from_, AttackInfo at_, const int& un_hit_)
 	{
 		if (this->state != Stand) 
 		{

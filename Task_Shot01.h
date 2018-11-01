@@ -47,6 +47,7 @@ namespace  Shot01
 		bool flag_Erase;	//壁や敵に衝突したとき、消滅するか否か
 		int limit_Erase;	//消滅するまでの時間
 		int power;			//攻撃力
+		int add_un_hit;		//プレイヤに与える無敵時間
 	public:
 		//状態ごとに行動を指定する
 		void Move();

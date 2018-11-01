@@ -95,7 +95,12 @@ namespace  Title
 		if (in.ST.down)
 		{
 			this->flag_transition = true;
-			auto display_effect = Display_Effect::Object::Create(true);
+			//˜A‘Å‚É‚æ‚é‘½d¶¬–h~
+			auto display_effect = ge->GetTask_One_G<Display_Effect::Object>("‰æ–ÊŒø‰Ê");
+			if (nullptr == display_effect)
+			{
+				Display_Effect::Object::Create(true);
+			};
 		}
 		//”wŒiƒAƒjƒ[ƒVƒ‡ƒ“
 		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
