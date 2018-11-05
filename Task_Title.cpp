@@ -43,6 +43,7 @@ namespace  Title
 		this->cnt_transition = 0;										//消滅カウンタ
 		this->limit_transparency = 100;									//画面遷移時の消滅時間
 		this->cnt_create_bubble = 0;									//エフェクトの生成カウンタ
+		this->time_avalable_controll = 250;								//操作を受け付けるまでの時間
 		this->cnt_anim_button = 0.0f;									//ボタンアニメカウンタ
 		this->interval_button = 2.0f;									//ボタンアニメ周期
 		this->cnt_anim_back = 0;										//背景アニメカウンタ
@@ -53,6 +54,8 @@ namespace  Title
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);		//泡のY軸座標初期位置
 		this->pos_button = ML::Vec2(float(ge->screenWidth / 2), 800);	//座標ボタン
 		this->controllerName = "P1";									//コントローラー宣言
+		this->eff = new Task_Effect::Object();							//メソッド呼び出し
+		ge->pause = true;												///生成時は操作を受け付けない
 		
 		//★タスクの生成
 
@@ -64,9 +67,10 @@ namespace  Title
 	{
 		//★データ＆タスク解放
 		ge->KillAll_G("エフェクト");
-
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
-			//★引き継ぎタスクの生成
+		//★引き継ぎタスクの生成
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
+			Game::Object::Create(true);
 		}
 
 		return  true;
@@ -78,6 +82,7 @@ namespace  Title
 		this->cnt_create_bubble++;
 		this->cnt_anim_back++;
 		this->cnt_anim_button += 0.1f;
+		this->cnt_available_controll++;
 
 		auto in = DI::GPad_GetState(this->controllerName);
 		//デバッグ切り替え
@@ -87,24 +92,33 @@ namespace  Title
 		if (this->cnt_create_bubble % 30 == 0)
 		{
 			float initX = float(rand() % (ge->screenWidth - 96));
-			int num = rand() % 3;
-			float ang = float(rand() % 360);
-			eff.Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
+			this->eff->Create_Effect(5, ML::Vec2(initX, this->init_bubble_pos_y));
 		}
+		//背景アニメーション
+		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
+		this->posY = y;
+		//一定時間経過後、操作を受け付ける
+		if (this->cnt_available_controll < this->time_avalable_controll)
+		{
+			this->cnt_available_controll++;
+		}
+		else
+		{
+			ge->pause = false;
+		}
+		//一定時間操作を受け付けない
+		if (ge->pause) { return; }
 		//自身に消滅要請
 		if (in.ST.down)
 		{
 			this->flag_transition = true;
 			//連打による多重生成防止
-			auto display_effect = ge->GetTask_One_G<Display_Effect::Object>("画面効果");
+			auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 			if (nullptr == display_effect)
 			{
 				Display_Effect::Object::Create(true);
 			};
 		}
-		//背景アニメーション
-		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
-		this->posY = y;
 		//消滅カウントダウン
 		if (this->flag_transition)
 		{

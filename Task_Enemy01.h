@@ -4,6 +4,7 @@
 //敵00(スライム
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Effect.h"
 
 namespace  Enemy01
 {
@@ -39,20 +40,21 @@ namespace  Enemy01
 	private:
 		bool  B_Initialize();
 		bool  B_Finalize();
-		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
-		void  UpDate();		//「実行」１フレーム毎に行う処理
+		bool  Initialize();		//「初期化」タスク生成時に１回だけ行う処理
+		void  UpDate();			//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		int interval_Caution;	//プレイヤが視界から外れた後、再度警戒に入るまでの時間
-		int interval_Attack;	//弾を生成する間隔
-		int interval_Flash;		//点滅間隔
-		int size_h_resource;	//被弾時、ホワイトアウトする際の基準値
-		int add_un_hit;		//プレイヤに与える無敵時間
-		float decSpeed;			//速度減衰量
-		float max_speed_fall;	//最大速度降下
-		ML::Box2D searchBase;	//視認矩形
-		ML::Vec2 shot_Init;		//弾の生成時、自身の座標に足す値
+		int interval_Caution;		//プレイヤが視界から外れた後、再度警戒に入るまでの時間
+		int interval_Attack;		//弾を生成する間隔
+		int interval_Flash;			//点滅間隔
+		int size_h_resource;		//被弾時、ホワイトアウトする際の基準値
+		int add_un_hit;				//プレイヤに与える無敵時間
+		float decSpeed;				//速度減衰量
+		float max_speed_fall;		//最大速度降下
+		ML::Box2D searchBase;		//視認矩形
+		ML::Vec2 shot_Init;			//弾の生成時、自身の座標に足す値
+		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		//コンストラクタ
 		Object();

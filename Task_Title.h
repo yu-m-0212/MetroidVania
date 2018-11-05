@@ -49,10 +49,12 @@ namespace  Title
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		bool flag_transition;		//画面遷移フラグ
 		int cnt_transition;			//消滅カウンタ
+		int cnt_available_controll;	//操作を受け付けるまでのカウンタ
 		int cnt_create_bubble;		//エフェクトの生成カウンタ
 		int cnt_anim_back;			//背景アニメカウンタ
 		int interval_anim_back;		//背景アニメ周期
 		int limit_transparency;		//画面遷移時の消滅時間
+		int time_avalable_controll;	//操作を受け付けるまでの時間
 		float init_bubble_pos_y;	//泡のY軸初期座標
 		float posY;					//背景Y軸座標
 		float posY_std;				//背景Y軸座標基準値
@@ -60,7 +62,7 @@ namespace  Title
 		float cnt_anim_button;		//ボタンアニメカウンタ
 		float interval_button;		//ボタンアニメ周期
 		ML::Vec2 pos_button;		//座標ボタン
-		Task_Effect::Object eff;	//メソッド呼び出し
+		Task_Effect::Object* eff;	//メソッド呼び出し
 		string controllerName;		//コントローラー宣言
 	};
 }

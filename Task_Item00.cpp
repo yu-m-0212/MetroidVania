@@ -92,7 +92,8 @@ namespace  Item00
 			return;
 		}
 		
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
+		if (nullptr == pl) { return; }
 		//メッセージ生成
 		this->tutrials->Create_Message("HPの上限が増加した", pl->pos, this->limit_message);
 		this->UpdateMotion(Lose);

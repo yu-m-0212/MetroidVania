@@ -40,8 +40,7 @@ namespace  Display_Effect
 		this->flag_in_out = 0;				//0=in 1=out
 		this->cnt_transition = 0;			//画面遷移カウンタ
 		this->time_create_next_task = 100;	//次のタスクを生成するタイミング
-		this->time_start_fade_out = 200;	//フェードアウトを始めるタイミング
-		this->next_scene = 0;				//引継ぎタスクを指定する変数
+		this->time_start_fade_out = 150;	//フェードアウトを始めるタイミング
 		
 		//★タスクの生成
 
@@ -70,30 +69,10 @@ namespace  Display_Effect
 		{
 			this->transparency += 0.01f;
 		}
-		//一定時間でフラグを反転し、引継ぎタスクを生成する
+		//一定時間でフラグを反転
 		if (this->cnt_transition == this->time_create_next_task)
 		{
 			this->flag_in_out = !this->flag_in_out;
-			switch (this->next_scene)
-			{
-			default:
-				break;
-			//Game
-			case 0:
-				Game::Object::Create(true);
-				break;
-			//Retry
-			case 1:
-				break;
-			//Ending
-			case 2:
-				Ending::Object::Create(true);
-				break;
-			//Title
-			case 3:
-				Title::Object::Create(true);
-				break;
-			}
 		}
 		//一定時間でフェードアウトを始める
 		if (this->flag_in_out && this->cnt_transition>this->time_start_fade_out)
@@ -113,13 +92,6 @@ namespace  Display_Effect
 		ML::Box2D draw(0, 0, 1920, 1080);
 		ML::Box2D  src(0, 0, 1920, 1080);
 		DG::Image_Draw(this->res->imageName, draw, src,ML::Color(this->transparency,1,1,1));
-	}
-	//引継ぎタスクを指定する
-	//引数	：	（整数）
-	//0=Game	1=Retry		2=Ending	3=Title
-	void Object::Set_Next_Scene(const int& next_)
-	{
-		this->next_scene = next_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

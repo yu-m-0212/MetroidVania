@@ -65,7 +65,7 @@ namespace  Player_Head
 		this->animCnt++;
 		if (ge->pause) { return; }
 		this->moveCnt++;
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		auto in = DI::GPad_GetState(this->controllerName);
 		this->angle_LR = pl->angle_LR;
@@ -119,7 +119,7 @@ namespace  Player_Head
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
 		if (pl->time_un_hit > 0) {

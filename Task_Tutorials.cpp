@@ -97,7 +97,7 @@ namespace  Tutorials
 			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 0.0f, 0.0f, 1.0f));
 		}
 		//プレイヤと接触したら画面下にメッセージを表示
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr != pl)
 		{
 			//リソースの指定

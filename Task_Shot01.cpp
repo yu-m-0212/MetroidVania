@@ -36,12 +36,14 @@ namespace  Shot01
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;	//描画順
-		this->recieveBase = this->hitBase;	//キャラクタとの接触矩形
-		this->flag_Erase = true;			//接触時消えるか
-		this->power = 0;					//攻撃力
-		this->limit_Erase = 0;				//消滅するまでの時間
-		this->add_un_hit = 60;				//プレイヤに与える無敵時間
+		this->render2D_Priority[1] = 0.4f;		//描画順
+		this->recieveBase = this->hitBase;		//キャラクタとの接触矩形
+		this->flag_Erase = true;				//接触時消えるか
+		this->power = 0;						//攻撃力
+		this->limit_Erase = 0;					//消滅するまでの時間
+		this->add_un_hit = 60;					//プレイヤに与える無敵時間
+		this->angle = 0.0f;						//角度
+		this->eff = new Task_Effect::Object();	//メソッド呼び出し
 		//★タスクの生成
 
 		return  true;
@@ -61,7 +63,7 @@ namespace  Shot01
 	{
 		//ポーズ
 		if (ge->pause) { return; }
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		this->moveCnt++;
 		//各状態ごとの処理
@@ -106,7 +108,7 @@ namespace  Shot01
 			}
 		}
 		//反射処理
-		auto shot_pl = ge->GetTask_One_G<Shot00::Object>("弾(プレイヤ)");
+		auto shot_pl = ge->GetTask_One_G<Shot00::Object>(Shot00::defGroupName);
 		if (nullptr != shot_pl)
 		{
 			ML::Box2D  me = this->hitBase.OffsetCopy(this->pos);
@@ -119,7 +121,7 @@ namespace  Shot01
 		//射撃は壁に当たると消滅する
 		if (this->flag_Erase)
 		{
-			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ"))
+			if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName,Map2D::defName))
 			{
 				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
 				if (true == map->CheckHit(hit))
@@ -165,6 +167,12 @@ namespace  Shot01
 	{
 		this->power = pow_;
 	}
+	//角度を指定する
+	//引数	：	（角度）
+	void Object::Set_Angle(const float& angle_)
+	{
+		this->angle = angle_;
+	}
 	//状態ごとに行動を指定する
 	void Object::Move()
 	{
@@ -189,11 +197,7 @@ namespace  Shot01
 		default:
 			break;
 		case Shoot:
-			auto ShootHitEffect = Task_Effect::Object::Create(true);
-			ShootHitEffect->pos = pos_;
-			ShootHitEffect->Set_Limit(18);
-			ShootHitEffect->state = ImpactPunch;
-			ShootHitEffect->angle_LR = this->angle_LR;
+			this->eff->Create_Effect(1, this->pos, this->angle,this->angle_LR);
 			break;
 		}
 	}

@@ -6,6 +6,7 @@
 #include "GameEngine_Ver3_7.h"
 #include "Task_Enemy01.h"
 #include "Task_Item00.h"
+#include  "Task_Corpse.h"
 
 namespace  Map2D
 {
@@ -51,6 +52,7 @@ namespace  Map2D
 		int					limit_Quake;					//画面を揺らす時間
 		Enemy01::Object*	enemy01;						//ポインタエネミー
 		Item00::Object*		item00;							//ポインタアイテム
+		Corpse::Object*		corpse;							//ポインタ遺体
 	public:
 		string				imageName;						//マップはリソース共有しない
 		int					arr[SIZE_MAP_H][SIZE_MAP_W];	//マップ配列

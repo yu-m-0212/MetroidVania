@@ -31,7 +31,7 @@ bool  BChara::CheckHead()
 	head.Offset((int)this->pos.x, (int)this->pos.y);
 
 
-	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
 	return map->CheckHit(head);
 }
@@ -40,7 +40,7 @@ bool  BChara::CheckHead()
 void BChara::CheckMove(ML::Vec2&  e_)
 {
 	//マップが存在するか調べてからアクセス
-	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 	if (nullptr == map) { return; }//マップが無ければ判定しない(出来ない）
 
 										  //横軸に対する移動
@@ -79,7 +79,7 @@ bool  BChara::CheckFoot()
 		1);
 	foot.Offset(this->pos);
 
-	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
 	return map->CheckHit(foot);
 }
@@ -95,7 +95,7 @@ bool BChara::CheckFront_LR()
 	ML::Box2D  front(x,this->hitBase.y,1,this->hitBase.h);
 	front.Offset(this->pos);
 
-	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
 	return map->CheckHit(front);
 }
@@ -110,7 +110,7 @@ bool BChara::CheckBack_LR()
 	ML::Box2D back(x, this->hitBase.y, 1, this->hitBase.h);
 	back.Offset(this->pos);
 
-	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
 	return map->CheckHit(back);
 }
@@ -126,7 +126,7 @@ bool BChara::CheckFrontFoot_LR()
 	ML::Box2D  frontFoot(x, this->hitBase.y+this->hitBase.h, 1, 1);
 	frontFoot.Offset(this->pos);
 
-	auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+	auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 	if (nullptr == map) { return false; }//マップが無ければ判定しない(出来ない）
 	return map->CheckHit(frontFoot);
 }
@@ -165,6 +165,12 @@ void BChara::Set_Flag_Erase(const int& erase_)
 {
 	this->flag_erase = erase_;
 }
+//ふっとび量を指定する
+//引数	：	（ML::Vec2）
+void BChara::Set_Move_Back(const ML::Vec2& move_)
+{
+	this->move_back = move_;
+}
 //範囲攻撃か否かを取得する
 bool BChara::Get_Range_Wide()
 {
@@ -179,4 +185,14 @@ bool BChara::Get_Tip()
 bool BChara::Get_Flag_Erase()
 {
 	return this->flag_erase;
+}
+//角度を取得する
+float BChara::Get_Angle()
+{
+	return this->angle;
+}
+//ふっとび量を取得する
+ML::Vec2 BChara::Get_Move_Back()
+{
+	return this->move_back;
 }

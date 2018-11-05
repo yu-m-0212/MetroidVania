@@ -66,7 +66,6 @@ public:
 	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置
 	ML::Vec2	moveVec;		//移動ベクトル
-	ML::Vec2	moveBack;		//攻撃に乗せるふっとび量
 	ML::Box2D   hitBase;		//マップとの判定範囲(キャラクタとの接触は別に行う)
 	ML::Box2D	recieveBase;	//キャラクタとの判定範囲(マップ用から変更がない場合はhitbaseで初期化する)
 	int			moveCnt;		//行動カウンタ
@@ -77,9 +76,11 @@ public:
 	float		maxSpeed;		//左右方向への移動の最大速
 	float		addSpeed;		//左右方向への移動の加算量
 private:
+	ML::Vec2	move_back;		//攻撃のふっとび量
 	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
 	bool		range_Wide;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
 	bool		flag_erase;		//遺体に触れたとき、true
+	float		angle;			//角度
 public:
 	//メソッド
 	//メンバ変数に最低限の初期化を行う
@@ -89,7 +90,7 @@ public:
 		, angle_LR(Right)
 		, pos(0, 0)
 		, moveVec(0, 0)
-		, moveBack(0, 0)
+		, move_back(0, 0)
 		, hitBase(0, 0, 0, 0)
 		, recieveBase(0, 0, 0, 0)
 		, moveCnt(0)
@@ -102,9 +103,15 @@ public:
 		, tip(false)
 		, range_Wide(false)
 		, flag_erase(false)
+		, angle(0)
 	{
 	}
 	virtual  ~BChara(){}
+	//親クラスメソッドのオーバーライド
+	void UpDate()
+	{
+		ML::MsgBox("実装されていません");
+	}
 	//キャラクタ共通メソッド
 	//めり込まない移動処理
 	virtual  void  CheckMove(ML::Vec2&  est_);
@@ -142,10 +149,17 @@ public:
 	//遺体の消滅フラグを指定する
 	//引数	：	（0か1）
 	void Set_Flag_Erase(const int&);
+	//ふっとび量を指定する
+	//引数	：	（ML::Vec2）
+	void Set_Move_Back(const ML::Vec2&);
 	//範囲攻撃か否かを取得する
 	bool Get_Range_Wide();
 	//ノックバックするか否かを取得する
 	bool Get_Tip();
 	//遺体の消滅フラグを取得する
 	bool Get_Flag_Erase();
+	//角度を取得する
+	float Get_Angle();
+	//ふっとび量を取得する
+	ML::Vec2 Get_Move_Back();
 };

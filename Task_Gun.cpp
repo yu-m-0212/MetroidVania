@@ -33,11 +33,11 @@ namespace  Gun
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;
-		this->hitBase = ML::Box2D(-69, -46, 138, 92);
-		this->controllerName = "P1";
-		this->tremor = 1.0f;
-		this->angle = 0.0f;
+		this->render2D_Priority[1] = 0.4f;				//描画順
+		this->hitBase = ML::Box2D(-69, -46, 138, 92);	//表示矩形
+		this->controllerName = "P1";					//コントローラ宣言
+		this->tremor = 1.0f;							//揺れ幅
+		this->angle = 0.0f;								//角度
 
 		//★タスクの生成
 
@@ -62,7 +62,7 @@ namespace  Gun
 	{
 		if (ge->pause) { return; }
 		this->moveCnt++;
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		auto in = DI::GPad_GetState(this->controllerName);
 		this->angle_LR = pl->angle_LR;
@@ -74,7 +74,7 @@ namespace  Gun
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		//無敵中は8フレーム中4フレーム画像を表示しない（点滅する）
 		if (pl->time_un_hit > 0) {
@@ -104,7 +104,7 @@ namespace  Gun
 	void Object::Think()
 	{
 		BChara::State nm = this->state; //とりあえず今の状態を指定
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		//思考（入力）や状況に応じてモーションを変更することを目的としている。
 		//モーションの変更以外の処理は行わない
@@ -135,7 +135,7 @@ namespace  Gun
 	void Object::Move()
 	{
 		auto in = DI::GPad_GetState(this->controllerName);
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		//共通の処理
 		switch (pl->state)
 		{

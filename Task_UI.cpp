@@ -67,9 +67,9 @@ namespace  UI
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
-		auto es = ge->GetTask_One_G<Enemy01::Object>("敵");
+		auto es = ge->GetTask_One_G<Enemy01::Object>(Enemy01::defGroupName);
 		auto in = DI::GPad_GetState(this->controllerName);
 		//ベースの表示
 		{

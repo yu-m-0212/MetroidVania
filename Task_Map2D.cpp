@@ -40,6 +40,7 @@ namespace  Map2D
 		this->limit_Quake = 0;					//画面を揺らす時間
 		this->enemy01 = new Enemy01::Object();	//ポインタエネミー
 		this->item00 = new Item00::Object();	//ポインタアイテム
+		this->corpse = new Corpse::Object();	//ポインタ遺体
 		//マップのゼロクリア
 		for (int y = 0; y < SIZE_MAP_H; ++y) {
 			for (int x = 0; x < SIZE_MAP_W; ++x) 
@@ -240,6 +241,13 @@ namespace  Map2D
 				{
 				default:
 					no = this->arr[y][x];
+					break;
+				//遺体の配置
+				case 4:
+					this->corpse->Create_Corpse(ML::Vec2(float(x*SIZE_CHIP), float(y*SIZE_CHIP)), BChara::Angle_LR::Left);
+					break;
+				//メッセージキャラクタの生成（現在は本編側で生成）
+				case 5:
 					break;
 				//アイテム00
 				case 6:

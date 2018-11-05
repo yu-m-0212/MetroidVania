@@ -55,8 +55,9 @@ namespace  Game
 		ge->pause = false;									//ポーズフラグの初期化
 		this->cnt_transition = 0;							//カウンタ遷移用
 		this->time_create_next_task = 100;					//引継ぎタスクの生成タイミング
-		this->time_kill_game = 200;							//自身を消滅させるタイミング
-		this->tutorials = new Tutorials::Object;			//ポインタメッセージ
+		this->time_kill_game = 150;							//自身を消滅させるタイミング
+		this->tutorials = new Tutorials::Object();			//ポインタメッセージ
+		this->eff = new Task_Effect::Object();				//ポインタエフェクト
 		
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
@@ -67,15 +68,16 @@ namespace  Game
 		//マップの生成
 		auto  m = Map2D::Object::Create(true);
 		m->Load("./data/Map/map0.txt");
-		////プレイヤの生成
+		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		pl->pos = ML::Vec2(224.0f, 4400.0f);
-		////妖精の生成
+		pl->pos = ML::Vec2(224.0f, 4460.0f);
+		this->eff->Create_Effect(6, pl->pos);
+		//カメラマンの生成
 		auto  spr = Sprite::Object::Create(true);
 		spr->Set_Target(pl);
 		spr->pos = pl->pos;
 		//UIの生成
-		auto ui = UI::Object::Create(true);
+		UI::Object::Create(true);
 		//チュートリアルの生成
 		tutorials->Create_Message("左スティックを横に倒すと移動", ML::Vec2(224, 4482), -1);
 		tutorials->Create_Message("×ボタンでジャンプ", ML::Vec2(1180, 4482), -1);
@@ -84,11 +86,10 @@ namespace  Game
 		tutorials->Create_Message("□ボタンで敵や敵のショットを弾く", ML::Vec2(7192, 5122), -1);
 		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
 		//背景の生成
-		auto back = Back::Object::Create(true);
-		//チュートリアル用の遺体を配置
-		auto corpse = Corpse::Object::Create(true);
-		corpse->pos = ML::Vec2(4730,5394);
-		corpse->angle_LR = BChara::Angle_LR::Left;
+		Back::Object::Create(true);
+		//仮ゴールキャラクタの生成
+		auto goal = Goal::Object::Create(true);
+		goal->pos = ML::Vec2(7870, 5106);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -124,6 +125,11 @@ namespace  Game
 		this->effect_Resource.reset();
 		if (!ge->QuitFlag() && this->nextTaskCreate)
 		{
+			//クリア時
+			if (ge->clear)
+			{
+				Ending::Object::Create(true);
+			}
 		}
 		return  true;
 	}
@@ -155,13 +161,12 @@ namespace  Game
 			if (this->cnt_transition == 0)
 			{
 				auto display_effect = Display_Effect::Object::Create(true);
-				display_effect->Set_Next_Scene(1);
 			}
 			this->cnt_transition++;
 			//リトライ生成
 			if (this->cnt_transition == this->time_create_next_task)
 			{
-				auto pl = ge->GetTask_One_G < Player::Object>("プレイヤ");
+				auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 				if (nullptr != pl)
 				{
 					auto retry = Retry::Object::Create(true);
@@ -171,12 +176,9 @@ namespace  Game
 					//死亡時の向き
 					this->angle_dead = pl->angle_LR;
 					retry->Set_Angle_Dead(this->angle_dead);
+					//消滅
+					this->Kill();
 				}
-			}
-			//一定時間で自身を消滅させる
-			else if (this->cnt_transition > this->time_kill_game)
-			{
-				this->Kill();
 			}
 		}
 		//ゲームクリア
@@ -185,8 +187,7 @@ namespace  Game
 			//フェードイン
 			if (this->cnt_transition == 0)
 			{
-				auto display_effect = Display_Effect::Object::Create(true);
-				display_effect->Set_Next_Scene(2);
+				Display_Effect::Object::Create(true);
 			}
 			this->cnt_transition++;
 			//一定時間で自身を消滅させる

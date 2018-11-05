@@ -14,6 +14,7 @@
 #include	"Task_Player_Head.h"
 #include	"Task_Enemy01.h"
 #include	"Task_Tutorials.h"
+#include	"Task_Display_Effect.h"
 
 namespace  Player
 {
@@ -56,27 +57,26 @@ namespace  Player
 		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量（摩擦
 		this->max_speed_fall = 15.0f;						//最大落下速度
 		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
-		this->height_Jump = -10.0f;							//ジャンプ力（初速）
+		this->height_jump = -10.0f;							//ジャンプ力（初速）
 		this->gravity = ML::Gravity(SIZE_CHIP);				//重力加速度＆時間速度による加算量
 		this->init_shot = 48.0f;							//生成位置ショット
-		this->speed_Shot = 10;								//ショット速度
-		this->limit_StompHoldTime = 30;						//ストンプ着地時の硬直時間
-		this->limit_Stomp = 15;								//ストンプ継続時間
-		this->limit_StompEffect = 15;						//継続時間ストンプ効果
-		this->limit_Quake = 15;								//画面揺れ時間
-		this->limit_Shot = 60;								//継続時間ショット
+		this->speed_shot = 10;								//ショット速度
+		this->limit_stompHoldTime = 30;						//ストンプ着地時の硬直時間
+		this->limit_stomp = 15;								//ストンプ継続時間
+		this->limit_quake = 15;								//画面揺れ時間
+		this->limit_shot = 60;								//継続時間ショット
 		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
-		this->limit_HealEffect = 24;						//継続時間回復エフェクト
-		this->dist_Quake = 5;								//画面揺れ幅
-		this->lv_Stomp = 1;									//ストンプアップグレードレベル
-		this->interval_Shot = 12;							//射撃の発射間隔（フレーム）
-		this->range_Stomp = ML::Box2D(-96, -96, 192, 192);	//範囲ストンプ
-		this->range_Shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
-		this->power_Stomp = 1;								//攻撃力ストンプ
-		this->power_Shot = 1;								//攻撃力ショット
+		this->dist_quake = 5;								//画面揺れ幅
+		this->lv_stomp = 1;									//ストンプアップグレードレベル
+		this->interval_shot = 12;							//射撃の発射間隔（フレーム）
+		this->range_stomp = ML::Box2D(-112, -112, 224, 224);//範囲ストンプ
+		this->range_shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
+		this->power_stomp = 1;								//攻撃力ストンプ
+		this->power_shot = 1;								//攻撃力ショット
 		this->gauge_melee_max = 100;						//近接攻撃リチャージ上限
 		this->gauge_melee = this->gauge_melee_max;			//近接攻撃のリチャージ
-		this->moveBack_Stomp = ML::Vec2(12, -4);			//ストンプふっとび量
+		this->moveBack_stomp = ML::Vec2(16, -6);			//ストンプふっとび量
+		this->eff = new Task_Effect::Object();				//メソッド呼び出し
 
 		//★タスクの生成
 		auto gun = Gun::Object::Create(true);
@@ -101,6 +101,9 @@ namespace  Player
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//フェードアウトしてから、操作を始める
+		auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+		if (nullptr != display_effect) { return; }
 		//クリア、敗北時
 		if (ge->clear || ge->failure) { return; }
 		//ポーズ
@@ -136,10 +139,7 @@ namespace  Player
 						BChara::AttackInfo at = { 0,0,0 };
 						(*it)->Received(this, at,0);
 						//回復エフェクトを生成
-						auto healEffect = Task_Effect::Object::Create(true);
-						healEffect->pos = this->pos;
-						healEffect->Set_Limit(this->limit_HealEffect);
-						healEffect->state = Heal;
+						eff->Create_Effect(4, this->pos);
 						break;
 					}
 				}
@@ -163,10 +163,7 @@ namespace  Player
 						if (!(*it)->Get_Flag_Erase())
 						{
 							//回復エフェクトを生成
-							auto healEffect = Task_Effect::Object::Create(true);
-							healEffect->pos = this->pos;
-							healEffect->Set_Limit(this->limit_HealEffect);
-							healEffect->state = Heal;
+							eff->Create_Effect(4, this->pos);
 							//フラグ反転
 							(*it)->Set_Flag_Erase(1);
 						}
@@ -188,7 +185,7 @@ namespace  Player
 			ge->camera2D.y = cpy;
 		}
 		//マップ外を写さないようにする調整処理
-		auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+		auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 		if (nullptr != map) {
 			map->AjastCameraPos();
 		}
@@ -199,7 +196,7 @@ namespace  Player
 			ge->failure = true;
 		}
 		//仮ゴールとの接触判定
-		auto goal = ge->GetTask_One_G<Goal::Object>("ゴール");
+		auto goal = ge->GetTask_One_G<Goal::Object>(Goal::defGroupName);
 		if (nullptr != goal)
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
@@ -241,9 +238,9 @@ namespace  Player
 		//ダメージ処理
 		this->hp -= at_.power;
 		//画面効果
-		auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド","マップ");
-		map->Set_Dist_Quake(this->dist_Quake);
-		map->Set_Limit_Quake(limit_Quake);
+		auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName,Map2D::defName);
+		map->Set_Dist_Quake(this->dist_quake);
+		map->Set_Limit_Quake(limit_quake);
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+6.5f, -2.0f); }
 		else							{ this->moveVec = ML::Vec2(-6.5f, -2.0f); }
@@ -332,7 +329,7 @@ namespace  Player
 			if (this->moveCnt > 0) { nm = Fall; }
 			break;
 		case StompLanding:
-			if (this->moveCnt >= this->limit_StompHoldTime) { nm = Stand; }
+			if (this->moveCnt >= this->limit_stompHoldTime) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
 		case	Damage:	//ダメージを受けて吹き飛んでいる
@@ -505,7 +502,7 @@ namespace  Player
 		case  Jump:		//上昇中
 			if (this->moveCnt == 0)
 			{
-				this->moveVec.y = this->height_Jump;//初速設定
+				this->moveVec.y = this->height_jump;//初速設定
 			}
 			//向きの変更は倒した瞬間
 			if (this->moveCnt<this->limit_JumpAngleChange&&in.LStick.L.down)
@@ -670,15 +667,15 @@ namespace  Player
 		auto in = DI::GPad_GetState(this->controllerName);
 		float angle=atan2(in.RStick.axis.y,in.RStick.axis.x);
 		//一定間隔で弾を生成
-		if (this->moveCnt % this->interval_Shot == 0)
+		if (this->moveCnt % this->interval_shot == 0)
 		{
 			auto shot = Shot00::Object::Create(true);
 			shot->state = Shoot;
 			//攻撃毎に攻撃範囲を生成時に指定
-			shot->hitBase = this->range_Shot;
-			shot->Set_Limit(this->limit_Shot);
+			shot->hitBase = this->range_shot;
+			shot->Set_Limit(this->limit_shot);
 			shot->Set_Erase(1);
-			shot->Set_Power(this->power_Shot);
+			shot->Set_Power(this->power_shot);
 			shot->angle_LR = this->angle_LR;
 			shot->Set_Tip(1);
 			//右スティックが入力されていなければ一定の軌道を描く
@@ -689,20 +686,20 @@ namespace  Player
 				{
 					shot->pos = ML::Vec2(this->pos.x + this->init_shot, this->pos.y);
 					shot->Set_Angle(0.0f);
-					shot->moveVec = ML::Vec2(+this->speed_Shot, 0);
+					shot->moveVec = ML::Vec2(+this->speed_shot, 0);
 				}
 				else
 				{
 					shot->pos = ML::Vec2(this->pos.x - this->init_shot, this->pos.y);
 					shot->Set_Angle(135.0f);
-					shot->moveVec = ML::Vec2(-this->speed_Shot, 0);
+					shot->moveVec = ML::Vec2(-this->speed_shot, 0);
 				}
 			}
 			//スティックの入力方向へ発射
 			else
 			{
 				shot->pos = this->pos + ML::Vec2(cos(angle),sin(angle)) * this->init_shot;
-				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->speed_Shot;
+				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->speed_shot;
 				shot->Set_Angle(angle);
 			}
 		}
@@ -737,31 +734,27 @@ namespace  Player
 		auto stompLandingRect = Shot00::Object::Create(true);
 		stompLandingRect->state = StompLanding;
 		//攻撃毎に攻撃範囲を生成時に指定
-		stompLandingRect->hitBase = this->range_Stomp;
+		stompLandingRect->hitBase = this->range_stomp;
 		stompLandingRect->pos = this->pos;
-		stompLandingRect->Set_Limit(this->limit_Stomp);
+		stompLandingRect->Set_Limit(this->limit_stomp);
 		stompLandingRect->Set_Erase(0);
-		stompLandingRect->Set_Power(this->power_Stomp);
+		stompLandingRect->Set_Power(this->power_stomp);
 		stompLandingRect->Set_Angle(0.0f);
 		//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
-		stompLandingRect->moveBack = this->moveBack_Stomp;
+		stompLandingRect->Set_Move_Back(this->moveBack_stomp);
 		//範囲攻撃であることを知らせるフラグをtrue
 		stompLandingRect->Set_Range_Wide(1);
 		//画面を揺らすための設定を行う
-		auto map = ge->GetTask_One_G<Map2D::Object>("フィールド");
-		map->Set_Dist_Quake(this->dist_Quake);
-		map->Set_Limit_Quake(this->limit_Quake);
+		auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
+		map->Set_Dist_Quake(this->dist_quake);
+		map->Set_Limit_Quake(this->limit_quake);
 		//エフェクトの生成
-		//タスクキルはエフェクト側で行う
-		auto stompLandingEffect = Task_Effect::Object::Create(true);
-		stompLandingEffect->pos = this->pos;
-		stompLandingEffect->Set_Limit(this->limit_StompEffect);
-		stompLandingEffect->state = StompLanding;
+		this->eff->Create_Effect(2, this->pos);
 	}
 	//ショットの発射間隔を取得する
 	int Object::Get_Interval_Shot()
 	{
-		return this->interval_Shot;
+		return this->interval_shot;
 	}
 	//HPの値を取得する
 	int Object::Get_HP()

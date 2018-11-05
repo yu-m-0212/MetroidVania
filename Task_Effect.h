@@ -47,56 +47,45 @@ namespace  Task_Effect
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		int cntLimit;			//消滅までの時間
-		int num_bubble;			//泡の大きさを指定する
-		int interval_bubble;	//泡の揺れ周期
-		float speed_surfacing;	//泡の浮上速度
-		float wide_bubble;		//泡の揺れ幅
-		float dist;				//撃破エフェクトの中心からの距離
-		float angle;			//表示する角度
-		Vec2 center;			//回転軸
+		//状態管理
+		enum State_Effect
+		{
+			Non,		//未指定
+			Hit_Shot,	//ヒットショット（プレイヤ）
+			Barrier,	//バリア
+			Defeat,		//撃破（エネミー）
+			Heal,		//回復
+			Bubble,		//泡
+			Appear		//登場
+		};
+		State_Effect state_effect;	//状態管理
+		int num_bubble;				//泡の大きさを指定する
+		int interval_bubble;		//泡の揺れ周期
+		int limit_erase;			//消滅までの時間
+		int limit_erase_hit_shot;	//時間消滅までヒットショット
+		int limit_erase_barrier;	//時間消滅までバリア
+		int limit_erase_defeat;		//時間消滅まで撃破
+		int limit_erase_heal;		//時間消滅まで回復
+		int limit_erase_bubble;		//時間消滅まで泡
+		int limit_erase_appear;		//時間消滅まで登場
+		int choice_state;			//外部から状態を指定する際、使用
+		float speed_surfacing;		//泡の浮上速度
+		float wide_bubble;			//泡の揺れ幅
+		float dist;					//撃破エフェクトの中心からの距離
+		float angle;				//表示する角度
+		Vec2 center;				//回転軸
+		Effect* eff;				//エフェクトクラス
 	public:
 		Object();
-		//泡エフェクトを生成する
-		//引数	：	（番号,初期座標,揺れ周期,揺れ幅,浮上速度,角度,消滅までの時間）
-		void Create_Bubble(const int&, const ML::Vec2&, const int&, const float&, const float&, const float&, const int&);
-		//気泡の動き（泡オブジェクトの座標に加算して使用する）
-		ML::Vec2 Move_Bubble();
+		//エフェクトを生成する（角度を指定しない）
+		//引数	：	（状態,座標）
+		static void Create_Effect(const int&, const ML::Vec2&);
+		//エフェクトを生成する（角度を指定する）
+		//引数	：	（状態,座標,角度,向き）
+		void Create_Effect(const int&, const ML::Vec2&, const float&, const BChara::Angle_LR&);
 		//状態ごとに行動を指定する
 		void Move();
 		//アニメーション
 		BChara::DrawInfo Anim();
-
-		//アクセサメソッド
-
-		//呼び出す際に消滅までの時間を指定する
-		//引数	：	（消滅までの時間）
-		inline void Set_Limit(const int&);
-		//泡の揺れ周期を指定する
-		//引数	：	（揺れ周期）
-		void Set_Interval_Bubble(const int&);
-		//泡の浮上速度を指定する
-		//引数	：	（浮上速度）
-		void Set_Speed_Surfacing(const float&);
-		//泡の大きさを指定する
-		//引数	：	（0~3)
-		void Set_Num_Bubble(const int&);
-		//泡の揺れ幅を指定する
-		//引数	：	（揺れ幅）
-		void Set_Wide_Bubble(const float&);
-		//中心点から広がるエフェクトを呼び出す際、中心からの初期位置を指定する
-		//引数	：	（中心点からの初期位置)
-		void Set_Dist(const float&);
-		//表示する角度を指定する
-		//引数	：	 (ML::ToRadian(角度))
-		void Set_Angle(const float&);
-		//回転の中心を外部から指定する
-		//引数	：	（中心座標）
-		void Set_Center(const Vec2&);
-		//中心点から広がるエフェクトの中心からの距離を取得する
-		float Get_Dist();
-
-		//エフェクトクラス
-		Effect eff;
 	};
 }

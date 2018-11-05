@@ -55,6 +55,7 @@ namespace  Game
 		int time_create_next_task;		//引継ぎタスクの生成タイミング
 		int time_kill_game;				//自身を消滅させるタイミング
 		Tutorials::Object* tutorials;	//ポインタメッセージ
+		Task_Effect::Object* eff;		//ポインタエフェクト
 	public:
 		//リソースを常駐させる
 		Shot00::Resource::SP	shot00_Resource;

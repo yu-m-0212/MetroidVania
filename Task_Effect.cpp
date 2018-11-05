@@ -35,14 +35,24 @@ namespace  Task_Effect
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->cntLimit = 0;					//消滅までの時間
+		this->state_effect = Non;			//状態管理
+		this->limit_erase = 0;				//時間消滅まで
 		this->dist = 0.0f;					//回転する際の中心からの距離
 		this->angle = 0.0f;					//角度
 		this->center = Vec2(0, 0);			//回転軸
 		this->num_bubble = 0;				//泡の大きさ
-		this->interval_bubble = 0;			//泡の揺れ周期
-		this->wide_bubble = 0.0f;			//泡の揺れ幅
-		this->render2D_Priority[1] = 0.5f;	//描画順
+		this->interval_bubble = 16;			//泡の揺れ周期
+		this->wide_bubble = 5.0f;			//泡の揺れ幅
+		this->limit_erase_hit_shot = 18;	//時間消滅までヒットショット
+		this->limit_erase_barrier = 15;		//時間消滅までバリア
+		this->limit_erase_defeat = 24;		//時間消滅まで撃破
+		this->limit_erase_heal = 24;		//時間消滅まで回復
+		this->limit_erase_bubble = 600;		//時間消滅まで泡
+		this->limit_erase_appear = 180;		//時間消滅まで登場
+		this->speed_surfacing = 3.0f;		//速度浮上
+		this->render2D_Priority[1] = 0.3f;	//描画順
+		this->choice_state = -1;			//外部から状態を指定する際、使用
+		Effect* eff = new Effect();			//メソッド呼び出し
 
 		//★タスクの生成
 
@@ -53,7 +63,8 @@ namespace  Task_Effect
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
 			//★引き継ぎタスクの生成
 		}
 
@@ -63,21 +74,65 @@ namespace  Task_Effect
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//状態が未指定なら一度だけ指定する
+		if (this->state_effect == Non)
+		{
+			switch (this->choice_state)
+			{
+			default:
+			case -1:	//-1は初期化値
+			case 0:		//未指定
+				break;
+			case 1:		//ヒットショット
+				this->state_effect = Hit_Shot;
+				this->limit_erase = this->limit_erase_hit_shot;
+				//左右によって角度を修正する
+				if (this->angle_LR == Left)
+				{
+					this->angle = this->angle - 135.0f;
+				}
+				break;
+			case 2:		//バリア
+				this->state_effect = Barrier;
+				this->limit_erase = this->limit_erase_barrier;
+				break;
+			case 3:
+				this->state_effect = Defeat;
+				this->limit_erase = this->limit_erase_defeat;
+				break;
+			case 4:		//回復
+				this->state_effect = Heal;
+				this->limit_erase = this->limit_erase_heal;
+				break;
+			case 5:		//泡
+				this->state_effect = Bubble;
+				//三種類の中から指定する
+				this->num_bubble = rand() % 3;
+				//描画角度
+				this->angle = float(rand() % 360);
+				//消滅までの時間
+				this->limit_erase = this->limit_erase_bubble;
+				break;
+			case 6:		//登場
+				this->state_effect = Appear;
+				this->limit_erase = this->limit_erase_appear;
+				break;
+			}
+		}
 		//ポーズ
 		if (ge->pause) { return; }
 		this->moveCnt++;
 		this->animCnt++;
 		//状態毎の行動
 		this->Move();
-		//★データ＆タスク解放
-		//限界の時間を迎えたら消滅
-		if (this->moveCnt >= this->cntLimit) {
-			//消滅申請
-			this->Kill();
-			return;
-		}
 		//移動
 		this->pos += this->moveVec;
+		//限界の時間を迎えたら消滅
+		if (this->moveCnt >= this->limit_erase)
+		{
+			//消滅申請
+			this->Kill();
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -93,7 +148,7 @@ namespace  Task_Effect
 	//-------------------------------------------------------------------
 	BChara::DrawInfo Object::Anim()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		//デフォルトカラーを宣言
 		Color dc(1, 1, 1, 1);
 		//各エフェクトをテーブルで用意する
@@ -128,7 +183,7 @@ namespace  Task_Effect
 		//各アニメーションの際、この変数にanimCntを入れ計算を行う
 		int effectCnt = 0;
 		//状態ごとの描画処理
-		switch (this->state)
+		switch (this->state_effect)
 		{
 		//アニメーションを付ける場合
 		//切り替わるフレーム数
@@ -136,12 +191,12 @@ namespace  Task_Effect
 		//effectCntに対象の要素番号を足して返す
 		case Unnon:
 			break;
-		case ImpactPunch:
+		case Hit_Shot:
 			effectCnt = this->animCnt / 6;
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt + 6];
 			break;
-		case StompLanding:
+		case Barrier:
 			effectCnt	= this->animCnt / 3;
 			effectCnt %= 5;
 			rtv = imageTable[effectCnt+15];
@@ -151,13 +206,19 @@ namespace  Task_Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt+9];
 			break;
-		case Lose:
+		case Defeat:
 			effectCnt = this->animCnt / 8;
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt + 12];
 			break;
 		case Bubble:
 			rtv = imageTable[this->num_bubble + 20];
+			break;
+		case Appear:
+			effectCnt = this->animCnt / 8;
+			effectCnt %= 3;
+			rtv = imageTable[effectCnt + 9];
+			rtv.color = ML::Color(1, 0, 0, 1);
 			break;
 		}
 		//	向きに応じて画像を左右反転する
@@ -168,34 +229,34 @@ namespace  Task_Effect
 		}
 		return rtv;
 	}
-	//泡エフェクトを生成する
-	//引数	：	（番号,初期座標,揺れ周期,揺れ幅,浮上速度,角度,消滅までの時間）
-	void Object::Create_Bubble(const int& num_, const ML::Vec2& pos_, const int& interval_, const float& wide_, const float& speedY_, const float& angle_, const int& limit_)
+	//エフェクトを生成する（角度を指定しない）
+	//引数	：	（状態,座標）
+	void Object::Create_Effect(const int& choice_, const ML::Vec2&pos_)
 	{
-		auto bubble = Task_Effect::Object::Create(true);
-		bubble->Set_State(Bubble);
-		bubble->Set_Num_Bubble(num_);
-		bubble->pos = pos_;
-		bubble->Set_Interval_Bubble(interval_);
-		bubble->Set_Wide_Bubble(wide_);
-		bubble->Set_Speed_Surfacing(speedY_);
-		bubble->Set_Angle(angle_);
-		bubble->Set_Limit(limit_);
+		auto eff = Task_Effect::Object::Create(true);
+		eff->choice_state = choice_;
+		eff->pos = pos_;
+	}
+	//エフェクトを生成する（角度を指定する）
+	//引数	：	（状態,座標,角度,向き）
+	void Object::Create_Effect(const int& choice_, const ML::Vec2& pos_, const float& angle_, const BChara::Angle_LR& angle_lr_)
+	{
+		//ポインタを宣言して確実に代入すること
+		auto eff = Task_Effect::Object::Create(true);
+		eff->choice_state = choice_;
+		eff->pos = pos_;
+		eff->angle = angle_;
+		eff->angle_LR = angle_lr_;
 	}
 	//状態ごとに行動を指定する
 	void Object::Move()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-		switch (this->state)
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
+		switch (this->state_effect)
 		{
 		default:
 			break;
-		case StompLanding:
-			break;
-		case Shoot:
-			break;
-		case Jumpshoot:
-		case Fallshoot:
+		case Non:
 			break;
 		case Heal:
 			if (nullptr == pl) { return; }
@@ -205,79 +266,10 @@ namespace  Task_Effect
 				this->moveVec.x = 0.0f;
 			}
 			break;
-		case Lose:
-			break;
 		case Bubble:
-			this->moveVec = this->Move_Bubble();
-			/*this->moveVec.x = float(sin(this->moveCnt / this->interval_bubble)*this->wide_bubble);
-			this->moveVec.y = -this->speed_surfacing;*/
+			this->moveVec = this->eff->Move_Bubble(this->moveCnt,this->interval_bubble,this->wide_bubble,this->speed_surfacing);
 			break;
 		}
-	}
-
-	//泡の動き（泡オブジェクトの座標に加算して使用する）
-	//引数	：	（カウンタ,揺れの周期,揺れ幅,浮上速度）
-	ML::Vec2 Object::Move_Bubble()
-	{
-		float x = float(sin(this->moveCnt / this->interval_bubble) * this->wide_bubble);
-		float y = -this->speed_surfacing;
-		return ML::Vec2(x, y);
-	}
-
-	//アクセサ
-
-	//呼び出す際に消滅までの時間を指定する
-	//引数	：	（消滅までの時間）
-	void Object::Set_Limit(const int& limit_)
-	{
-		this->cntLimit = limit_;
-	}
-	//泡の大きさを指定する
-	//引数	：	（0~3)
-	void Object::Set_Num_Bubble(const int& num_)
-	{
-		this->num_bubble = num_;
-	}
-	//泡の揺れ周期を指定する
-	//引数	：	（揺れ周期）
-	void Object::Set_Interval_Bubble(const int& interval_)
-	{
-		this->interval_bubble = interval_;
-	}
-	//泡の浮上速度を指定する
-	//引数	：	（浮上速度）
-	void Object::Set_Speed_Surfacing(const float& speedY_)
-	{
-		this->speed_surfacing = speedY_;
-	}
-	//泡の揺れ幅を指定する
-	//引数	：	（揺れ幅）
-	void Object::Set_Wide_Bubble(const float& wide_)
-	{
-		this->wide_bubble = wide_;
-	}
-	//中心点から広がるエフェクトを呼び出す際、中心からの初期位置を指定する
-	//引数	：	（中心点からの初期位置)
-	void Object::Set_Dist(const float& dist_)
-	{
-		this->dist = dist_;
-	}
-	//中心点から広がるエフェクトの中心からの距離を取得する
-	float Object::Get_Dist()
-	{
-		return this->dist;
-	}
-	//表示する角度を指定する
-	//引数	：	 (ML::ToRadian(角度))
-	void Object::Set_Angle(const float& angle_)
-	{
-		this->angle = angle_;
-	}
-	//回転の中心を外部から指定する
-	//引数	：	（中心座標）
-	void Object::Set_Center(const Vec2& center_)
-	{
-		this->center = center_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

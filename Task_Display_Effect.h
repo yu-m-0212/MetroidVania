@@ -50,11 +50,6 @@ namespace  Display_Effect
 		int cnt_transition;			//画面遷移カウンタ
 		int time_create_next_task;	//引継ぎタスクを生成するタイミング
 		int time_start_fade_out;	//フェードアウトを始めるタイミング
-		int next_scene;				//引継ぎタスクを指定する変数
 	public:
-		//引継ぎタスクを指定する
-		//引数	：	（整数）
-		//0=Game	1=Retry		2=Ending	3=Title
-		void Set_Next_Scene(const int&);
 	};
 }

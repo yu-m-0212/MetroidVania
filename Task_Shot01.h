@@ -4,6 +4,7 @@
 //エネミーの発生させる判定矩形(弾）
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Effect.h"
 
 namespace  Shot01
 {
@@ -44,10 +45,12 @@ namespace  Shot01
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		bool flag_Erase;	//壁や敵に衝突したとき、消滅するか否か
-		int limit_Erase;	//消滅するまでの時間
-		int power;			//攻撃力
-		int add_un_hit;		//プレイヤに与える無敵時間
+		bool flag_Erase;			//壁や敵に衝突したとき、消滅するか否か
+		int limit_Erase;			//消滅するまでの時間
+		int power;					//攻撃力
+		int add_un_hit;	 			//プレイヤに与える無敵時間
+		float angle;				//角度
+		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		//状態ごとに行動を指定する
 		void Move();
@@ -65,5 +68,8 @@ namespace  Shot01
 		//外部から生成する際、攻撃力を指定
 		//引数	：	（整数値）
 		void Set_Power(const int&);
+		//角度を指定する
+		//引数	：	（角度）
+		void Set_Angle(const float&);
 	};
 }

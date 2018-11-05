@@ -38,7 +38,6 @@ namespace  Corpse
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -49,8 +48,13 @@ namespace  Corpse
 		float transparency;		//描画透明度
 		float max_speed_fall;	//最大速度降下
 	public:
+		//コンストラクタ
+		Object();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
 		void Received(BChara* from_, AttackInfo at_,const int&);
+		//生成メソッド
+		//引数	：	（座標,向き）
+		void Create_Corpse(const ML::Vec2&, const BChara::Angle_LR&);
 	};
 }

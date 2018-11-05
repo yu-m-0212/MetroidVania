@@ -4,6 +4,7 @@
 //プレイヤの発生させる判定矩形（弾）
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Effect.h"
 
 namespace  Shot00
 {
@@ -44,11 +45,12 @@ namespace  Shot00
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		bool flag_Erase;	//壁や敵に衝突したとき、消滅するか否か
-		int limit_Erase;	//消滅するまでの時間
-		int power;			//攻撃力
-		int un_hit;			//与無敵時間
-		float angle;		//描画方向
+		bool flag_Erase;			//壁や敵に衝突したとき、消滅するか否か
+		int limit_Erase;			//消滅するまでの時間
+		int power;					//攻撃力
+		int un_hit;					//与無敵時間
+		float angle;				//描画方向
+		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		//状態ごとに行動を指定する
 		void Move();

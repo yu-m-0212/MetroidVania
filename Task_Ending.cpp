@@ -46,12 +46,11 @@ namespace  Ending
 	{
 		//★データ＆タスク解放
 
-
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
-			//★引き継ぎタスクの生成
+		//★引き継ぎタスクの生成
+		if (!ge->QuitFlag() && this->nextTaskCreate)
+		{
 			auto  nextTask = Title::Object::Create(true);
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -64,7 +63,6 @@ namespace  Ending
 		if (this->logoPosY <= 0) {
 			this->logoPosY = 0;
 		}
-
 		if (this->logoPosY == 0) {
 			if (in.ST.down) {
 				//自身に消滅要請

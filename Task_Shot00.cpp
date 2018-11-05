@@ -35,12 +35,13 @@ namespace  Shot00
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;	//描画順
-		this->recieveBase = this->hitBase;	//キャラクタとの接触矩形
-		this->flag_Erase = true;			//接触したとき消滅するか
-		this->power = 0;					//攻撃力
-		this->un_hit = 4;					//相手に与える無敵時間
-		this->limit_Erase = 0;				//消滅するまでの時間
+		this->render2D_Priority[1] = 0.4f;		//描画順
+		this->recieveBase = this->hitBase;		//キャラクタとの接触矩形
+		this->flag_Erase = true;				//接触したとき消滅するか
+		this->power = 0;						//攻撃力
+		this->un_hit = 8;						//相手に与える無敵時間
+		this->limit_Erase = 0;					//消滅するまでの時間
+		this->eff = new Task_Effect::Object();	//メソッド呼び出し
 		//★タスクの生成
 
 		return  true;
@@ -60,7 +61,7 @@ namespace  Shot00
 	{
 		//ポーズ
 		if (ge->pause) { return; }
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		this->moveCnt++;
 		//各状態ごとの処理
@@ -107,7 +108,7 @@ namespace  Shot00
 		//射撃は壁に当たると消滅する
 		if (this->flag_Erase)
 		{
-			if (auto map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ")) 
+			if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName)) 
 			{
 				if (nullptr != map)
 				{
@@ -156,7 +157,7 @@ namespace  Shot00
 	//状態ごとに行動を指定する
 	void Object::Move()
 	{
-		auto pl = ge->GetTask_One_G <Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G <Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		switch (this->state)
 		{
@@ -199,51 +200,16 @@ namespace  Shot00
 	}
 	//消滅する際、状態に応じてエフェクトを生成
 	//引数	：	（エフェクトを生成する座標）
-	//caseの中で宣言したローカル変数のスコープがswitch文全体に及ぶ恐れがある為
-	//意図的にブロック{}を設けること
 	void Object::Effect_Hit(const ML::Vec2& pos_)
 	{
 		switch (this->state)
 		{
 		default:
 			break;
-		case StompLanding:
-		{
-			auto StompLandingHitEffect = Task_Effect::Object::Create(true);
-			//範囲攻撃は敵の位置を基準にエフェクトを生成する
-			StompLandingHitEffect->pos = pos_;
-			StompLandingHitEffect->Set_Limit(18);
-			StompLandingHitEffect->state = ImpactPunch;
-			//範囲攻撃は弾と敵との位置関係で左右を決める
-			if (this->pos.x - pos_.x > 0)
-			{
-				StompLandingHitEffect->angle_LR = Left;
-			}
-			else
-			{
-				StompLandingHitEffect->angle_LR = Right;
-			}
-			break;
-		}
 		case Shoot:
 		case Jumpshoot:
 		case Fallshoot:
-		{
-			auto ShootHitEffect = Task_Effect::Object::Create(true);
-			ShootHitEffect->pos = pos_;
-			ShootHitEffect->Set_Limit(18);
-			ShootHitEffect->state = ImpactPunch;
-			ShootHitEffect->angle_LR = this->angle_LR;
-			if (this->angle_LR == Right)
-			{
-				ShootHitEffect->Set_Angle(this->angle);
-			}
-			else
-			{
-				ShootHitEffect->Set_Angle(this->angle - 135.0f);
-			}
-			break;
-		}
+			this->eff->Create_Effect(1, this->pos, this->angle, this->angle_LR);
 		}
 	}
 	//呼び出したタスクから寿命を設定する

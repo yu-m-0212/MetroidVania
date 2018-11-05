@@ -43,20 +43,24 @@ namespace  Retry
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;
-		this->controllerName = "P1";
+		this->render2D_Priority[1] = 0.4f;							//描画順
+		this->controllerName = "P1";								//コントローラ宣言
 		this->flag_transition = false;								//画面遷移用フラグ
 		this->cnt_transition = 0;									//カウンタ遷移用
-		this->title_or_game = 0;									//引継ぎタスクの選択フラグ
+		this->title_or_game = 0;									//引継ぎタスクの選択フラグ(0=Game,1=Title)
 		this->time_create_next_task = 100;							//引継ぎタスクの生成タイミング
-		this->time_kill_game = 200;									//自身を消滅させるタイミング
+		this->time_kill_game = 100;									//自身を消滅させるタイミング
 		this->cnt_create_bubble = 0;								//エフェクトの生成カウンタ
+		this->cnt_available_controll = 0;							//生成後、操作を受け付けるまでのカウンタ
+		this->time_available_controll = 150;						//生成後、操作を受け付けるまでの時間
 		this->cnt_anim_back = 0;									//背景アニメカウンタ
 		this->interval_anim_back = 25;								//背景アニメ周期
 		this->posY = -360.0f;										//背景Y軸座標
 		this->posY_std = -240.0f;									//背景Y軸座標基準値
 		this->height_anim_back = 25.0f;								//背景アニメ揺れ幅
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);	//泡のY軸座標初期位置
+		this->eff = new Task_Effect::Object();						//メソッド呼び出し
+		ge->pause = true;											//生成時、操作を受け付けない
 
 		//★タスクの生成
 
@@ -70,6 +74,7 @@ namespace  Retry
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
 		{
+			
 		}
 		return  true;
 	}
@@ -79,6 +84,15 @@ namespace  Retry
 	{
 		this->cnt_create_bubble++;
 		this->cnt_anim_back++;
+		//一定時間、操作を受け付けない
+		if (this->cnt_available_controll < this->time_available_controll)
+		{
+			this->cnt_available_controll++;
+		}
+		else
+		{
+			ge->pause = false;
+		}
 
 		auto in = DI::GPad_GetState(this->controllerName);
 
@@ -86,13 +100,13 @@ namespace  Retry
 		if (this->cnt_create_bubble % 30 == 0)
 		{
 			float initX = float(rand() % (ge->screenWidth - 96));
-			int num = rand() % 3;
-			float ang = float(rand() % 360);
-			eff.Create_Bubble(num, ML::Vec2(initX, float(this->init_bubble_pos_y)), 16, 5.0f, 3.0f, ang, 600);
+			this->eff->Create_Effect(5, ML::Vec2(initX, this->init_bubble_pos_y));
 		}
 		//背景アニメーション
 		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
 		this->posY = y;
+		//生成後、フェードアウトが終わってから操作受付け
+		if (ge->pause) { return; }
 		//画面遷移
 		if (!this->flag_transition)
 		{
@@ -100,35 +114,49 @@ namespace  Retry
 			if (in.ST.down)
 			{
 				this->flag_transition = true;
-				auto display_effect = Display_Effect::Object::Create(true);
-				display_effect->Set_Next_Scene(1);
-				this->title_or_game = 1;
+				auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				if (nullptr == display_effect)
+				{
+					Display_Effect::Object::Create(true);
+				}
+				this->title_or_game = 0;
 			}
 			//タイトルに戻る場合
 			else if (in.SE.down)
 			{
 				this->flag_transition = true;
-				auto display_effect = Display_Effect::Object::Create(true);
-				display_effect->Set_Next_Scene(3);
-				this->title_or_game = 0;
+				auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				if (nullptr == display_effect)
+				{
+					Display_Effect::Object::Create(true);
+				}
+				this->title_or_game = 1;
 			}
 		}
 		//消滅カウントダウン
 		else
 		{
 			this->cnt_transition++;
-		}
-		//本編を再開する場合
-		if (this->title_or_game == 1)
-		{
-			//本編と遺体を生成する
-			if (this->cnt_transition == this->time_create_next_task)
+			if (this->title_or_game == 0)
 			{
-				Game::Object::Create(true);
-				//リトライする場合は前回の死亡地点に遺体を設置
-				auto corpse = Corpse::Object::Create(true);
-				corpse->pos = this->pos_dead;
-				corpse->angle_LR = this->angle_dead;
+				//画面遷移時間になったら本編生成
+				if (this->cnt_transition == this->time_create_next_task)
+				{
+					Game::Object::Create(true);
+					//リトライする場合は前回の死亡地点に遺体を設置
+					auto corpse = Corpse::Object::Create(true);
+					corpse->pos = this->pos_dead;
+					corpse->angle_LR = this->angle_dead;
+				}
+			}
+			//タイトルに戻る
+			else if (this->title_or_game == 1)
+			{
+				//画面遷移時間になったら本編生成
+				if (this->cnt_transition == this->time_create_next_task)
+				{
+					Title::Object::Create(true);
+				}
 			}
 		}
 		//一定時間で消滅する

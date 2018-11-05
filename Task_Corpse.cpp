@@ -44,6 +44,8 @@ namespace  Corpse
 		this->gravity = ML::Gravity(SIZE_CHIP);		//重力加速度＆時間速度による加算量
 		this->max_speed_fall = 15.0f;				//最大落下速度
 		this->transparency = 1.0f;					//描画透明度
+
+		BChara* bc = new BChara();
 		
 		//★タスクの生成
 
@@ -125,9 +127,17 @@ namespace  Corpse
 		//一度だけプレイヤを回復する
 		if (!this->Get_Flag_Erase())
 		{
-			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 			pl->hp = pl->Get_Max_HP();
 		}
+	}
+	//生成メソッド
+	//引数	：	（座標,向き）
+	void Object::Create_Corpse(const ML::Vec2& pos_, const BChara::Angle_LR& angle_)
+	{
+		auto corpse = Corpse::Object::Create(true);
+		corpse->pos = pos_;
+		corpse->angle_LR = angle_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

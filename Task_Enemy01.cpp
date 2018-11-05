@@ -44,18 +44,19 @@ namespace  Enemy01
 		this->angle_LR = Left;
 		this->state = Stand;
 		this->hp = 10;
-		this->maxSpeed = 2.0f;							//最大移動速度(横)
-		this->addSpeed = 0.7f;							//歩行加速度(地面の影響である程度打ち消される
-		this->decSpeed = 0.5f;							//接地状態の時の速度減衰量(摩擦
-		this->max_speed_fall = 10.0f;					//最大落下速度
-		this->gravity = ML::Gravity(SIZE_CHIP) * 5;		//重力加速度&時間速度による加算量
-		this->interval_Caution = 60;					//プレイヤが視界から外れた後、再度警戒に入るまでの時間
-		this->interval_Attack = 120;					//弾を生成する間隔
-		this->interval_Flash = 4;						//点滅間隔
-		this->add_un_hit = 60;							//プレイヤに与える無敵時間
-		this->size_h_resource = 192;					//被弾時、ホワイトアウトする際の基準値
-		this->searchBase = ML::Box2D(-192, -96, 384, 192);
-		this->shot_Init = ML::Vec2(0, -45);
+		this->maxSpeed = 2.0f;								//最大移動速度(横)
+		this->addSpeed = 0.7f;								//歩行加速度(地面の影響である程度打ち消される
+		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量(摩擦
+		this->max_speed_fall = 10.0f;						//最大落下速度
+		this->gravity = ML::Gravity(SIZE_CHIP) * 5;			//重力加速度&時間速度による加算量
+		this->interval_Caution = 60;						//プレイヤが視界から外れた後、再度警戒に入るまでの時間
+		this->interval_Attack = 120;						//弾を生成する間隔
+		this->interval_Flash = 4;							//点滅間隔
+		this->add_un_hit = 60;								//プレイヤに与える無敵時間
+		this->size_h_resource = 192;						//被弾時、ホワイトアウトする際の基準値
+		this->searchBase = ML::Box2D(-192, -96, 384, 192);	//探知矩形
+		this->shot_Init = ML::Vec2(0, -45);					//生成位置補正ショット
+		this->eff = new Task_Effect::Object();				//メソッド呼び出し
 		//★タスクの生成
 		return  true;
 	}
@@ -68,12 +69,11 @@ namespace  Enemy01
 		{
 			//★引き継ぎタスクの生成
 		}
-		//撃破エフェクトの生成
-		auto DefeatEffect = Task_Effect::Object::Create(true);
-		DefeatEffect->pos = this->pos;
-		DefeatEffect->Set_Limit(24);
-		DefeatEffect->state = Lose;
-		DefeatEffect->angle_LR = this->angle_LR;
+		//ゲームが進行中の時のみ撃破エフェクトの生成
+		if (!ge->failure)
+		{
+			this->eff->Create_Effect(3, this->pos);
+		}
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -169,7 +169,7 @@ namespace  Enemy01
 		if (!from_->Get_Range_Wide())
 		{
 			//吹き飛ばされる
-			this->moveVec = from_->moveBack;
+			this->moveVec = from_->Get_Move_Back();
 		}
 		//範囲攻撃の場合は攻撃を受けた瞬間の位置関係で飛ぶ方向を決める
 		else
@@ -177,13 +177,13 @@ namespace  Enemy01
 			//自分が右側にいるとき
 			if (this->pos.x - from_->pos.x > 0)
 			{
-				this->moveVec = from_->moveBack;
+				this->moveVec = from_->Get_Move_Back();
 			}
 			//自分が左側にいるとき
 			else
 			{
-				float x = from_->moveBack.x*(-1);
-				this->moveVec = ML::Vec2(x, from_->moveBack.y);
+				float x = from_->Get_Move_Back().x*(-1);
+				this->moveVec = ML::Vec2(x, from_->Get_Move_Back().y);
 			}
 		}
 		//状態を遷移させない時、使用
@@ -325,7 +325,7 @@ namespace  Enemy01
 			break;
 		case Caution:
 		{
-			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 			if (nullptr == pl) { break; }
 			//プレイヤに向きを変える
 			if (this->pos.x - pl->pos.x > 0)
@@ -341,7 +341,7 @@ namespace  Enemy01
 		case Shoot:
 			if (this->moveCnt == 0)
 			{
-				auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+				auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 				if (nullptr == pl) { break; }
 				auto shot = Shot01::Object::Create(true);
 				//呼び出した判定矩形に思考させるため状態を指定
@@ -429,7 +429,7 @@ namespace  Enemy01
 	//プレイヤを発見したら警戒モードに入る
 	bool Object::Search_Player()
 	{
-		auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (pl == nullptr || this == nullptr) { return false; }
 		ML::Box2D you = pl->hitBase.OffsetCopy(pl->pos);
 		ML::Box2D  me = this->searchBase.OffsetCopy(this->pos);

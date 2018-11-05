@@ -93,7 +93,7 @@ namespace  Sprite
 			ge->camera2D.y = cpy;
 		}
 		//マップ外を写さないようにする調整処理
-		auto   map = ge->GetTask_One_GN<Map2D::Object>("フィールド", "マップ");
+		auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 		if (nullptr != map) {
 			map->AjastCameraPos();
 		}
@@ -121,7 +121,7 @@ namespace  Sprite
 	{
 		RECT  r = { ge->camera2D.w / 2, ge->camera2D.y - 1, ge->camera2D.w / 2 + 1, ge->camera2D.y + 1 };
 		//矩形がマップ外に出ていたら丸め込みを行う
-		auto map = ge->GetTask_One_G<Map2D::Object>("フィールド");
+		auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
 		RECT  m = {
 			map->hitBase.x,
 			map->hitBase.y,

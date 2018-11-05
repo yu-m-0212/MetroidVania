@@ -4,6 +4,7 @@
 //プレイヤ
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Effect.h"
 
 namespace  Player
 {
@@ -49,27 +50,26 @@ namespace  Player
 		float decSpeed;				//速度減衰量
 		float max_StompFallSpeed;	//ストンプ時の最大降下速度
 		float max_speed_fall;		//最大速度降下
-		float speed_Shot;			//ショット速度
+		float speed_shot;			//ショット速度
 		float init_shot;			//生成位置ショット
-		float height_Jump;			//ジャンプ初速
-		int interval_Shot;			//射撃の発射間隔（フレーム）
+		float height_jump;			//ジャンプ初速
+		int interval_shot;			//射撃の発射間隔（フレーム）
 		int limit_JumpAngleChange;	//ジャンプから一定時間内なら向きを変えられる
-		int limit_Stomp;			//継続時間ストンプ
-		int limit_StompEffect;		//継続時間ストンプ効果
-		int limit_StompHoldTime;	//硬直時間ストンプ
-		int limit_Quake;			//画面揺れ時間
-		int limit_Shot;				//継続時間ショット
-		int limit_HealEffect;		//継続時間回復効果
-		int lv_Stomp;				//ストンプアップグレードレベル
-		int dist_Quake;				//画面揺れ幅
-		int power_Stomp;			//攻撃力ストンプ
-		int power_Shot;				//攻撃力ショット
+		int limit_stomp;			//継続時間ストンプ
+		int limit_stompHoldTime;	//硬直時間ストンプ
+		int limit_quake;			//画面揺れ時間
+		int limit_shot;				//継続時間ショット
+		int lv_stomp;				//ストンプアップグレードレベル
+		int dist_quake;				//画面揺れ幅
+		int power_stomp;			//攻撃力ストンプ
+		int power_shot;				//攻撃力ショット
 		int gauge_melee;			//近接攻撃のリチャージ
 		int gauge_melee_max;		//近接攻撃リチャージ上限
 		int max_hp;					//上限HP
-		ML::Box2D range_Stomp;		//範囲ストンプ
-		ML::Box2D range_Shot;		//範囲ショット
-		ML::Vec2 moveBack_Stomp;	//ふっとび量ストンプ
+		ML::Box2D range_stomp;		//範囲ストンプ
+		ML::Box2D range_shot;		//範囲ショット
+		ML::Vec2 moveBack_stomp;	//ふっとび量ストンプ
+		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		//思考＆状況判断(ステータス決定）
 		void  Think();
