@@ -62,6 +62,7 @@ public:
 					//その他必要に応じて
 	};
 	//キャラクタ共通メンバ変数
+	//徐々に非公開にすること
 	Angle_LR	angle_LR;
 	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置

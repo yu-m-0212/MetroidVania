@@ -4,6 +4,7 @@
 #include  "MyPG.h"
 #include  "Task_Ending.h"
 #include  "Task_Title.h"
+#include  "Task_Display_Effect.h"
 
 namespace  Ending
 {
@@ -12,15 +13,15 @@ namespace  Ending
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "EndingLogoImg";
-		DG::Image_Create(this->imageName, "./data/image/Ending.bmp");
+		this->name_image = "name_image";
+		DG::Image_Create(this->name_image, "./data/image/Staff_Roll.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->imageName);
+		DG::Image_Erase(this->name_image);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -33,11 +34,15 @@ namespace  Ending
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 1.0f;
-		this->logoPosY = 270;
-
+		this->render2D_Priority[1] = 1.0f;												//描画順
+		this->transition = false;														//フラグ画面遷移
+		this->cnt_transition = 0;														//カウンタ画面遷移
+		this->time_kill_this = 150;														//時間自身を消滅させる
+		this->size_image_w = int(DG::Image_Size(this->res->name_image).x);				//サイズリソース幅
+		this->size_image_h = int(DG::Image_Size(this->res->name_image).y);				//サイズリソース高さ
+		this->pos_staff_roll = 0.0f;													//表示位置スタッフロール
+		this->add_pos_staff_roll = 3.0f;												//加算量表示位置スタッフロール
 		//★タスクの生成
-
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -58,29 +63,38 @@ namespace  Ending
 	void  Object::UpDate()
 	{
 		auto in = DI::GPad_GetState("P1");
-
-		this->logoPosY -= 9;
-		if (this->logoPosY <= 0) {
-			this->logoPosY = 0;
+		//画面が停止するまでの処理
+		if (this->pos_staff_roll > int(-this->size_image_h + ge->screenHeight))
+		{
+			this->pos_staff_roll -= this->add_pos_staff_roll;
 		}
-		if (this->logoPosY == 0) {
-			if (in.ST.down) {
-				//自身に消滅要請
-				this->Kill();
+		//画面遷移
+		if (in.ST.down)
+		{
+			this->transition = true;
+		}
+		if (this->transition)
+		{
+			if (this->cnt_transition == 0)
+			{
+				Display_Effect::Object::Create(true);
 			}
+			this->cnt_transition++;
+		}
+		if (this->cnt_transition >= this->time_kill_this)
+		{
+			this->Kill();
 		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		ML::Box2D  draw(0, 0, 480, 270);
-		ML::Box2D  src(0, 0, 240, 135);
-
-		draw.Offset(0, this->logoPosY);
-		DG::Image_Draw(this->res->imageName, draw, src);
+		ML::Box2D draw(0, 0,int(this->size_image_w),int(this->size_image_h));
+		draw.Offset(ML::Vec2(0, this->pos_staff_roll));
+		ML::Box2D  src(0, 0, int(this->size_image_w), int(this->size_image_h));
+		DG::Image_Draw(this->res->name_image, draw, src);
 	}
-
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

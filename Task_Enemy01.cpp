@@ -70,7 +70,7 @@ namespace  Enemy01
 			//★引き継ぎタスクの生成
 		}
 		//ゲームが進行中の時のみ撃破エフェクトの生成
-		if (!ge->failure)
+		if (!ge->failure && !ge->clear)
 		{
 			this->eff->Create_Effect(3, this->pos);
 		}

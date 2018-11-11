@@ -12,7 +12,7 @@ namespace  Tutorials
 {
 	//タスクに割り当てるグループ名と固有名
 	const  string  defGroupName("チュートリアル");	//グループ名
-	const  string  defName("NoName");	//タスク名
+	const  string  defName("NoName");				//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{

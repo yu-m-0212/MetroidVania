@@ -45,7 +45,7 @@ namespace  Task_Effect
 		this->wide_bubble = 5.0f;			//–A‚Ì—h‚ê•
 		this->limit_erase_hit_shot = 18;	//ŽžŠÔÁ–Å‚Ü‚ÅƒqƒbƒgƒVƒ‡ƒbƒg
 		this->limit_erase_barrier = 15;		//ŽžŠÔÁ–Å‚Ü‚ÅƒoƒŠƒA
-		this->limit_erase_defeat = 24;		//ŽžŠÔÁ–Å‚Ü‚ÅŒ‚”j
+		this->limit_erase_defeat = 36;		//ŽžŠÔÁ–Å‚Ü‚ÅŒ‚”j
 		this->limit_erase_heal = 24;		//ŽžŠÔÁ–Å‚Ü‚Å‰ñ•œ
 		this->limit_erase_bubble = 600;		//ŽžŠÔÁ–Å‚Ü‚Å–A
 		this->limit_erase_appear = 180;		//ŽžŠÔÁ–Å‚Ü‚Å“oê
@@ -97,7 +97,7 @@ namespace  Task_Effect
 				this->limit_erase = this->limit_erase_barrier;
 				break;
 			case 3:
-				this->state_effect = Defeat;
+				this->state_effect = Defeat_Enemy;
 				this->limit_erase = this->limit_erase_defeat;
 				break;
 			case 4:		//‰ñ•œ
@@ -177,6 +177,12 @@ namespace  Task_Effect
 			{Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//–A1	[20]
 			{Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//–A2	[21]
 			{Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//–A3	[22]
+			{Box2D(-16, -16,  32,  32),Box2D(1632,   0,  32,  32),dc},//ƒGƒlƒ~[Œ‚”j1				[23]
+			{Box2D(-16, -16,  32,  32),Box2D(1632,  32,  32,  32),dc},//ƒGƒlƒ~[Œ‚”j2				[24]
+			{Box2D(-16, -16,  32,  32),Box2D(1632,  64,  32,  32),dc},//ƒGƒlƒ~[Œ‚”j3				[25]
+			{Box2D(-16, -16,  32,  32),Box2D(1632,  96,  32,  32),dc},//ƒGƒlƒ~[Œ‚”j4				[26]
+			{Box2D(-16, -16,  32,  32),Box2D(1632, 128,  32,  32),dc},//ƒGƒlƒ~[Œ‚”j5				[27]
+			{Box2D(-16, -16,  32,  32),Box2D(1632, 160,  32,  32),dc} //ƒGƒlƒ~[Œ‚”j6				[28]
 		};
 		//•Ô‚·•Ï”‚ð—pˆÓ
 		BChara::DrawInfo  rtv;
@@ -206,10 +212,10 @@ namespace  Task_Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt+9];
 			break;
-		case Defeat:
-			effectCnt = this->animCnt / 8;
-			effectCnt %= 3;
-			rtv = imageTable[effectCnt + 12];
+		case Defeat_Enemy:
+			effectCnt = this->animCnt / 6;
+			effectCnt %= 6;
+			rtv = imageTable[effectCnt + 23];
 			break;
 		case Bubble:
 			rtv = imageTable[this->num_bubble + 20];

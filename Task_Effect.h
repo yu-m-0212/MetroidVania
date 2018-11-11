@@ -44,8 +44,8 @@ namespace  Task_Effect
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
 		void  UpDate();		//「実行」１フレーム毎に行う処理
-		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
-		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
+		void  Render2D_AF();//「2D描画」１フレーム毎に行う処理
+		bool  Finalize();	//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//状態管理
 		enum State_Effect
@@ -53,10 +53,10 @@ namespace  Task_Effect
 			Non,		//未指定
 			Hit_Shot,	//ヒットショット（プレイヤ）
 			Barrier,	//バリア
-			Defeat,		//撃破（エネミー）
 			Heal,		//回復
 			Bubble,		//泡
-			Appear		//登場
+			Appear,		//登場
+			Defeat_Enemy//撃破（エネミー）
 		};
 		State_Effect state_effect;	//状態管理
 		int num_bubble;				//泡の大きさを指定する
