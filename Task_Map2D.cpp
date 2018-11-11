@@ -72,7 +72,6 @@ namespace  Map2D
 	{
 		//★データ＆タスク解放
 		DG::Image_Erase(this->imageName);
-
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}

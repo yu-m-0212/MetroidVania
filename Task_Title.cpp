@@ -55,7 +55,7 @@ namespace  Title
 		this->pos_button = ML::Vec2(float(ge->screenWidth / 2), 800);	//座標ボタン
 		this->controllerName = "P1";									//コントローラー宣言
 		this->eff = new Task_Effect::Object();							//メソッド呼び出し
-		ge->pause = true;												///生成時は操作を受け付けない
+		ge->pause = true;												//生成時は操作を受け付けない
 		
 		//★タスクの生成
 

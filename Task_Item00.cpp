@@ -38,7 +38,7 @@ namespace  Item00
 		this->recieveBase = this->hitBase;				//キャラクタとの判定矩形
 		this->add_Hp = 1;								//プレイヤのHP増加量
 		this->limit_message = 180;						//時間制限メッセージ
-		this->tutrials = new Tutorials::Object();		//ポインタチュートリアル
+		this->tutorials = new Tutorials::Object();		//ポインタチュートリアル
 		//★タスクの生成
 		return  true;
 	}
@@ -47,8 +47,6 @@ namespace  Item00
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
-
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}
@@ -95,7 +93,7 @@ namespace  Item00
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		//メッセージ生成
-		this->tutrials->Create_Message("HPの上限が増加した", pl->pos, this->limit_message);
+		this->tutorials->Create_Message("HPの上限が増加した", pl->pos, this->limit_message);
 		this->UpdateMotion(Lose);
 		//体力上限を増加し、回復する
 		int max = pl->Get_Max_HP();

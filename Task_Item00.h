@@ -48,7 +48,7 @@ namespace  Item00
 	private:
 		int add_Hp;						//プレイヤのHP増加量
 		int limit_message;				//制限時間メッセージ
-		Tutorials::Object* tutrials;	//ポインタチュートリアル
+		Tutorials::Object* tutorials;	//ポインタチュートリアル
 	public:
 		//コンストラクタ
 		Object();

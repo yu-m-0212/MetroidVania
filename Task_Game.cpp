@@ -97,6 +97,7 @@ namespace  Game
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
+
 		ge->KillAll_G("タイトル"); 
 
 		ge->KillAll_G("プレイヤ");

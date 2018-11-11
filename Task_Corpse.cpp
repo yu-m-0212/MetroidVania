@@ -44,8 +44,6 @@ namespace  Corpse
 		this->gravity = ML::Gravity(SIZE_CHIP);		//重力加速度＆時間速度による加算量
 		this->max_speed_fall = 15.0f;				//最大落下速度
 		this->transparency = 1.0f;					//描画透明度
-
-		BChara* bc = new BChara();
 		
 		//★タスクの生成
 
