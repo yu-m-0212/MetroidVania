@@ -25,7 +25,7 @@ namespace  Enemy01
 		static  Resource::SP  Create();
 	//•ÏX‰Â
 		//‹¤—L‚·‚é•Ï”‚Í‚±‚±‚É’Ç‰Á‚·‚é
-		string imageName;
+		string imageName;				//–¼‘O‰æ‘œ
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara

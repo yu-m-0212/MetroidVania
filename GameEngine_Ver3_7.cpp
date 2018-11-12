@@ -298,8 +298,6 @@ GameEngine::~GameEngine( )
   DG::Font_Erase("Debug");
 //	タイマー分解能の設定（1ミリ秒単位）を解除する
 	timeEndPeriod(1);
-////	サウンド環境の開放
-//	dm.reset( );
 //	入力機器環境の解放
 	DI::Finalize();
 //	画像処理環境の解放

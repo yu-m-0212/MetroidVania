@@ -126,6 +126,7 @@ namespace  Corpse
 		if (!this->Get_Flag_Erase())
 		{
 			auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
+			if (nullptr == pl) { return; }
 			pl->hp = pl->Get_Max_HP();
 		}
 	}

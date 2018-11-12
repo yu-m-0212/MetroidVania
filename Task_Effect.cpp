@@ -5,6 +5,7 @@
 #include  "Effect.h"
 #include  "Task_Effect.h"
 #include  "Task_Player.h"
+#include  "Task_Map2D.h"
 
 using namespace ML;
 namespace  Task_Effect
@@ -35,24 +36,27 @@ namespace  Task_Effect
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->state_effect = Non;			//状態管理
-		this->limit_erase = 0;				//時間消滅まで
-		this->dist = 0.0f;					//回転する際の中心からの距離
-		this->angle = 0.0f;					//角度
-		this->center = Vec2(0, 0);			//回転軸
-		this->num_bubble = 0;				//泡の大きさ
-		this->interval_bubble = 16;			//泡の揺れ周期
-		this->wide_bubble = 5.0f;			//泡の揺れ幅
-		this->limit_erase_hit_shot = 18;	//時間消滅までヒットショット
-		this->limit_erase_barrier = 15;		//時間消滅までバリア
-		this->limit_erase_defeat = 36;		//時間消滅まで撃破
-		this->limit_erase_heal = 24;		//時間消滅まで回復
-		this->limit_erase_bubble = 600;		//時間消滅まで泡
-		this->limit_erase_appear = 180;		//時間消滅まで登場
-		this->speed_surfacing = 3.0f;		//速度浮上
-		this->render2D_Priority[1] = 0.3f;	//描画順
-		this->choice_state = -1;			//外部から状態を指定する際、使用
-		Effect* eff = new Effect();			//メソッド呼び出し
+		this->state_effect = Non;				//状態管理
+		this->limit_erase = 0;					//時間消滅まで
+		this->dist = 0.0f;						//回転する際の中心からの距離
+		this->angle = 0.0f;						//角度
+		this->center = Vec2(0, 0);				//回転軸
+		this->num_bubble = 0;					//泡の大きさ
+		this->interval_bubble = 16;				//泡の揺れ周期
+		this->wide_bubble = 5.0f;				//泡の揺れ幅
+		this->limit_erase_hit_shot = 18;		//時間消滅までヒットショット
+		this->limit_erase_barrier = 15;			//時間消滅までバリア
+		this->limit_erase_defeat = 36;			//時間消滅まで撃破
+		this->limit_erase_heal = 24;			//時間消滅まで回復
+		this->limit_erase_bubble = 600;			//時間消滅まで泡
+		this->limit_erase_appear = 180;			//時間消滅まで登場
+		this->limit_erase_debris = 120;			//消滅までの時間破片
+		this->speed_surfacing = 3.0f;			//速度浮上
+		this->speed_Debris = 6.0f;				//速度破片
+		this->gravity = ML::Gravity(SIZE_CHIP);	//重力加速度
+		this->render2D_Priority[1] = 0.3f;		//描画順
+		this->choice_state = -1;				//外部から状態を指定する際、使用
+		Effect* eff = new Effect();				//メソッド呼び出し
 
 		//★タスクの生成
 
@@ -117,6 +121,12 @@ namespace  Task_Effect
 				this->state_effect = Appear;
 				this->limit_erase = this->limit_erase_appear;
 				break;
+			case 7:		//破片
+				this->state_effect = Debris;
+				this->limit_erase = this->limit_erase_debris;
+				//初速
+				this->moveVec.y = sin(this->angle)*this->speed_Debris;
+				break;
 			}
 		}
 		//ポーズ
@@ -154,35 +164,41 @@ namespace  Task_Effect
 		//各エフェクトをテーブルで用意する
 		BChara::DrawInfo imageTable[]
 		{
-			{Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc},//ストンプ着地の衝撃1		[ 0]
-			{Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc},//ストンプ着地の衝撃2		[ 1]
-			{Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc},//ストンプ着地の衝撃3		[ 2]
-			{Box2D(-96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc},//パンチ風切り1				[ 3]
-			{Box2D(-96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc},//パンチ風切り2				[ 4]
-			{Box2D(-96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc},//パンチ風切り3				[ 5]
-			{Box2D(-96, -64, 192, 128),Box2D( 384,   0, 192, 128),dc},//パンチの衝撃1				[ 6]
-			{Box2D(-96, -64, 192, 128),Box2D( 384, 128, 192, 128),dc},//パンチの衝撃2				[ 7]
-			{Box2D(-96, -64, 192, 128),Box2D( 384, 256, 192, 128),dc},//パンチの衝撃3				[ 8]
-			{Box2D(-96, -64, 192, 128),Box2D( 576,   0, 192, 128),dc},//遺体から回復1				[ 9]
-			{Box2D(-96, -64, 192, 128),Box2D( 576, 128, 192, 128),dc},//遺体から回復2				[10]
-			{Box2D(-96, -64, 192, 128),Box2D( 576, 256, 192, 128),dc},//遺体から回復3				[11]
-			{Box2D(-96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc},//エネミー爆散1				[12]
-			{Box2D(-96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc},//エネミー爆散2				[13]
-			{Box2D(-96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc},//エネミー爆散3				[14]
-			{Box2D(-96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc},//衝撃波1					[15]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc},//衝撃波2					[16]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc},//衝撃波3					[17]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc},//衝撃波4					[18]
-			{Box2D(-96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc},//衝撃波5					[19]
-			{Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1	[20]
-			{Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2	[21]
-			{Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3	[22]
-			{Box2D(-16, -16,  32,  32),Box2D(1632,   0,  32,  32),dc},//エネミー撃破1				[23]
-			{Box2D(-16, -16,  32,  32),Box2D(1632,  32,  32,  32),dc},//エネミー撃破2				[24]
-			{Box2D(-16, -16,  32,  32),Box2D(1632,  64,  32,  32),dc},//エネミー撃破3				[25]
-			{Box2D(-16, -16,  32,  32),Box2D(1632,  96,  32,  32),dc},//エネミー撃破4				[26]
-			{Box2D(-16, -16,  32,  32),Box2D(1632, 128,  32,  32),dc},//エネミー撃破5				[27]
-			{Box2D(-16, -16,  32,  32),Box2D(1632, 160,  32,  32),dc} //エネミー撃破6				[28]
+			{ Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc },//ストンプ着地の衝撃1		[ 0]
+			{ Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc },//ストンプ着地の衝撃2		[ 1]
+			{ Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc },//ストンプ着地の衝撃3		[ 2]
+			{ Box2D(-96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc },//パンチ風切り1				[ 3]
+			{ Box2D(-96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc },//パンチ風切り2				[ 4]
+			{ Box2D(-96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc },//パンチ風切り3				[ 5]
+			{ Box2D(-96, -64, 192, 128),Box2D( 384,   0, 192, 128),dc },//パンチの衝撃1				[ 6]
+			{ Box2D(-96, -64, 192, 128),Box2D( 384, 128, 192, 128),dc },//パンチの衝撃2				[ 7]
+			{ Box2D(-96, -64, 192, 128),Box2D( 384, 256, 192, 128),dc },//パンチの衝撃3				[ 8]
+			{ Box2D(-96, -64, 192, 128),Box2D( 576,   0, 192, 128),dc },//遺体から回復1				[ 9]
+			{ Box2D(-96, -64, 192, 128),Box2D( 576, 128, 192, 128),dc },//遺体から回復2				[10]
+			{ Box2D(-96, -64, 192, 128),Box2D( 576, 256, 192, 128),dc },//遺体から回復3				[11]
+			{ Box2D(-96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc },//エネミー爆散1				[12]
+			{ Box2D(-96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc },//エネミー爆散2				[13]
+			{ Box2D(-96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc },//エネミー爆散3				[14]
+			{ Box2D(-96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc },//衝撃波1					[15]
+			{ Box2D(-96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc },//衝撃波2					[16]
+			{ Box2D(-96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc },//衝撃波3					[17]
+			{ Box2D(-96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc },//衝撃波4					[18]
+			{ Box2D(-96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc },//衝撃波5					[19]
+			{ Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1	[20]
+			{ Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2	[21]
+			{ Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3	[22]
+			{ Box2D(-16, -16,  32,  32),Box2D(1632,   0,  32,  32),dc },//エネミー撃破1				[23]
+			{ Box2D(-16, -16,  32,  32),Box2D(1632,  32,  32,  32),dc },//エネミー撃破2				[24]
+			{ Box2D(-16, -16,  32,  32),Box2D(1632,  64,  32,  32),dc },//エネミー撃破3				[25]
+			{ Box2D(-16, -16,  32,  32),Box2D(1632,  96,  32,  32),dc },//エネミー撃破4				[26]
+			{ Box2D(-16, -16,  32,  32),Box2D(1632, 128,  32,  32),dc },//エネミー撃破5				[27]
+			{ Box2D(-16, -16,  32,  32),Box2D(1632, 160,  32,  32),dc },//エネミー撃破6				[28]
+			{ Box2D(-16, -16,  32,  32),Box2D(1664,   0,  32,  32),dc },//爆発破片1					[29]
+			{ Box2D(-16, -16,  32,  32),Box2D(1664,  32,  32,  32),dc },//爆発破片2					[30]
+			{ Box2D(-16, -16,  32,  32),Box2D(1664,  64,  32,  32),dc },//爆発破片3					[31]
+			{ Box2D(-16, -16,  32,  32),Box2D(1664,  96,  32,  32),dc },//爆発破片4					[32]
+			{ Box2D(-16, -16,  32,  32),Box2D(1664, 128,  32,  32),dc },//爆発破片5					[33]
+			{ Box2D(-16, -16,  32,  32),Box2D(1664, 160,  32,  32),dc },//爆発破片6					[34]
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -225,6 +241,11 @@ namespace  Task_Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt + 9];
 			rtv.color = ML::Color(1, 0, 0, 1);
+			break;
+		case Debris:
+			effectCnt = this->animCnt / (this->limit_erase_debris / 6);
+			effectCnt %= 6;
+			rtv = imageTable[effectCnt + 29];
 			break;
 		}
 		//	向きに応じて画像を左右反転する
@@ -274,6 +295,9 @@ namespace  Task_Effect
 			break;
 		case Bubble:
 			this->moveVec = this->eff->Move_Bubble(this->moveCnt,this->interval_bubble,this->wide_bubble,this->speed_surfacing);
+			break;
+		case Debris:
+			this->moveVec = this->eff->Move_Parabola(this->speed_Debris,this->moveVec.y,this->gravity,this->angle);
 			break;
 		}
 	}

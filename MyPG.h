@@ -80,7 +80,6 @@ namespace  MyPG
 		bool clear;						//クリアフラグ
 		bool failure;					//ミスフラグ
 		bool pause;						//ポーズフラグ
-
 	//----------------------------------------------
 	};
 }

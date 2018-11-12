@@ -72,7 +72,13 @@ namespace  Enemy01
 		//ゲームが進行中の時のみ撃破エフェクトの生成
 		if (!ge->failure && !ge->clear)
 		{
+			//画面エフェクトの生成
 			this->eff->Create_Effect(3, this->pos);
+			for (int i = 0; i < 5; ++i)
+			{
+				this->eff->Create_Effect(7, this->pos, float(rand() % 360), this->angle_LR);
+			}
+			//SEの再生
 		}
 		return  true;
 	}

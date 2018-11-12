@@ -50,13 +50,14 @@ namespace  Task_Effect
 		//状態管理
 		enum State_Effect
 		{
-			Non,		//未指定
-			Hit_Shot,	//ヒットショット（プレイヤ）
-			Barrier,	//バリア
-			Heal,		//回復
-			Bubble,		//泡
-			Appear,		//登場
-			Defeat_Enemy//撃破（エネミー）
+			Non,			//未指定
+			Hit_Shot,		//ヒットショット（プレイヤ）
+			Barrier,		//バリア
+			Heal,			//回復
+			Bubble,			//泡
+			Appear,			//登場
+			Defeat_Enemy,	//撃破（エネミー）
+			Debris			//破片
 		};
 		State_Effect state_effect;	//状態管理
 		int num_bubble;				//泡の大きさを指定する
@@ -68,11 +69,14 @@ namespace  Task_Effect
 		int limit_erase_heal;		//時間消滅まで回復
 		int limit_erase_bubble;		//時間消滅まで泡
 		int limit_erase_appear;		//時間消滅まで登場
+		int limit_erase_debris;		//消滅までの時間破片
 		int choice_state;			//外部から状態を指定する際、使用
 		float speed_surfacing;		//泡の浮上速度
+		float speed_Debris;			//速度破片
 		float wide_bubble;			//泡の揺れ幅
 		float dist;					//撃破エフェクトの中心からの距離
 		float angle;				//表示する角度
+		float gravity;				//重力加速度
 		Vec2 center;				//回転軸
 		Effect* eff;				//エフェクトクラス
 	public:

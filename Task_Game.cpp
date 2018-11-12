@@ -89,8 +89,8 @@ namespace  Game
 		Back::Object::Create(true);
 		//仮ゴールキャラクタの生成
 		auto goal = Goal::Object::Create(true);
-		/*goal->pos = ML::Vec2(7870, 5106);*/
-		goal->pos = ML::Vec2(300.0f, 4460.0f);
+		goal->pos = ML::Vec2(7870, 5106);
+		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		return  true;
 	}
 	//-------------------------------------------------------------------

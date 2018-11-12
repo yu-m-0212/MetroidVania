@@ -201,6 +201,9 @@
     <ClCompile Include="Task_Display_Effect.cpp">
       <Filter>MyPG\Display</Filter>
     </ClCompile>
+    <ClCompile Include="Dm2008_Ver1_3.cpp">
+      <Filter>LIB</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -334,6 +337,9 @@
     </ClInclude>
     <ClInclude Include="Task_Display_Effect.h">
       <Filter>MyPG\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="Dm2008_Ver1_3.h">
+      <Filter>LIB</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
