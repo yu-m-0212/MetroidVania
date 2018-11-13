@@ -152,7 +152,7 @@ namespace  Retry
 			//タイトルに戻る
 			else if (this->title_or_game == 1)
 			{
-				//画面遷移時間になったら本編生成
+				//画面遷移時間になったらタイトル生成
 				if (this->cnt_transition == this->time_create_next_task)
 				{
 					Title::Object::Create(true);

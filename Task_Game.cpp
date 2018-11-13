@@ -63,6 +63,8 @@ namespace  Game
 		this->shot00_Resource = Shot00::Resource::Create();
 		this->shot01_Resource = Shot01::Resource::Create();
 		this->effect_Resource = Task_Effect::Resource::Create();
+		this->player_resource = Player::Resource::Create();
+		this->enemy01_resource = Enemy01::Resource::Create();
 
 		//★タスクの生成
 		//マップの生成
@@ -90,6 +92,7 @@ namespace  Game
 		//仮ゴールキャラクタの生成
 		auto goal = Goal::Object::Create(true);
 		goal->pos = ML::Vec2(7870, 5106);
+		//プレイヤの目の前に生成する場合
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		return  true;
 	}
@@ -125,6 +128,9 @@ namespace  Game
 		this->shot00_Resource.reset();
 		this->shot01_Resource.reset();
 		this->effect_Resource.reset();
+		this->player_resource.reset();
+		//エネミーのサウンドリソースの扱いに再考の余地あり
+		this->enemy01_resource.reset();
 		if (!ge->QuitFlag() && this->nextTaskCreate)
 		{
 			//クリア時

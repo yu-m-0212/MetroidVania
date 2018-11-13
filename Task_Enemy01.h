@@ -26,6 +26,8 @@ namespace  Enemy01
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
 		string imageName;				//名前画像
+		string base_file_path_sound;	//サウンドファイルパスベース
+		string name_sound_defeat;		//名前効果音爆発
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara

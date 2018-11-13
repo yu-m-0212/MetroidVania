@@ -24,8 +24,9 @@ namespace  Title
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//‹¤—L‚·‚é•Ï”‚Í‚±‚±‚É’Ç‰Á‚·‚é
-		string	back_title;
-		string	button_title;
+		string	back_title;			//‰æ‘œ”wŒi
+		string	button_title;		//‰æ‘œOptionƒ{ƒ^ƒ“
+		string	name_sound_bubble;	//Œø‰Ê‰¹–A
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BTask

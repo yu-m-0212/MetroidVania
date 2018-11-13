@@ -8,6 +8,8 @@
 #include  "Task_Shot01.h"
 #include  "Task_Effect.h"
 #include  "Task_Tutorials.h"
+#include  "Task_Player.h"
+#include  "Task_Enemy01.h"
 
 namespace  Game
 {
@@ -58,8 +60,10 @@ namespace  Game
 		Task_Effect::Object* eff;		//ポインタエフェクト
 	public:
 		//リソースを常駐させる
-		Shot00::Resource::SP	shot00_Resource;
-		Shot01::Resource::SP	shot01_Resource;
+		Shot00::Resource::SP		shot00_Resource;
+		Shot01::Resource::SP		shot01_Resource;
 		Task_Effect::Resource::SP	effect_Resource;
+		Player::Resource::SP		player_resource;
+		Enemy01::Resource::SP		enemy01_resource;
 	};
 }

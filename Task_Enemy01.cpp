@@ -19,6 +19,12 @@ namespace  Enemy01
 	{
 		this->imageName = "Enemy01Img";
 		DG::Image_Create(this->imageName, "./data/image/enemy01.png");
+
+		this->base_file_path_sound = "./data/sound/wav/";
+		this->name_sound_defeat = "sound_defeat";
+		//wavファイルの中でも再生できないものあり
+		DM::Sound_CreateSE(this->name_sound_defeat, this->base_file_path_sound + "explosion_enemy01.wav");
+		DM::Sound_Volume(this->name_sound_defeat, 1000);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -26,6 +32,7 @@ namespace  Enemy01
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_sound_defeat);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -43,7 +50,7 @@ namespace  Enemy01
 		this->recieveBase = this->hitBase;
 		this->angle_LR = Left;
 		this->state = Stand;
-		this->hp = 10;
+		this->hp = 7;
 		this->maxSpeed = 2.0f;								//最大移動速度(横)
 		this->addSpeed = 0.7f;								//歩行加速度(地面の影響である程度打ち消される
 		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量(摩擦
@@ -79,6 +86,7 @@ namespace  Enemy01
 				this->eff->Create_Effect(7, this->pos, float(rand() % 360), this->angle_LR);
 			}
 			//SEの再生
+			DM::Sound_Play(this->res->name_sound_defeat, false);
 		}
 		return  true;
 	}

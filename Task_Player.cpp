@@ -25,6 +25,17 @@ namespace  Player
 	{
 		this->imageName = "PlayerImg";
 		DG::Image_Create(this->imageName, "./data/image/player.png");
+
+		this->base_file_path_sound = "./data/sound/wav/";
+		this->name_sound_landing = "sound_landing";
+		DM::Sound_CreateSE(this->name_sound_landing, this->base_file_path_sound + "landing_player01.wav");
+		DM::Sound_Volume(this->name_sound_landing, 1000);
+		this->name_sound_jump = "jump_sound";
+		DM::Sound_CreateSE(this->name_sound_jump, this->base_file_path_sound + "jump_player01.wav");
+		DM::Sound_Volume(this->name_sound_jump, 1000);
+		this->name_sound_shot = "shot_sound";
+		DM::Sound_CreateSE(this->name_sound_shot, this->base_file_path_sound + "shot_player01.wav");
+		DM::Sound_Volume(this->name_sound_shot, 1000);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -32,6 +43,9 @@ namespace  Player
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_sound_landing);
+		DM::Sound_Erase(this->name_sound_jump);
+		DM::Sound_Erase(this->name_sound_shot);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -501,7 +515,10 @@ namespace  Player
 		case  Jump:		//上昇中
 			if (this->moveCnt == 0)
 			{
-				this->moveVec.y = this->height_jump;//初速設定
+				//初速設定
+				this->moveVec.y = this->height_jump;
+				//SE再生
+				DM::Sound_Play(this->res->name_sound_jump,false);
 			}
 			//向きの変更は倒した瞬間
 			if (this->moveCnt<this->limit_JumpAngleChange&&in.LStick.L.down)
@@ -534,6 +551,11 @@ namespace  Player
 			}
 			break;
 		case Landing:
+			//SE再生
+			if (this->moveCnt == 0)
+			{
+				DM::Sound_Play(this->res->name_sound_landing, false);
+			}
 			break;
 		case PreStomp:
 			break;
@@ -701,6 +723,8 @@ namespace  Player
 				shot->moveVec = ML::Vec2(cos(angle), sin(angle)) * this->speed_shot;
 				shot->Set_Angle(angle);
 			}
+			//SE再生
+			DM::Sound_Play(this->res->name_sound_shot,false);
 		}
 	}
 	//行動ショット中

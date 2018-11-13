@@ -18,6 +18,10 @@ namespace  Title
 		DG::Image_Create(this->back_title, "./data/image/Title.png");
 		this->button_title = "button";
 		DG::Image_Create(this->button_title, "./data/image/ui.png");
+
+		this->name_sound_bubble = "sound_bubble";
+		DM::Sound_CreateStream(this->name_sound_bubble, "./data/sound/wav/bubbling.wav");
+		DM::Sound_Volume(this->name_sound_bubble, 1000);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -26,6 +30,7 @@ namespace  Title
 	{
 		DG::Image_Erase(this->back_title);
 		DG::Image_Erase(this->button_title);
+		DM::Sound_Erase(this->name_sound_bubble);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -59,6 +64,9 @@ namespace  Title
 		
 		//★タスクの生成
 
+		//BGMの再生
+		DM::Sound_Play(this->res->name_sound_bubble, true);
+
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -67,12 +75,13 @@ namespace  Title
 	{
 		//★データ＆タスク解放
 		ge->KillAll_G("エフェクト");
+		//サウンドの停止
+		DM::Sound_Stop(this->res->name_sound_bubble);
 		//★引き継ぎタスクの生成
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
 		{
 			Game::Object::Create(true);
 		}
-
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -118,6 +127,8 @@ namespace  Title
 			{
 				Display_Effect::Object::Create(true);
 			};
+			//サウンドのフェードアウト
+			DM::Sound_FadeOut(this->res->name_sound_bubble);
 		}
 		//消滅カウントダウン
 		if (this->flag_transition)
@@ -134,12 +145,14 @@ namespace  Title
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		//背景の描画
 		{
 			ML::Box2D  draw(-640, -360, 3200, 1800);
 			draw.Offset(ML::Vec2(0, this->posY));
 			ML::Box2D   src(0, 0, 3200, 1800);
 			DG::Image_Draw(this->res->back_title, draw, src);
 		}
+		//ボタンの描画
 		{
 			ML::Box2D draw(-425, -125, 850, 250);
 			draw.Offset(this->pos_button);

@@ -40,6 +40,12 @@ namespace MyPG
 				return false;
 			}
 		}
+		if (DM::Initialize(wnd_) == false)
+		{
+			//初期化失敗でプログラム終了
+			DestroyWindow(wnd_);
+			return false;
+		}
 		//デバッグ用フォントの準備
 		DG::Font_Create("Debug", "ＭＳ Ｐゴシック", 4, 16);
 
@@ -101,6 +107,8 @@ namespace MyPG
 	{
 		//入力装置の更新
 		DI::UpDate();
+		//	サウンドの更新(ストリーミング監視）
+		DM::Check_Stream();
 	}
 
 	//2D描画環境のデフォルトパラメータ設定
