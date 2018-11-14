@@ -14,14 +14,23 @@ namespace  Title
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
+
 		this->back_title = "back";
 		DG::Image_Create(this->back_title, "./data/image/Title.png");
+
 		this->button_title = "button";
 		DG::Image_Create(this->button_title, "./data/image/ui.png");
 
+		this->base_file_path = "./data/sound/wav/";
+
 		this->name_sound_bubble = "sound_bubble";
-		DM::Sound_CreateStream(this->name_sound_bubble, "./data/sound/wav/bubbling.wav");
+		DM::Sound_CreateStream(this->name_sound_bubble, this->base_file_path + "bubbling.wav");
 		DM::Sound_Volume(this->name_sound_bubble, 1000);
+
+		this->name_environmental_title = "environmental_title";
+		DM::Sound_CreateStream(this->name_environmental_title, this->base_file_path + "environmental_title.wav");
+		DM::Sound_Volume(this->name_environmental_title, 1000);
+
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -31,6 +40,7 @@ namespace  Title
 		DG::Image_Erase(this->back_title);
 		DG::Image_Erase(this->button_title);
 		DM::Sound_Erase(this->name_sound_bubble);
+		DM::Sound_Erase(this->name_environmental_title);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -66,6 +76,7 @@ namespace  Title
 
 		//BGMの再生
 		DM::Sound_Play(this->res->name_sound_bubble, true);
+		DM::Sound_Play(this->res->name_environmental_title, true);
 
 		return  true;
 	}
@@ -77,6 +88,7 @@ namespace  Title
 		ge->KillAll_G("エフェクト");
 		//サウンドの停止
 		DM::Sound_Stop(this->res->name_sound_bubble);
+		DM::Sound_Stop(this->res->name_environmental_title);
 		//★引き継ぎタスクの生成
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
 		{
@@ -129,6 +141,7 @@ namespace  Title
 			};
 			//サウンドのフェードアウト
 			DM::Sound_FadeOut(this->res->name_sound_bubble);
+			DM::Sound_FadeOut(this->res->name_environmental_title);
 		}
 		//消滅カウントダウン
 		if (this->flag_transition)

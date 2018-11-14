@@ -27,15 +27,26 @@ namespace  Player
 		DG::Image_Create(this->imageName, "./data/image/player.png");
 
 		this->base_file_path_sound = "./data/sound/wav/";
+
 		this->name_sound_landing = "sound_landing";
 		DM::Sound_CreateSE(this->name_sound_landing, this->base_file_path_sound + "landing_player01.wav");
 		DM::Sound_Volume(this->name_sound_landing, 1000);
+
 		this->name_sound_jump = "jump_sound";
 		DM::Sound_CreateSE(this->name_sound_jump, this->base_file_path_sound + "jump_player01.wav");
 		DM::Sound_Volume(this->name_sound_jump, 1000);
+
 		this->name_sound_shot = "shot_sound";
 		DM::Sound_CreateSE(this->name_sound_shot, this->base_file_path_sound + "shot_player01.wav");
 		DM::Sound_Volume(this->name_sound_shot, 1000);
+
+		this->name_sound_barrier = "sound_barrier";
+		DM::Sound_CreateSE(this->name_sound_barrier, this->base_file_path_sound + "activate_barrier_player01.wav");
+		DM::Sound_Volume(this->name_sound_barrier, 1000);
+
+		this->name_not_recharge = "not_recharge";
+		DM::Sound_CreateSE(this->name_not_recharge, this->base_file_path_sound + "not_recharge_barrier_player01.wav");
+		DM::Sound_Volume(this->name_not_recharge, 1000);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -46,6 +57,8 @@ namespace  Player
 		DM::Sound_Erase(this->name_sound_landing);
 		DM::Sound_Erase(this->name_sound_jump);
 		DM::Sound_Erase(this->name_sound_shot);
+		DM::Sound_Erase(this->name_sound_barrier);
+		DM::Sound_Erase(this->name_not_recharge);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -562,11 +575,21 @@ namespace  Player
 		case LandStomp:
 		case AirStomp:
 		case StompLanding:
-			//リチャージ済みの時のみ
-			if (this->moveCnt == 0&&this->gauge_melee==this->gauge_melee_max)
+			if (this->moveCnt == 0)
 			{
-				this->Stomp_Std();
-				this->gauge_melee = 0;
+				//リチャージ済み
+				if (this->gauge_melee == this->gauge_melee_max)
+				{
+					this->Stomp_Std();
+					this->gauge_melee = 0;
+					//SE再生
+					DM::Sound_Play(this->res->name_sound_barrier, false);
+				}
+				//未リチャージ
+				else
+				{
+					DM::Sound_Play(this->res->name_not_recharge, false);
+				}
 			}
 			break;
 		case  Shoot:

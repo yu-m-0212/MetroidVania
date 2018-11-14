@@ -23,6 +23,7 @@
 #include  "Task_Corpse.h"
 #include  "Task_Gun.h"
 #include  "Task_Display_Effect.h"
+#include  "Task_Boss01.h"
 
 namespace  Game
 {
@@ -31,12 +32,22 @@ namespace  Game
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
+		//基礎ファイルパス
+		this->base_file_path_game = "./data/sound/wav/";
+
+		//環境音
+		this->name_environmental_game = "environmental_game";
+		DM::Sound_CreateStream(this->name_environmental_game,
+			this->base_file_path_game + "environmental_game.wav");
+		DM::Sound_Volume(this->name_environmental_game, 1000);
+
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
+		DM::Sound_Erase(this->name_environmental_game);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -94,6 +105,11 @@ namespace  Game
 		goal->pos = ML::Vec2(7870, 5106);
 		//プレイヤの目の前に生成する場合
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
+		//BGMの再生
+		DM::Sound_Play(this->res->name_environmental_game, true);
+		//仮にボスの生成
+		auto boss01 = Boss01::Object::Create(true);
+		boss01->pos = ML::Vec2(700.0f, 4500.0f);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -139,6 +155,8 @@ namespace  Game
 				Ending::Object::Create(true);
 			}
 		}
+		//サウンドの停止
+		DM::Sound_Stop(this->res->name_environmental_game);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -169,6 +187,7 @@ namespace  Game
 			if (this->cnt_transition == 0)
 			{
 				auto display_effect = Display_Effect::Object::Create(true);
+				DM::Sound_FadeOut(this->res->name_environmental_game);
 			}
 			this->cnt_transition++;
 			//リトライ生成
@@ -196,6 +215,7 @@ namespace  Game
 			if (this->cnt_transition == 0)
 			{
 				Display_Effect::Object::Create(true);
+				DM::Sound_FadeOut(this->res->name_environmental_game);
 			}
 			this->cnt_transition++;
 			//一定時間で自身を消滅させる

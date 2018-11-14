@@ -24,11 +24,13 @@ namespace  Player
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string		imageName;				//名前画像
+		string		imageName;				//画像リソース
 		string		base_file_path_sound;	//サウンドファイルパスベース
-		string		name_sound_landing,		//名前効果音着地
-					name_sound_jump,		//名前効果音ジャンプ
-					name_sound_shot;		//名前効果音ショット
+		string		name_sound_landing;		//効果音着地
+		string		name_sound_jump;		//効果音ジャンプ
+		string		name_sound_shot;		//効果音ショット
+		string		name_sound_barrier;		//効果音バリア
+		string		name_not_recharge;		//効果音未リチャージバリア
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara

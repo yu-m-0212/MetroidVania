@@ -24,9 +24,12 @@ namespace  Title
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string	back_title;			//画像背景
-		string	button_title;		//画像Optionボタン
-		string	name_sound_bubble;	//効果音泡
+		string	back_title;					//画像背景
+		string	button_title;				//画像Optionボタン
+
+		string	base_file_path;				//ベースファイルパス
+		string	name_sound_bubble;			//効果音泡
+		string	name_environmental_title;	//環境音タイトル
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BTask

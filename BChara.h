@@ -40,10 +40,6 @@ public:
 		Lose,			//	消える・昇天
 		Caution,		//	エネミー警戒時
 		TargetLost,		//	対象を見失ったとき
-		//以下、エフェクトタスク表示用
-		ImpactPunch,	//	パンチを当てた時の衝撃
-		Heal,			//	遺体から回復
-		Bubble			//	泡
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };
@@ -63,6 +59,7 @@ public:
 	};
 	//キャラクタ共通メンバ変数
 	//徐々に非公開にすること
+	//BCharaメソッドに使用しないものはここに持たせること
 	Angle_LR	angle_LR;
 	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置

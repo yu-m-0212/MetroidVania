@@ -1,21 +1,15 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//ゲーム本編
+//ボス01
 //-------------------------------------------------------------------
-#include "GameEngine_Ver3_7.h"
-#include  "Task_Shot00.h"
-#include  "Task_Shot01.h"
-#include  "Task_Effect.h"
-#include  "Task_Tutorials.h"
-#include  "Task_Player.h"
-#include  "Task_Enemy01.h"
+#include "BChara.h"
 
-namespace  Game
+namespace  Boss01
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("本編");	//グループ名
-	const  string  defName("NoName");	//タスク名
+	const  string  defGroupName("ボス01");	//グループ名
+	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -28,14 +22,13 @@ namespace  Game
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
-		string base_file_path_game;		//基礎ファイルパス
-		string name_environmental_game;	//環境音本編
+		string name_image;	//画像リソース
 	};
 	//-------------------------------------------------------------------
-	class  Object : public  BTask
+	class  Object : public  BChara
 	{
-	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
 		virtual  ~Object();
 		typedef  shared_ptr<Object>		SP;
@@ -52,20 +45,23 @@ namespace  Game
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	private:
-		ML::Vec2 pos_dead;				//前回の死亡地点
-		BChara::Angle_LR angle_dead;	//死亡時の向き
-		int cnt_transition;				//カウンタ遷移用
-		int time_create_next_task;		//引継ぎタスクの生成タイミング
-		int time_kill_game;				//自身を消滅させるタイミング
-		Tutorials::Object* tutorials;	//ポインタメッセージ
-		Task_Effect::Object* eff;		//ポインタエフェクト
+		//状態管理
+		enum State_Boss
+		{
+			Base	//土台
+		};
+		State_Boss state_boss;	//ボス用状態管理
+		float std_pos_x;		//基準値横軸座標
+		ML::Box2D hit_body;		//矩形身体
 	public:
-		//リソースを常駐させる
-		Shot00::Resource::SP		shot00_Resource;
-		Shot01::Resource::SP		shot01_Resource;
-		Task_Effect::Resource::SP	effect_Resource;
-		Player::Resource::SP		player_resource;
-		Enemy01::Resource::SP		enemy01_resource;
+		//接触時の応答処理（必ず受け身の処理として実装する）
+		//引数	：	(攻撃側,攻撃情報,与無敵時間)
+		void Received(BChara* from_, AttackInfo at_, const int&);
+		//思考＆状況判断(ステータス決定）
+		void  Think();
+		//モーションに対応した処理
+		void  Move();
+		//アニメーション制御
+		BChara::DrawInfo  Anim();
 	};
 }

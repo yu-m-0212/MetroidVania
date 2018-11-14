@@ -16,6 +16,13 @@ namespace  Shot00
 	{
 		this->imageName = "Shot00Img";
 		DG::Image_Create(this->imageName, "./data/image/Shot00.png");
+
+		this->base_file_path_shot = "./data/sound/wav/";
+
+		this->name_sound_hit = "hit_shot";
+		DM::Sound_CreateSE(this->name_sound_hit, this->base_file_path_shot + "hit_shot_player01.wav");
+		DM::Sound_Volume(this->name_sound_hit, 1000);
+
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -23,6 +30,7 @@ namespace  Shot00
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_sound_hit);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -80,6 +88,8 @@ namespace  Shot00
 					++it) {
 					//相手に接触の有無を確認させる
 					if ((*it)->CheckHit(me)) {
+						//効果音の再生
+						DM::Sound_Play(this->res->name_sound_hit,false);
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { this->power,0,0 };
 						(*it)->Received(this, at, this->un_hit);
@@ -115,6 +125,8 @@ namespace  Shot00
 					ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
 					if (true == map->CheckHit(hit))
 					{
+						//効果音の再生
+						DM::Sound_Play(this->res->name_sound_hit, false);
 						//対応したヒット時のエフェクトを生成し消滅する
 						this->Effect_Hit(this->pos);
 						this->Kill();
