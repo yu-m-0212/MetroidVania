@@ -1,6 +1,13 @@
+スタッフロール
+
 Images
 helpcomputer from OpenGameArt.org
 
 Sounds
 Free Sound Effect.com
 魔王魂
+
+Softwear
+Tiled
+Visual Studio
+Photo Shop
