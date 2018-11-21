@@ -100,27 +100,37 @@ namespace  UI
 			}
 		}
 		//近接攻撃ゲージの表示
+		if(pl->Get_Barrier())
 		{
-			ML::Box2D draw(1589, 53, pl->Get_Gauge_Mlee() * 3, 24);
-			ML::Box2D  src(64, 0, 64, 64);
-			ML::Color  clr;
-			//マックスの時、点滅する
-			if (pl->Get_Gauge_Mlee() == pl->Get_Gauge_Melle_Max())
+			//バー
 			{
-				if (this->cnt % 12 == 0)
+				ML::Box2D draw(1589, 53, pl->Get_Gauge_Mlee() * 3, 24);
+				ML::Box2D  src(64, 0, 64, 64);
+				ML::Color  clr;
+				//マックスの時、点滅する
+				if (pl->Get_Gauge_Mlee() == pl->Get_Gauge_Melle_Max())
 				{
-					clr = ML::Color(1, 1, 1, 1);
+					if (this->cnt % 12 == 0)
+					{
+						clr = ML::Color(1, 1, 1, 1);
+					}
+					else
+					{
+						clr = ML::Color(1, 0.25f, 0.5f, 1);
+					}
 				}
 				else
 				{
 					clr = ML::Color(1, 0.25f, 0.5f, 1);
 				}
+				DG::Image_Draw(this->res->hpImageName, draw, src, clr);
 			}
-			else
+			//フレーム
 			{
-				clr = ML::Color(1, 0.25f, 0.5f, 1);
+				ML::Box2D draw(0, 0, 1920, 128);
+				ML::Box2D  src(0, 576, 1920, 128);
+				DG::Image_Draw(this->res->hpImageName, draw, src);
 			}
-			DG::Image_Draw(this->res->hpImageName, draw, src, clr);
 		}
 		//以下デバッグ----------------------------------------------------
 		if (ge->debugMode)

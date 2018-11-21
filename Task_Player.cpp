@@ -15,6 +15,8 @@
 #include	"Task_Enemy01.h"
 #include	"Task_Tutorials.h"
 #include	"Task_Display_Effect.h"
+#include	"Task_Item00.h"
+#include	"Task_Item01.h"
 
 namespace  Player
 {
@@ -76,6 +78,7 @@ namespace  Player
 		this->recieveBase = this->hitBase;
 		this->angle_LR = Right;
 		this->controllerName = "P1";
+		this->barrier = false;								//バリアの使用制限
 		this->state = Stand;								//キャラ初期状態
 		this->max_hp = 3;									//HP最大値
 		this->hp = this->max_hp;							//HP初期値
@@ -139,9 +142,12 @@ namespace  Player
 		//無敵時間の減少
 		if (this->time_un_hit > 0) { this->time_un_hit--; }
 		//近接攻撃のリチャージ
-		if (this->gauge_melee < 100)
+		if (this->barrier)
 		{
-			this->gauge_melee++;
+			if (this->gauge_melee < 100)
+			{
+				this->gauge_melee++;
+			}
 		}
 		//思考・状況判断
 		this->Think();
@@ -164,8 +170,6 @@ namespace  Player
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
 						(*it)->Received(this, at,0);
-						//回復エフェクトを生成
-						eff->Create_Effect(4, this->pos);
 						break;
 					}
 				}
@@ -289,21 +293,21 @@ namespace  Player
 			if (in.LStick.R.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
-			if (in.B1.down) { nm = PreStomp; }
+			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (!this->CheckFoot()) { nm = Fall; }//足元 障害　無し
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.off&&in.LStick.R.off) { nm = SlowDown; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
-			if (in.B1.down) { nm = PreStomp; }
+			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			break;
 		case SlowDown:	//減速中
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B1.down) { nm = PreStomp; }
+			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
@@ -314,24 +318,24 @@ namespace  Player
 		case  Jump:		//上昇中
 			if (this->moveVec.y >= 0) { nm = Fall; }
 			if (in.R1.on) { nm = Jumpshoot; }
-			if (in.B1.down) { nm = AirStomp; }
+			if (in.B1.down&&barrier) { nm = AirStomp; }
 			break;
 		case  Fall:		//落下中
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
 			if (in.R1.on) { nm = Fallshoot; }
-			if (in.B1.down) { nm = AirStomp; }
+			if (in.B1.down&&barrier) { nm = AirStomp; }
 			break;
 		case  Landing:	//着地
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = Jump; }
-			if (in.B1.down) { nm = PreStomp; }
+			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 6) { nm = Stand; }
 			break;
 		case  Shoot:	//射撃
 			if (in.R1.off) {nm = Stand;}
-			if (in.B1.down) { PreStomp; }
+			if (in.B1.down&&barrier) { PreStomp; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (!this->CheckFoot()) { nm = Fallshoot; }
 			break;
@@ -359,14 +363,10 @@ namespace  Player
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
 		case	Damage:	//ダメージを受けて吹き飛んでいる
-			if (this->moveCnt >= 12 && this->CheckFoot()) 
-			{
-				nm = Stand;
-			}
-			else if (this->moveCnt >= 12 && !this->CheckFoot())
-			{
-				nm = Fall;
-			}
+			if (this->moveCnt >= 12 &&
+				this->CheckFoot()) {nm = Stand;}
+			else if (this->moveCnt >= 12 &&
+				!this->CheckFoot()){nm = Fall;}
 			break;
 		}
 		//モーション更新
@@ -797,6 +797,11 @@ namespace  Player
 		//エフェクトの生成
 		this->eff->Create_Effect(2, this->pos);
 	}
+	//バリアの取得状況を取得する
+	bool Object::Get_Barrier()
+	{
+		return this->barrier;
+	}
 	//ショットの発射間隔を取得する
 	int Object::Get_Interval_Shot()
 	{
@@ -832,6 +837,12 @@ namespace  Player
 	void Object::Set_Max_HP(const int& max_)
 	{
 		this->max_hp = max_;
+	}
+	//バリアの取得状況を指定する
+	//引数	：	（bool）
+	void Object::Set_Barrier(const bool& flag_)
+	{
+		this->barrier = flag_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

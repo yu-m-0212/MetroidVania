@@ -24,6 +24,7 @@
 #include  "Task_Gun.h"
 #include  "Task_Display_Effect.h"
 #include  "Task_Boss01.h"
+#include  "Task_Boss02.h"
 
 namespace  Game
 {
@@ -108,8 +109,10 @@ namespace  Game
 		//BGMの再生
 		DM::Sound_Play(this->res->name_environmental_game, true);
 		//仮にボスの生成
-		auto boss01 = Boss01::Object::Create(true);
-		boss01->pos = ML::Vec2(700.0f, 4500.0f);
+		/*auto boss01 = Task_Boss01::Object::Create(true);
+		boss01->pos = ML::Vec2(700.0f, 4360.0f);
+		auto boss02 = Task_Boss01::Object::Create(true);
+		boss01->pos = ML::Vec2(700.0f, 4260.0f);*/
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -140,6 +143,8 @@ namespace  Game
 		ge->KillAll_G("UI");
 		ge->KillAll_G("背景");
 		ge->KillAll_G("ポーズ");
+
+		ge->KillAll_G("ボス");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 		this->shot01_Resource.reset();

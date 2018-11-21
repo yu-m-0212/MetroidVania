@@ -40,6 +40,10 @@ public:
 		Lose,			//	消える・昇天
 		Caution,		//	エネミー警戒時
 		TargetLost,		//	対象を見失ったとき
+		//以下はボス用のステートメント
+		Boss_Floating,	//何にも触れていない状態
+		Boss_Base,		//接地し土台の役割を担う
+		Boss_Common		//他のボス矩形に接触し追従運動する
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };

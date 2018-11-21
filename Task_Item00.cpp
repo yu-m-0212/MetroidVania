@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//アイテム00(回復ポーション)
+//アイテム00(体力上限アップ)
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Item00.h"
@@ -39,6 +39,7 @@ namespace  Item00
 		this->add_Hp = 1;								//プレイヤのHP増加量
 		this->limit_message = 180;						//時間制限メッセージ
 		this->tutorials = new Tutorials::Object();		//ポインタチュートリアル
+		this->eff = new Task_Effect::Object();			//ポインタエフェクト
 		//★タスクの生成
 		return  true;
 	}
@@ -49,6 +50,9 @@ namespace  Item00
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
+			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+			if (nullptr == pl) { return true; }
+			this->eff->Create_Effect(4, pl->pos);
 		}
 
 		return  true;

@@ -1,10 +1,11 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//アイテム00(回復ポーション)
+//アイテム00(体力上限アップ)
 //-------------------------------------------------------------------
 #include "BChara.h"
 #include "Task_Tutorials.h"
+#include "Task_Effect.h"
 
 namespace  Item00
 {
@@ -49,6 +50,7 @@ namespace  Item00
 		int add_Hp;						//プレイヤのHP増加量
 		int limit_message;				//制限時間メッセージ
 		Tutorials::Object* tutorials;	//ポインタチュートリアル
+		Task_Effect::Object* eff;		//ポインタエフェクト
 	public:
 		//コンストラクタ
 		Object();
@@ -56,7 +58,7 @@ namespace  Item00
 		BChara::DrawInfo Anim();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-		void Received(BChara* from_, AttackInfo at_,const int&);
+		void Received(BChara* from_, AttackInfo at_, const int&);
 		//アイテム00の生成
 		//引数	：	（初期座標）
 		void Create_Item00(const ML::Vec2&);

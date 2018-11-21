@@ -1,9 +1,10 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//アイテム01(ジャンプ力ポーション)
+//アイテム01(バリアアビリティ)
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Tutorials.h"
 
 namespace  Item01
 {
@@ -23,7 +24,7 @@ namespace  Item01
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string imageName;
+		string name_image;	//画像リソース
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -37,18 +38,26 @@ namespace  Item01
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
+	public:
+		Object();
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+	private:
+		int limit_message;				//メッセージの時間制限
+		ML::Vec2 center;				//画面中央座標
+		Tutorials::Object* tutorials;	//メソッド呼び出し
 	public:
 		//アニメーション制御
 		BChara::DrawInfo Anim();
 		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_);
+		void Received(BChara* from_, AttackInfo at_, const int& un_hit_);
+		//アイテム01の生成
+		//引数	：	（初期座標）
+		void Create_Item01(const ML::Vec2&);
 	};
 }

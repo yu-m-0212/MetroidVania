@@ -5,10 +5,10 @@
 //-------------------------------------------------------------------
 #include "BChara.h"
 
-namespace  Boss01
+namespace  Task_Boss01
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("ボス01");	//グループ名
+	const  string  defGroupName("ボス");	//グループ名
 	const  string  defName("NoName");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
@@ -45,14 +45,11 @@ namespace  Boss01
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		//状態管理
-		enum State_Boss
-		{
-			Base	//土台
-		};
-		State_Boss state_boss;	//ボス用状態管理
+	private:
+		int interval_shake;		//間隔左右揺れ
 		float std_pos_x;		//基準値横軸座標
-		ML::Box2D hit_body;		//矩形身体
+		float speed_shake;		//速度揺れ
+		float max_speed_fall;	//最大落下速度
 	public:
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	(攻撃側,攻撃情報,与無敵時間)

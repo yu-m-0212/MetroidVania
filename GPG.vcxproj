@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BChara.cpp" />
+    <ClCompile Include="Boss01.cpp" />
     <ClCompile Include="DG2014\DG2014_DGObject.cpp" />
     <ClCompile Include="DG2014\DG2014_Effect.cpp" />
     <ClCompile Include="DG2014\DG2014_Font.cpp" />
@@ -103,6 +104,8 @@
     <ClCompile Include="myLib.cpp" />
     <ClCompile Include="MyPG.cpp" />
     <ClCompile Include="Task_Back.cpp" />
+    <ClCompile Include="Task_Boss01.cpp" />
+    <ClCompile Include="Task_Boss02.cpp" />
     <ClCompile Include="Task_Corpse.cpp" />
     <ClCompile Include="Task_Display_Effect.cpp" />
     <ClCompile Include="Task_Effect.cpp" />
@@ -132,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BChara.h" />
+    <ClInclude Include="Boss01.h" />
     <ClInclude Include="DG2014\DG2014_DGObject.h" />
     <ClInclude Include="DG2014\DG2014_Effect.h" />
     <ClInclude Include="DG2014\DG2014_Font.h" />
@@ -151,6 +155,8 @@
     <ClInclude Include="myLib.h" />
     <ClInclude Include="MyPG.h" />
     <ClInclude Include="Task_Back.h" />
+    <ClInclude Include="Task_Boss01.h" />
+    <ClInclude Include="Task_Boss02.h" />
     <ClInclude Include="Task_Corpse.h" />
     <ClInclude Include="Task_Display_Effect.h" />
     <ClInclude Include="Task_Effect.h" />

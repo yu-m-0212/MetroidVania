@@ -37,32 +37,35 @@
     <Filter Include="Game">
       <UniqueIdentifier>{42ffffda-c957-4c7c-9bbb-e6b88443d981}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Chara_Item">
-      <UniqueIdentifier>{9a1a3014-cb83-4a12-ba4f-ddf73ae84928}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyPG\Chara_Player">
-      <UniqueIdentifier>{2ea57be2-c8ce-4607-9e86-a6dabbb13b1b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MyPG\Stage">
       <UniqueIdentifier>{f21ecf45-9b75-43ef-8182-6702da7e7076}</UniqueIdentifier>
     </Filter>
     <Filter Include="MyPG\Scenes">
       <UniqueIdentifier>{8d875217-27f1-4370-afbc-c14b988432d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Chara_Enemy00">
-      <UniqueIdentifier>{e9f26407-a735-4e9c-be34-00d71f5f57ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="MyPG\Chara_Enemy01">
-      <UniqueIdentifier>{6d08d147-2bfd-41ef-a8ba-4154761d5fb7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MyPG\Display">
       <UniqueIdentifier>{a7d8b172-1c28-4033-a6f4-931a973691fb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Chara_Tutorials">
+    <Filter Include="MyPG\Boss01">
+      <UniqueIdentifier>{12f70c85-74da-4bab-a045-96b0f5bc226a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\Tutorials">
       <UniqueIdentifier>{0077beaf-43d4-4ccf-a8ee-cbd99b453031}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Class">
-      <UniqueIdentifier>{75297c4b-e0a2-4e0f-beab-0876f02cf3bb}</UniqueIdentifier>
+    <Filter Include="MyPG\Player">
+      <UniqueIdentifier>{2ea57be2-c8ce-4607-9e86-a6dabbb13b1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\Item">
+      <UniqueIdentifier>{9a1a3014-cb83-4a12-ba4f-ddf73ae84928}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\Enemy01">
+      <UniqueIdentifier>{6d08d147-2bfd-41ef-a8ba-4154761d5fb7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\Enemy00">
+      <UniqueIdentifier>{e9f26407-a735-4e9c-be34-00d71f5f57ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\Effect">
+      <UniqueIdentifier>{18d8a613-69b7-4355-8866-0313d7d53ad8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -129,38 +132,32 @@
     <ClCompile Include="Task_Game.cpp">
       <Filter>MyPG\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="BChara.cpp">
-      <Filter>MyPG\Class</Filter>
-    </ClCompile>
     <ClCompile Include="Task_Retry.cpp">
       <Filter>MyPG\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Task_Player.cpp">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClCompile>
     <ClCompile Include="Task_Enemy00.cpp">
-      <Filter>MyPG\Chara_Enemy00</Filter>
+      <Filter>MyPG\Enemy00</Filter>
     </ClCompile>
     <ClCompile Include="Task_Shot00.cpp">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClCompile>
     <ClCompile Include="Task_Corpse.cpp">
-      <Filter>MyPG</Filter>
-    </ClCompile>
-    <ClCompile Include="Task_Effect.cpp">
       <Filter>MyPG</Filter>
     </ClCompile>
     <ClCompile Include="Task_Goal.cpp">
       <Filter>MyPG</Filter>
     </ClCompile>
     <ClCompile Include="Task_Item00.cpp">
-      <Filter>MyPG\Chara_Item</Filter>
+      <Filter>MyPG\Item</Filter>
     </ClCompile>
     <ClCompile Include="Task_Item01.cpp">
-      <Filter>MyPG\Chara_Item</Filter>
+      <Filter>MyPG\Item</Filter>
     </ClCompile>
     <ClCompile Include="Task_Item02.cpp">
-      <Filter>MyPG\Chara_Item</Filter>
+      <Filter>MyPG\Item</Filter>
     </ClCompile>
     <ClCompile Include="Task_Map2D.cpp">
       <Filter>MyPG\Stage</Filter>
@@ -172,37 +169,52 @@
       <Filter>MyPG\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Task_Enemy01.cpp">
-      <Filter>MyPG\Chara_Enemy01</Filter>
+      <Filter>MyPG\Enemy01</Filter>
     </ClCompile>
     <ClCompile Include="Task_EnemySearch.cpp">
-      <Filter>MyPG\Chara_Enemy01</Filter>
+      <Filter>MyPG\Enemy01</Filter>
     </ClCompile>
     <ClCompile Include="Task_Shot01.cpp">
-      <Filter>MyPG\Chara_Enemy01</Filter>
+      <Filter>MyPG\Enemy01</Filter>
     </ClCompile>
     <ClCompile Include="Task_UI.cpp">
       <Filter>MyPG\Display</Filter>
     </ClCompile>
     <ClCompile Include="Task_Tutorials.cpp">
-      <Filter>MyPG\Chara_Tutorials</Filter>
+      <Filter>MyPG\Tutorials</Filter>
     </ClCompile>
     <ClCompile Include="Task_Sprite.cpp">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClCompile>
     <ClCompile Include="Task_Gun.cpp">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClCompile>
     <ClCompile Include="Task_Player_Head.cpp">
-      <Filter>MyPG\Chara_Player</Filter>
-    </ClCompile>
-    <ClCompile Include="Effect.cpp">
-      <Filter>MyPG\Class</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClCompile>
     <ClCompile Include="Task_Display_Effect.cpp">
       <Filter>MyPG\Display</Filter>
     </ClCompile>
     <ClCompile Include="Dm2008_Ver1_3.cpp">
       <Filter>LIB</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_Boss01.cpp">
+      <Filter>MyPG\Boss01</Filter>
+    </ClCompile>
+    <ClCompile Include="Effect.cpp">
+      <Filter>MyPG\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="BChara.cpp">
+      <Filter>MyPG</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_Effect.cpp">
+      <Filter>MyPG\Effect</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss01.cpp">
+      <Filter>MyPG\Boss01</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_Boss02.cpp">
+      <Filter>MyPG\Boss01</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -266,38 +278,32 @@
     <ClInclude Include="Task_Game.h">
       <Filter>MyPG\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="BChara.h">
-      <Filter>MyPG\Class</Filter>
-    </ClInclude>
     <ClInclude Include="Task_Retry.h">
       <Filter>MyPG\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Task_Player.h">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="Task_Enemy00.h">
-      <Filter>MyPG\Chara_Enemy00</Filter>
+      <Filter>MyPG\Enemy00</Filter>
     </ClInclude>
     <ClInclude Include="Task_Shot00.h">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="Task_Corpse.h">
-      <Filter>MyPG</Filter>
-    </ClInclude>
-    <ClInclude Include="Task_Effect.h">
       <Filter>MyPG</Filter>
     </ClInclude>
     <ClInclude Include="Task_Goal.h">
       <Filter>MyPG</Filter>
     </ClInclude>
     <ClInclude Include="Task_Item00.h">
-      <Filter>MyPG\Chara_Item</Filter>
+      <Filter>MyPG\Item</Filter>
     </ClInclude>
     <ClInclude Include="Task_Item01.h">
-      <Filter>MyPG\Chara_Item</Filter>
+      <Filter>MyPG\Item</Filter>
     </ClInclude>
     <ClInclude Include="Task_Item02.h">
-      <Filter>MyPG\Chara_Item</Filter>
+      <Filter>MyPG\Item</Filter>
     </ClInclude>
     <ClInclude Include="Task_Map2D.h">
       <Filter>MyPG\Stage</Filter>
@@ -309,37 +315,52 @@
       <Filter>MyPG\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Task_Enemy01.h">
-      <Filter>MyPG\Chara_Enemy01</Filter>
+      <Filter>MyPG\Enemy01</Filter>
     </ClInclude>
     <ClInclude Include="Task_EnemySearch.h">
-      <Filter>MyPG\Chara_Enemy01</Filter>
+      <Filter>MyPG\Enemy01</Filter>
     </ClInclude>
     <ClInclude Include="Task_Shot01.h">
-      <Filter>MyPG\Chara_Enemy01</Filter>
+      <Filter>MyPG\Enemy01</Filter>
     </ClInclude>
     <ClInclude Include="Task_UI.h">
       <Filter>MyPG\Display</Filter>
     </ClInclude>
     <ClInclude Include="Task_Tutorials.h">
-      <Filter>MyPG\Chara_Tutorials</Filter>
+      <Filter>MyPG\Tutorials</Filter>
     </ClInclude>
     <ClInclude Include="Task_Sprite.h">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="Task_Gun.h">
-      <Filter>MyPG\Chara_Player</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="Task_Player_Head.h">
-      <Filter>MyPG\Chara_Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Effect.h">
-      <Filter>MyPG\Class</Filter>
+      <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="Task_Display_Effect.h">
       <Filter>MyPG\Display</Filter>
     </ClInclude>
     <ClInclude Include="Dm2008_Ver1_3.h">
       <Filter>LIB</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Boss01.h">
+      <Filter>MyPG\Boss01</Filter>
+    </ClInclude>
+    <ClInclude Include="Effect.h">
+      <Filter>MyPG\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="BChara.h">
+      <Filter>MyPG</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Effect.h">
+      <Filter>MyPG\Effect</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss01.h">
+      <Filter>MyPG\Boss01</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Boss02.h">
+      <Filter>MyPG\Boss01</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

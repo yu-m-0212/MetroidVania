@@ -52,7 +52,8 @@ namespace  Player
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		string controllerName;
+		bool barrier;				//バリアの使用制限
+		string controllerName;		//コントローラ宣言
 		float decSpeed;				//速度減衰量
 		float max_StompFallSpeed;	//ストンプ時の最大降下速度
 		float max_speed_fall;		//最大速度降下
@@ -94,6 +95,9 @@ namespace  Player
 		void Move_Shot();
 
 		//アクセサメソッド
+
+		//バリアの取得状況を取得する
+		bool Get_Barrier();
 		//HPの値を取得する
 		int Get_HP();
 		//HPの最大値を取得する
@@ -110,5 +114,8 @@ namespace  Player
 		//HPの最大値を指定する
 		//引数	：	（int）
 		void Set_Max_HP(const int&);
+		//バリアの取得状況を指定する
+		//引数	：	（bool）
+		void Set_Barrier(const bool&);
 	};
 }

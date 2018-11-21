@@ -1,19 +1,19 @@
 //-------------------------------------------------------------------
-//アイテム01(バリアアビリティ)
+//ボス01
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_Item01.h"
-#include  "Task_Player.h"
+#include  "Task_Boss01.h"
+#include  "Task_Boss02.h"
 
-namespace  Item01
+namespace  Task_Boss02
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->name_image = "image_item01";
-		DG::Image_Create(this->name_image, "./data/image/Item01.png");
+		this->name_image = "image_boss01";
+		DG::Image_Create(this->name_image, "./data/image/Boss01.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -33,14 +33,19 @@ namespace  Item01
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.7f;						//描画順
-		this->limit_message = 180;								//メッセージの時間制限
-		this->hitBase = ML::Box2D(-16, -16, 32, 32);			//マップとの判定矩形
-		this->recieveBase = this->hitBase;						//キャラクタとの判定矩形
-		this->center = ML::Vec2(float(ge->screenWidth / 2.0f),
-			float(ge->screenHeight / 2.0f));					//画面の中心座標
-		this->tutorials = new Tutorials::Object();				//メソッド呼び出し
+		this->render2D_Priority[1] = 0.6f;				//描画順
+		this->state_boss = Common;						//ボス用状態管理
+		this->hitBase = ML::Box2D(-92, -46, 184, 92);	//マップとの判定矩形
+		this->recieveBase = this->hitBase;				//矩形身体
+		this->state = Stand;							//状態管理
+		this->interval_shake = 20;						//間隔左右揺れ
+		this->speed_shake = 15.0f;						//速度揺れ
+		this->std_pos_x = 700.0f;						//基準値横軸座標
+		this->gravity = ML::Gravity(SIZE_CHIP);			//重力加速度
+		this->max_speed_fall = 2.0f;					//最大落下速度
+
 		//★タスクの生成
+
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -48,9 +53,9 @@ namespace  Item01
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-		delete this->tutorials;
 
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
 			//★引き継ぎタスクの生成
 		}
 
@@ -62,65 +67,131 @@ namespace  Item01
 	{
 		this->moveCnt++;
 		this->animCnt++;
-		if (this->time_un_hit > 0) { this->time_un_hit--; }
-
-		switch (this->state) {
-		case Stand:
-			this->pos.y += float(sin(this->moveCnt / 12));
-			break;
-		case Lose:
-			this->Kill();
-			break;
+		this->Move();
+		//重力加速
+		//現状、状態遷移もここで行う
+		if (!this->CheckFoot())
+		{
+			this->moveVec.y = min(this->moveVec.y + this->gravity, this->max_speed_fall);
+			this->state_boss = Common;
 		}
+		else
+		{
+			this->moveVec.y = 0.0f;
+			this->state_boss = Base;
+		}
+		//移動処理
+		this->pos += this->moveVec;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		BChara::DrawInfo di = this->Anim();
+		BChara::DrawInfo  di = this->Anim();
 		di.draw.Offset(this->pos);
 		//スクロール対応
 		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->name_image, di.draw, di.src, di.color);
+		//他タスクの回転が干渉しないように修正
+		DG::Image_Rotation(this->res->name_image, 0.0f, ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2)));
+		DG::Image_Draw(this->res->name_image, di.draw, di.src);
 	}
-	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_,const int& un_hit_)
+	//引数	：	(攻撃側,攻撃情報,与無敵時間)
+	void Object::Received(BChara* from_, AttackInfo at_, const int&)
 	{
-		if (this->state != Stand)
-		{
-			return;
-		}
-		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
-		if (nullptr == pl) { return; }
-		//メッセージ生成
-		this->tutorials->Create_Message("バリアを取得した[□を押す]", this->center, this->limit_message);
-		this->UpdateMotion(Lose);
-		//バリアを有効にする
-		pl->Set_Barrier(true);
+		//ダメージ処理
+		this->hp -= at_.power;
+		this->UpdateMotion(Damage);
 	}
-	//-------------------------------------------------------------------
-	//アニメーション制御
-	BChara::DrawInfo Object::Anim()
+	//思考＆状況判断(ステータス決定）
+	void  Object::Think()
 	{
-		BChara::DrawInfo imageTable[] = {
-			//draw					src						color
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,64,64),ML::Color(1,1,1,1) },	//Stand[0]
+		BChara::State  nm = this->state;	//とりあえず今の状態を指定
+
+		//思考（入力）や状況に応じてモーションを変更する事を目的としている。
+		//モーションの変更以外の処理は行わない
+		switch (nm) 
+		{
+			default:
+				break;
+		case Stand:
+			break;
+		}
+		//モーション更新
+		this->UpdateMotion(nm);
+	}
+	//モーションに対応した処理
+	void  Object::Move()
+	{
+		//汎用キャラステート管理
+		switch (this->state)
+		{
+		default:
+			break;
+		case Stand:
+			break;
+		}
+		//ボス用ステート
+		switch (this->state_boss)
+		{
+		default:
+			break;
+		case Common:
+		{
+			auto boss = ge->GetTask_One_G<Task_Boss01::Object>(Task_Boss01::defGroupName);
+			if (nullptr == boss) { return; }
+			ML::Box2D  me = this->recieveBase.OffsetCopy(this->pos);
+			//頭部との接触を判定する
+			ML::Box2D you = ML::Box2D(boss->recieveBase.x, boss->recieveBase.y - 1,
+				boss->recieveBase.w, 1);
+			you.Offset(boss->pos);
+			if (you.Hit(me))
+			{
+				this->moveVec.y = 0.0f;
+			}
+			break;
+		}
+		case Base:
+			//制作用仮処理
+			this->pos.x = this->std_pos_x + float(sin(this->moveCnt / this->interval_shake) * this->speed_shake);
+			break;
+		}
+	}
+	//アニメーション制御
+	BChara::DrawInfo  Object::Anim()
+	{
+		//デフォルトの値を用意
+		int x = 184, y = 92;
+		ML::Color dc(1, 1, 1, 1);
+		BChara::DrawInfo imageTable[] = 
+		{
+			{this->recieveBase,ML::Box2D(x * 0,y * 0,184,92),dc}
 		};
 		BChara::DrawInfo  rtv;
+		//アニメーションカウンタの宣言
+
 		switch (this->state) 
 		{
-		//停止----------------------------------------------------------------------------
-		case  Stand:	rtv = imageTable[0];	break;
+		default:
+		case Stand:
+			rtv = imageTable[0];
+			break;
 		}
 		return rtv;
 	}
-	//アイテム01の生成
-	//引数	：	（初期座標）
-	void Object::Create_Item01(const ML::Vec2& pos_)
+	//アクセサ
+
+	void Object::Set_State_Boss(const State_Boss& state_)
 	{
-		auto item = Item01::Object::Create(true);
-		item->pos = pos_;
+		this->state_boss = state_;
+	}
+	void Object::Set_Std_Pos_X(const float& x_)
+	{
+		this->std_pos_x = x_;
+	}
+	void Object::Set_Hit_Body(const ML::Box2D& hit_)
+	{
+		this->recieveBase = hit_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
