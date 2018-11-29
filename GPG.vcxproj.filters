@@ -46,9 +46,6 @@
     <Filter Include="MyPG\Display">
       <UniqueIdentifier>{a7d8b172-1c28-4033-a6f4-931a973691fb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Boss01">
-      <UniqueIdentifier>{12f70c85-74da-4bab-a045-96b0f5bc226a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MyPG\Tutorials">
       <UniqueIdentifier>{0077beaf-43d4-4ccf-a8ee-cbd99b453031}</UniqueIdentifier>
     </Filter>
@@ -66,6 +63,9 @@
     </Filter>
     <Filter Include="MyPG\Effect">
       <UniqueIdentifier>{18d8a613-69b7-4355-8866-0313d7d53ad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MyPG\Boss">
+      <UniqueIdentifier>{d8fa7d89-8382-4d88-9b64-289080956d57}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -198,9 +198,6 @@
     <ClCompile Include="Dm2008_Ver1_3.cpp">
       <Filter>LIB</Filter>
     </ClCompile>
-    <ClCompile Include="Task_Boss01.cpp">
-      <Filter>MyPG\Boss01</Filter>
-    </ClCompile>
     <ClCompile Include="Effect.cpp">
       <Filter>MyPG\Effect</Filter>
     </ClCompile>
@@ -210,11 +207,8 @@
     <ClCompile Include="Task_Effect.cpp">
       <Filter>MyPG\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Boss01.cpp">
-      <Filter>MyPG\Boss01</Filter>
-    </ClCompile>
-    <ClCompile Include="Task_Boss02.cpp">
-      <Filter>MyPG\Boss01</Filter>
+    <ClCompile Include="Task_Boss.cpp">
+      <Filter>MyPG\Boss</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -344,9 +338,6 @@
     <ClInclude Include="Dm2008_Ver1_3.h">
       <Filter>LIB</Filter>
     </ClInclude>
-    <ClInclude Include="Task_Boss01.h">
-      <Filter>MyPG\Boss01</Filter>
-    </ClInclude>
     <ClInclude Include="Effect.h">
       <Filter>MyPG\Effect</Filter>
     </ClInclude>
@@ -356,11 +347,8 @@
     <ClInclude Include="Task_Effect.h">
       <Filter>MyPG\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Boss01.h">
-      <Filter>MyPG\Boss01</Filter>
-    </ClInclude>
-    <ClInclude Include="Task_Boss02.h">
-      <Filter>MyPG\Boss01</Filter>
+    <ClInclude Include="Task_Boss.h">
+      <Filter>MyPG\Boss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

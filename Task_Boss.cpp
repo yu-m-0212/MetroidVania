@@ -1,26 +1,22 @@
 //-------------------------------------------------------------------
-//アイテム00(体力上限アップ)
+//ボス（タスク）
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_Item00.h"
-#include  "Task_Player.h"
+#include  "Task_Boss.h"
 
-namespace  Item00
+namespace  Boss
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "Item00Img";
-		DG::Image_Create(this->imageName, "./data/image/Item00.png");
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->imageName);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -33,15 +29,9 @@ namespace  Item00
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.7f;													//描画順
-		this->hitBase = ML::Box2D(-16, -16, 32, 32);										//マップとの判定矩形
-		this->recieveBase = this->hitBase;													//キャラクタとの判定矩形
-		this->add_Hp = 1;																	//プレイヤのHP増加量
-		this->limit_message = 180;															//時間制限メッセージ
-		this->center = ML::Vec2(float(ge->screenWidth / 2), float(ge->screenHeight / 2));	//画面中央
-		this->tutorials = new Tutorials::Object();											//ポインタチュートリアル
-		this->eff = new Task_Effect::Object();												//ポインタエフェクト
+		
 		//★タスクの生成
+
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -49,11 +39,10 @@ namespace  Item00
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
+
+
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
-			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-			if (nullptr == pl) { return true; }
-			this->eff->Create_Effect(4, pl->pos);
 		}
 
 		return  true;
@@ -62,72 +51,67 @@ namespace  Item00
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		this->moveCnt++;
-		this->animCnt++;
-		if (this->time_un_hit > 0) { this->time_un_hit--; }
-
-		switch (this->state) {
-		case Stand:
-			this->pos.y += float(sin(this->moveCnt/12));
-			break;
-		case Lose:
-			this->Kill();
-			break;
-		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		BChara::DrawInfo di = this->Anim();
-		di.draw.Offset(this->pos);
-		//スクロール対応
-		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, di.draw, di.src, di.color);
 	}
-	//-------------------------------------------------------------------
-	//接触時の応答処理（必ず受け身の処理として実装する）
-	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-	void Object::Received(BChara* from_, AttackInfo at_, const int& un_hit_)
+	//思考
+	void Object::Think()
 	{
-		if (this->state != Stand) 
+		BChara::State nm = this->state; //とりあえず今の状態を指定
+										//思考（入力）や状況に応じてモーションを変更することを目的としている。
+										//モーションの変更以外の処理は行わない
+										//モーション更新
+		switch (nm)
 		{
-			return;
+		default:
+			break;
+		case Floating:
+			break;
 		}
-		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
-		if (nullptr == pl) { return; }
-		//メッセージ生成
-		this->tutorials->Create_Message("HPの上限が増加した", this->center, this->limit_message);
-		this->UpdateMotion(Lose);
-		//体力上限を増加し、回復する
-		int max = pl->Get_Max_HP();
-		max += this->add_Hp;
-		pl->Set_Max_HP(max);
-		pl->hp = pl->Get_Max_HP();
+		this->UpdateMotion(nm);
 	}
-	//-------------------------------------------------------------------
-	//アニメーション制御
+	//行動
+	void Object::Move()
+	{
+		//-----------------------------------------------------------------
+		//モーション毎に固有の処理
+		switch (this->state)
+		{
+		default:
+			break;
+		case Floating:
+			break;
+		}
+	}
+	//攻撃を受けた際、呼び出す
+	//引数	：	（呼び出し元,攻撃情報）
+	void Object::Recieved(const BChara*, const BChara::AttackInfo&)
+	{
+		this->UpdateMotion(Damage);
+	}
+	//アニメーション
 	BChara::DrawInfo Object::Anim()
 	{
+		//デフォルトの値を用意
+		ML::Color dc(1, 1, 1, 1);
 		BChara::DrawInfo imageTable[] = {
-			//draw					src						color
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,64,64),ML::Color(1,1,1,1)},	//Stand[0]
+			//draw			src
+			{ ML::Box2D(0,0,0,0),ML::Box2D(0,0,0,0),dc }	//[0]
 		};
 		BChara::DrawInfo  rtv;
-		switch (this->state) {
-			//	停止----------------------------------------------------------------------------
-		case  Stand:	rtv = imageTable[0];	break;
-			//	消える・昇天---------------------------------------------------------------------
-		case Lose:		rtv = imageTable[1];	break;
+		//アニメカウンタの宣言
+
+		switch (this->state)
+		{
+		default:
+		case Floating:
+			rtv = imageTable[0];
+			break;
 		}
 		return rtv;
-	}
-	//アイテム00の生成
-	//引数	：	（初期座標）
-	void Object::Create_Item00(const ML::Vec2& pos_)
-	{
-		auto item = Item00::Object::Create(true);
-		item->pos = pos_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

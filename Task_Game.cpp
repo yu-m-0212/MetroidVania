@@ -23,8 +23,6 @@
 #include  "Task_Corpse.h"
 #include  "Task_Gun.h"
 #include  "Task_Display_Effect.h"
-#include  "Task_Boss01.h"
-#include  "Task_Boss02.h"
 
 namespace  Game
 {
@@ -97,7 +95,7 @@ namespace  Game
 		tutorials->Create_Message("×ボタンでジャンプ", ML::Vec2(1180, 4482), -1);
 		tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1);
 		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6792, 3650), -1);
-		tutorials->Create_Message("□ボタンで敵や敵のショットを弾く", ML::Vec2(7192, 5122), -1);
+		/*tutorials->Create_Message("□ボタンで敵や敵のショットを弾く", ML::Vec2(7192, 5122), -1);*/
 		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
 		//背景の生成
 		Back::Object::Create(true);
@@ -108,11 +106,6 @@ namespace  Game
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		//BGMの再生
 		DM::Sound_Play(this->res->name_environmental_game, true);
-		//仮にボスの生成
-		/*auto boss01 = Task_Boss01::Object::Create(true);
-		boss01->pos = ML::Vec2(700.0f, 4360.0f);
-		auto boss02 = Task_Boss01::Object::Create(true);
-		boss01->pos = ML::Vec2(700.0f, 4260.0f);*/
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -143,8 +136,6 @@ namespace  Game
 		ge->KillAll_G("UI");
 		ge->KillAll_G("背景");
 		ge->KillAll_G("ポーズ");
-
-		ge->KillAll_G("ボス");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 		this->shot01_Resource.reset();

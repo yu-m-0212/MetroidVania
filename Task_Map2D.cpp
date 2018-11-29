@@ -150,7 +150,6 @@ namespace  Map2D
 		chipFilePath = "./data/image/" + chipFileName;
 		DG::Image_Create(this->imageName, chipFilePath);
 
-
 		//マップ配列サイズの読み込み
 		fin >> this->sizeX >> this->sizeY;
 		this->hitBase = ML::Box2D(0, 0, this->sizeX * SIZE_CHIP, this->sizeY * SIZE_CHIP);

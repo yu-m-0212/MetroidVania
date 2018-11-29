@@ -40,10 +40,6 @@ public:
 		Lose,			//	消える・昇天
 		Caution,		//	エネミー警戒時
 		TargetLost,		//	対象を見失ったとき
-		//以下はボス用のステートメント
-		Boss_Floating,	//何にも触れていない状態
-		Boss_Base,		//接地し土台の役割を担う
-		Boss_Common		//他のボス矩形に接触し追従運動する
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };
@@ -63,7 +59,7 @@ public:
 	};
 	//キャラクタ共通メンバ変数
 	//徐々に非公開にすること
-	//BCharaメソッドに使用しないものはここに持たせること
+	//BCharaメソッドに使用するものはここに持たせること
 	Angle_LR	angle_LR;
 	State		state;			//現在の行動を示すフラグ
 	ML::Vec2    pos;			//キャラクタ位置
@@ -109,7 +105,7 @@ public:
 	{
 	}
 	virtual  ~BChara(){}
-	//親クラスメソッドのオーバーライド
+	//親クラス仮想関数のオーバーライド
 	void UpDate()
 	{
 		ML::MsgBox("実装されていません");

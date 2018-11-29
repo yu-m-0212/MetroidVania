@@ -1,17 +1,15 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//アイテム00(体力上限アップ)
+//ボス（タスク）
 //-------------------------------------------------------------------
 #include "BChara.h"
-#include "Task_Tutorials.h"
-#include "Task_Effect.h"
 
-namespace  Item00
+namespace  Boss
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("アイテム");		//グループ名
-	const  string  defName("NoName");			//タスク名
+	const  string  defGroupName("ボス");	//グループ名
+	const  string  defName("ボス");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -24,13 +22,12 @@ namespace  Item00
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
-		string imageName;
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
 	{
-	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
 		virtual  ~Object();
 		typedef  shared_ptr<Object>		SP;
@@ -45,23 +42,29 @@ namespace  Item00
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
+	public:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		enum State_Boss
+		{
+			Floating,	//どこにも接続していない
+			Common,		//土台以外と接続状態
+			Base		//マップと接続している
+		};
 	private:
-		int add_Hp;						//プレイヤのHP増加量
-		int limit_message;				//制限時間メッセージ
-		ML::Vec2 center;				//画面中央
-		Tutorials::Object* tutorials;	//ポインタチュートリアル
-		Task_Effect::Object* eff;		//ポインタエフェクト
+		State_Boss state_boss;	//状態管理
+		float speed_fall;		//速度落下
+		float max_speed_fall;	//最大速度落下
 	public:
 		//コンストラクタ
 		Object();
-		//アニメーション制御
+		//思考
+		void Think();
+		//行動
+		void Move();
+		//攻撃を受けた際、呼び出す
+		//引数	：	（呼び出し元,攻撃情報）
+		void Recieved(const BChara*, const BChara::AttackInfo&);
+		//アニメーション
 		BChara::DrawInfo Anim();
-		//接触時の応答処理（必ず受け身の処理として実装する）
-		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-		void Received(BChara* from_, AttackInfo at_, const int&);
-		//アイテム00の生成
-		//引数	：	（初期座標）
-		void Create_Item00(const ML::Vec2&);
 	};
 }

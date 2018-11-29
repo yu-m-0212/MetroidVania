@@ -124,14 +124,17 @@ namespace  Tutorials
 			//時間制限付きの場合、常に表示
 			else
 			{
-				//プレイヤの上に表示
-				ML::Box2D draw(int(pl->pos.x - this->message.length()*FONT_WIDTH / 2),
-					int(pl->pos.y), this->message.length()*FONT_WIDTH, FONT_HIGHT);
-				draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+				//メッセージボックスの表示位置
+				ML::Box2D draw_box(-(int(ge->screenWidth / 2)), -FONT_HIGHT/2, int(ge->screenWidth), FONT_HIGHT);
+				draw_box.Offset(this->pos);
+				//メッセージの表示位置
+				ML::Box2D draw_text(-(int(this->message.length()*FONT_WIDTH / 2)),
+					int(-FONT_HIGHT / 2), this->message.length()*FONT_WIDTH, FONT_HIGHT);
+				draw_text.Offset(this->pos);
 				//メッセージボックスの表示
-				DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
+				DG::Image_Draw(this->res->imageName, draw_box, src, ML::Color(0.7f, 0.0f, 0.0f, 0.0f));
 				//メッセージを表示
-				DG::Font_Draw(this->res->fontName, draw, this->message, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
+				DG::Font_Draw(this->res->fontName, draw_text, this->message, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
 			}
 		}
 	}
