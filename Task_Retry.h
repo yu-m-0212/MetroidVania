@@ -55,12 +55,12 @@ namespace  Retry
 		bool title_or_game;				//引継ぎタスクの選択フラグ
 		int cnt_transition;				//カウンタ遷移用
 		int cnt_create_bubble;			//エフェクトの生成カウンタ
-		int cnt_anim_back;				//背景アニメカウンタ
 		int cnt_available_controll;		//生成後、操作を受け付けるまでのカウンタ
 		int time_create_next_task;		//引継ぎタスクの生成タイミング
 		int time_kill_game;				//自身を消滅させるタイミング
 		int time_available_controll;	//生成後、操作を受け付けるまでの時間
-		int interval_anim_back;			//背景アニメ周期
+		float interval_anim_back;		//背景アニメ周期
+		float cnt_anim_back;			//背景アニメカウンタ
 		float posY;						//背景Y軸座標
 		float posY_std;					//背景Y軸座標基準値
 		float height_anim_back;			//背景アニメ揺れ幅

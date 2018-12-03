@@ -53,11 +53,11 @@ namespace  Retry
 		this->cnt_create_bubble = 0;								//エフェクトの生成カウンタ
 		this->cnt_available_controll = 0;							//生成後、操作を受け付けるまでのカウンタ
 		this->time_available_controll = 150;						//生成後、操作を受け付けるまでの時間
-		this->cnt_anim_back = 0;									//背景アニメカウンタ
-		this->interval_anim_back = 25;								//背景アニメ周期
+		this->cnt_anim_back = 0.0f;									//背景アニメカウンタ
+		this->interval_anim_back = 25.0f;							//背景アニメ周期
 		this->posY = -360.0f;										//背景Y軸座標
 		this->posY_std = -240.0f;									//背景Y軸座標基準値
-		this->height_anim_back = 25.0f;								//背景アニメ揺れ幅
+		this->height_anim_back = 30.0f;								//背景アニメ揺れ幅
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);	//泡のY軸座標初期位置
 		this->eff = new Task_Effect::Object();						//メソッド呼び出し
 		ge->pause = true;											//生成時、操作を受け付けない
@@ -83,7 +83,7 @@ namespace  Retry
 	void  Object::UpDate()
 	{
 		this->cnt_create_bubble++;
-		this->cnt_anim_back++;
+		this->cnt_anim_back+=1.0f;
 		//一定時間、操作を受け付けない
 		if (this->cnt_available_controll < this->time_available_controll)
 		{
@@ -103,7 +103,7 @@ namespace  Retry
 			this->eff->Create_Effect(5, ML::Vec2(initX, this->init_bubble_pos_y));
 		}
 		//背景アニメーション
-		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
+		float y = this->posY_std + sinf(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back;
 		this->posY = y;
 		//生成後、フェードアウトが終わってから操作受付け
 		if (ge->pause) { return; }

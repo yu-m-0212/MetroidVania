@@ -207,7 +207,13 @@
     <ClCompile Include="Task_Effect.cpp">
       <Filter>MyPG\Effect</Filter>
     </ClCompile>
-    <ClCompile Include="Task_Boss.cpp">
+    <ClCompile Include="Task_Boss_Upper.cpp">
+      <Filter>MyPG\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_Boss_Upper_Middle.cpp">
+      <Filter>MyPG\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Task_Boss_Center.cpp">
       <Filter>MyPG\Boss</Filter>
     </ClCompile>
   </ItemGroup>
@@ -347,7 +353,13 @@
     <ClInclude Include="Task_Effect.h">
       <Filter>MyPG\Effect</Filter>
     </ClInclude>
-    <ClInclude Include="Task_Boss.h">
+    <ClInclude Include="Task_Boss_Upper.h">
+      <Filter>MyPG\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Boss_Upper_Middle.h">
+      <Filter>MyPG\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Boss_Center.h">
       <Filter>MyPG\Boss</Filter>
     </ClInclude>
   </ItemGroup>

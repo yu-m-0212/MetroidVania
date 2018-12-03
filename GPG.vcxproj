@@ -103,7 +103,9 @@
     <ClCompile Include="myLib.cpp" />
     <ClCompile Include="MyPG.cpp" />
     <ClCompile Include="Task_Back.cpp" />
-    <ClCompile Include="Task_Boss.cpp" />
+    <ClCompile Include="Task_Boss_Center.cpp" />
+    <ClCompile Include="Task_Boss_Upper.cpp" />
+    <ClCompile Include="Task_Boss_Upper_Middle.cpp" />
     <ClCompile Include="Task_Corpse.cpp" />
     <ClCompile Include="Task_Display_Effect.cpp" />
     <ClCompile Include="Task_Effect.cpp" />
@@ -152,7 +154,9 @@
     <ClInclude Include="myLib.h" />
     <ClInclude Include="MyPG.h" />
     <ClInclude Include="Task_Back.h" />
-    <ClInclude Include="Task_Boss.h" />
+    <ClInclude Include="Task_Boss_Center.h" />
+    <ClInclude Include="Task_Boss_Upper.h" />
+    <ClInclude Include="Task_Boss_Upper_Middle.h" />
     <ClInclude Include="Task_Corpse.h" />
     <ClInclude Include="Task_Display_Effect.h" />
     <ClInclude Include="Task_Effect.h" />

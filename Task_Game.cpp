@@ -23,6 +23,9 @@
 #include  "Task_Corpse.h"
 #include  "Task_Gun.h"
 #include  "Task_Display_Effect.h"
+#include  "Task_Boss_Upper.h"
+#include  "Task_Boss_Upper_Middle.h"
+#include  "Task_Boss_Center.h"
 
 namespace  Game
 {
@@ -95,7 +98,6 @@ namespace  Game
 		tutorials->Create_Message("×ボタンでジャンプ", ML::Vec2(1180, 4482), -1);
 		tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1);
 		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6792, 3650), -1);
-		/*tutorials->Create_Message("□ボタンで敵や敵のショットを弾く", ML::Vec2(7192, 5122), -1);*/
 		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
 		//背景の生成
 		Back::Object::Create(true);
@@ -104,6 +106,13 @@ namespace  Game
 		goal->pos = ML::Vec2(7870, 5106);
 		//プレイヤの目の前に生成する場合
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
+		//ボスの生成
+		auto boss_upper = Boss_Upper::Object::Create(true);
+		boss_upper->pos = ML::Vec2(700.0f, 4300.0f);
+		auto boss_upper_middle = Boss_Upper_Middle::Object::Create(true);
+		boss_upper_middle->pos = ML::Vec2(700.0f, 4392.0f);
+		auto boss_center = Boss_Center::Object::Create(true);
+		boss_center->pos = ML::Vec2(700.0f, 4484.0f);
 		//BGMの再生
 		DM::Sound_Play(this->res->name_environmental_game, true);
 		return  true;
@@ -136,6 +145,8 @@ namespace  Game
 		ge->KillAll_G("UI");
 		ge->KillAll_G("背景");
 		ge->KillAll_G("ポーズ");
+
+		ge->KillAll_G("ボス");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 		this->shot01_Resource.reset();

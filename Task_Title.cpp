@@ -61,11 +61,11 @@ namespace  Title
 		this->time_avalable_controll = 250;								//操作を受け付けるまでの時間
 		this->cnt_anim_button = 0.0f;									//ボタンアニメカウンタ
 		this->interval_button = 2.0f;									//ボタンアニメ周期
-		this->cnt_anim_back = 0;										//背景アニメカウンタ
-		this->interval_anim_back = 25;									//背景アニメ周期
+		this->cnt_anim_back = 0.0f;										//背景アニメカウンタ
+		this->interval_anim_back = 25.0f;								//背景アニメ周期
 		this->posY = -360.0f;											//背景Y軸座標
 		this->posY_std = -240.0f;										//背景Y軸座標基準値
-		this->height_anim_back = 25.0f;									//背景アニメ揺れ幅
+		this->height_anim_back = 30.0f;									//背景アニメ揺れ幅
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);		//泡のY軸座標初期位置
 		this->pos_button = ML::Vec2(float(ge->screenWidth / 2), 800);	//座標ボタン
 		this->controllerName = "P1";									//コントローラー宣言
@@ -101,7 +101,7 @@ namespace  Title
 	void  Object::UpDate()
 	{
 		this->cnt_create_bubble++;
-		this->cnt_anim_back++;
+		this->cnt_anim_back += 1.0f;
 		this->cnt_anim_button += 0.1f;
 		this->cnt_available_controll++;
 
@@ -116,7 +116,7 @@ namespace  Title
 			this->eff->Create_Effect(5, ML::Vec2(initX, this->init_bubble_pos_y));
 		}
 		//背景アニメーション
-		float y = this->posY_std + float(sin(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back);
+		float y = this->posY_std + sinf(this->cnt_anim_back / this->interval_anim_back)*this->height_anim_back;
 		this->posY = y;
 		//一定時間経過後、操作を受け付ける
 		if (this->cnt_available_controll < this->time_avalable_controll)
