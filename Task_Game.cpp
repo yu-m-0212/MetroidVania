@@ -26,6 +26,7 @@
 #include  "Task_Boss_Upper.h"
 #include  "Task_Boss_Upper_Middle.h"
 #include  "Task_Boss_Center.h"
+#include  "Task_Boss_Lower.h"
 
 namespace  Game
 {
@@ -108,11 +109,13 @@ namespace  Game
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		//ƒ{ƒX‚Ì¶¬
 		auto boss_upper = Boss_Upper::Object::Create(true);
-		boss_upper->pos = ML::Vec2(700.0f, 4300.0f);
+		boss_upper->pos = ML::Vec2(700.0f, 4200.0f);
 		auto boss_upper_middle = Boss_Upper_Middle::Object::Create(true);
-		boss_upper_middle->pos = ML::Vec2(700.0f, 4392.0f);
+		boss_upper_middle->pos = ML::Vec2(700.0f, 4292.0f);
 		auto boss_center = Boss_Center::Object::Create(true);
-		boss_center->pos = ML::Vec2(700.0f, 4484.0f);
+		boss_center->pos = ML::Vec2(700.0f, 4384.0f);
+		auto lower = Boss_Lower::Object::Create(true);
+		lower->pos = ML::Vec2(700.0f, 4476.0f);
 		//BGM‚ÌÄ¶
 		DM::Sound_Play(this->res->name_environmental_game, true);
 		return  true;

@@ -216,6 +216,12 @@
     <ClCompile Include="Task_Boss_Center.cpp">
       <Filter>MyPG\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Boss_Lower.cpp">
+      <Filter>MyPG\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>MyPG\Boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -360,6 +366,12 @@
       <Filter>MyPG\Boss</Filter>
     </ClInclude>
     <ClInclude Include="Task_Boss_Center.h">
+      <Filter>MyPG\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Boss_Lower.h">
+      <Filter>MyPG\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss.h">
       <Filter>MyPG\Boss</Filter>
     </ClInclude>
   </ItemGroup>

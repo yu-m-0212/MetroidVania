@@ -37,7 +37,6 @@ namespace  Shot01
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -52,11 +51,16 @@ namespace  Shot01
 		float angle;				//角度
 		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
+		//コンストラクタ
+		Object();
 		//状態ごとに行動を指定する
 		void Move();
 		//消滅する際、状態に応じてエフェクトを生成
 		//引数	：	（エフェクトを生成する座標）
 		void Effect_Hit(const ML::Vec2&);
+		//ショットを生成する
+		//引数	：	（座標,移動量,矩形,消滅時間,攻撃力,壁に当たった時消えるか否か）
+		void Create_Shot(const ML::Vec2&, const ML::Vec2&, const ML::Box2D&, const int&, const int&, const bool&);
 
 		//アクセサ
 		//攻撃毎に寿命を設ける際に使用

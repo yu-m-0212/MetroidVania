@@ -4,6 +4,8 @@
 //ボス（アッパー）
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Boss.h"
+#include "Task_Shot01.h"
 
 namespace  Boss_Upper
 {
@@ -45,10 +47,20 @@ namespace  Boss_Upper
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		//横揺れ
 		float speed_shake;		//速度横揺れ
 		float std_pos_x;		//横揺れ基準値
 		float cnt_shake;		//カウンタ横揺れ
 		float interval_shake;	//間隔横揺れ
+		//ショット生成
+		int cnt_move;			//カウンタ行動
+		int interval_shot;		//生成時間ショット
+		//ショット情報
+		ML::Vec2 vec_shot;		//移動量ショット
+		ML::Box2D hit_shot;		//矩形ショット
+		//インスタンス
+		Boss* boss;				//ボスクラスポインタ
+		Shot01::Object* shot;	//ショットオブジェクトポインタ
 	public:
 	};
 }

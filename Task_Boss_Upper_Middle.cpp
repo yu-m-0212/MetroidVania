@@ -33,10 +33,16 @@ namespace  Boss_Upper_Middle
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.6f;				//描画順
-		this->hitBase = ML::Box2D(-92, -46, 184, 92);	//マップとの判定矩形
-		this->recieveBase = this->hitBase;				//キャラクタとの判定矩形
-		this->speed_chase = 0.1f;						//速度追従
+		this->render2D_Priority[1] = 0.6f;					//描画順
+		this->hitBase = ML::Box2D(-92, -46, 184, 92);		//マップとの判定矩形
+		this->recieveBase = this->hitBase;					//キャラクタとの判定矩形
+		this->speed_chase = 0.1f;							//速度追従
+		this->shot = new Shot01::Object();					//メソッド呼び出し
+		this->boss = new Boss();							//メソッド呼び出し
+		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);		//移動量ショット
+		this->hit_shot = ML::Box2D(-8, -8, 16, 16);			//矩形ショット
+		this->cnt_move = 0;									//カウンタ行動
+		this->interval_shot = -1;							//生成時間ショット
 		
 		//★タスクの生成
 
@@ -47,7 +53,8 @@ namespace  Boss_Upper_Middle
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
+		delete this->shot;
+		delete this->boss;
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
 		{
 			//★引き継ぎタスクの生成
@@ -59,13 +66,27 @@ namespace  Boss_Upper_Middle
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//ショット生成用カウンタを進める
+		this->cnt_move++;
 		//基準となるタスクに追従する
 		auto upper = ge->GetTask_One_G<Boss_Upper::Object>(Boss_Upper::defGroupName);
 		//存在するか確認
 		if (nullptr == upper) { return; }
 		//目標に向かって移動する
-		float target = upper->pos.x - this->pos.x;
-		this->pos.x += target * this->speed_chase;
+		this->pos.x += this->boss->Chase_Target(this->pos.x, upper->pos.x, this->speed_chase);
+		//ショットの生成時間が初期値なら値を入れる
+		if (this->interval_shot == -1)
+		{
+			this->interval_shot = rand() % MAX_INTERVAL_SHOT;
+		}
+		//生成時間になったらショットを生成する
+		if (this->cnt_move == this->interval_shot)
+		{
+			this->shot->Create_Shot(this->pos, this->vec_shot, this->hit_shot, LIMIT_SHOT, POWER_SHOT, true);
+			//カウンタと生成時間をリセットする
+			this->cnt_move = 0;
+			this->interval_shot = -1;
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理

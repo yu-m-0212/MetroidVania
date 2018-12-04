@@ -32,13 +32,19 @@ namespace  Boss_Upper
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.6f;				//描画順
-		this->hitBase = ML::Box2D(-92, -46, 184, 92);	//マップとの判定矩形
-		this->recieveBase = this->hitBase;				//キャラクタとの判定矩形
-		this->std_pos_x = 700.0f;						//横揺れ基準値
-		this->speed_shake = 64.0f;						//速度横揺れ
-		this->cnt_shake = 0.0f;							//カウンタ横揺れ
-		this->interval_shake = 12.0f;					//間隔横揺れ
+		this->render2D_Priority[1] = 0.6f;					//描画順
+		this->hitBase = ML::Box2D(-92, -46, 184, 92);		//マップとの判定矩形
+		this->recieveBase = this->hitBase;					//キャラクタとの判定矩形
+		this->std_pos_x = 700.0f;							//横揺れ基準値
+		this->speed_shake = 64.0f;							//速度横揺れ
+		this->cnt_shake = 0.0f;								//カウンタ横揺れ
+		this->interval_shake = 12.0f;						//間隔横揺れ
+		this->shot = new Shot01::Object();					//ショットオブジェクトインスタンス
+		this->boss = new Boss();							//ボスクラスインスタンス
+		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);		//移動量ショット
+		this->hit_shot = ML::Box2D(-8, -8, 16, 16);			//矩形ショット
+		this->cnt_move = 0;									//カウンタ行動
+		this->interval_shot = -1;							//生成時間ショット
 		
 		//★タスクの生成
 
@@ -62,9 +68,23 @@ namespace  Boss_Upper
 	void  Object::UpDate()
 	{
 		this->cnt_shake += 1.0f;
+		this->cnt_move++;
 		//左右に揺れる
 		//このタスクの動きを基準とする
 		this->pos.x = this->std_pos_x + sinf(this->cnt_shake / this->interval_shake)*this->speed_shake;
+		//ショットの生成時間が初期値なら値を入れる
+		if (this->interval_shot == -1)
+		{
+			this->interval_shot = rand() % MAX_INTERVAL_SHOT;
+		}
+		//生成時間になったらショットを生成する
+		if (this->cnt_move == this->interval_shot)
+		{
+			this->shot->Create_Shot(this->pos, this->vec_shot, this->hit_shot, LIMIT_SHOT, POWER_SHOT, true);
+			//カウンタと生成時間をリセットする
+			this->cnt_move = 0;
+			this->interval_shot = -1;
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理

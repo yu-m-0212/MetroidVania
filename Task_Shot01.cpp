@@ -201,6 +201,18 @@ namespace  Shot01
 			break;
 		}
 	}
+	//ショットを生成する
+	//引数	：	（座標,移動量,矩形,消滅時間,攻撃力,壁に当たった時消えるか否か）
+	void Object::Create_Shot(const ML::Vec2& pos_, const ML::Vec2& vec_, const ML::Box2D& hit_, const int& time_, const int& power_, const bool& erase_)
+	{
+		auto shot = Shot01::Object::Create(true);
+		shot->pos = pos_;
+		shot->moveVec = vec_;
+		shot->hitBase = hit_;
+		shot->limit_Erase = time_;
+		shot->power = power_;
+		shot->flag_Erase = erase_;
+	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

@@ -4,6 +4,8 @@
 //ボス（センター）
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Boss.h"
+#include "Task_Shot01.h"
 
 namespace  Boss_Center
 {
@@ -45,7 +47,15 @@ namespace  Boss_Center
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		float speed_chase;	//速度追従
+		int cnt_move;			//カウンタ行動
+		int interval_shot;		//生成時間ショット
+
+		float speed_chase;		//速度追従
+		ML::Vec2 vec_shot;		//移動量ショット
+		ML::Box2D hit_shot;		//矩形ショット
+
+		Boss* boss;				//メソッド呼び出し
+		Shot01::Object* shot;	//メソッド呼び出し
 	public:
 	};
 }
