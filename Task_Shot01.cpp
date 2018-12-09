@@ -39,6 +39,7 @@ namespace  Shot01
 		this->render2D_Priority[1] = 0.4f;		//描画順
 		this->recieveBase = this->hitBase;		//キャラクタとの接触矩形
 		this->flag_Erase = true;				//接触時消えるか
+		this->flag_reflect = false;				//反射した弾か否か
 		this->power = 0;						//攻撃力
 		this->limit_Erase = 0;					//消滅するまでの時間
 		this->add_un_hit = 60;					//プレイヤに与える無敵時間
@@ -83,7 +84,7 @@ namespace  Shot01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at,this->add_un_hit);
+					(*it)->Received(this, at, this->add_un_hit);
 					//ショットのみ消滅
 					//格闘は複数体にあたる
 					if (this->flag_Erase)
@@ -113,15 +114,21 @@ namespace  Shot01
 		{
 			ML::Box2D  me = this->hitBase.OffsetCopy(this->pos);
 			ML::Box2D you = shot_pl->hitBase.OffsetCopy(shot_pl->pos);
-			if (you.Hit(me) && shot_pl->state == StompLanding)
+			//自身がまだ反射弾ではないとき
+			if (!this->flag_reflect)
 			{
-				this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
+				if (you.Hit(me) && shot_pl->state == StompLanding)
+				{
+					this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
+					//反射フラグ反転
+					this->flag_reflect = true;
+				}
 			}
 		}
 		//射撃は壁に当たると消滅する
 		if (this->flag_Erase)
 		{
-			if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName,Map2D::defName))
+			if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName))
 			{
 				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
 				if (true == map->CheckHit(hit))
@@ -138,6 +145,28 @@ namespace  Shot01
 			//消滅申請
 			this->Kill();
 			return;
+		}
+		//反射した弾はエネミーとも判定を行う
+		if (this->flag_reflect)
+		{
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			auto targets = ge->GetTask_Group_G<BChara>("敵");
+			if (nullptr == pl) { return; }
+			for (auto it = targets->begin();
+				it != targets->end();
+				++it) {
+				//相手に接触の有無を確認させる
+				if ((*it)->CheckHit(me)) {
+					//相手にダメージの処理を行わせる
+					BChara::AttackInfo at = { this->power,0,0 };
+					(*it)->Received(this, at, this->add_un_hit);
+					//対応したヒット時のエフェクトを生成
+					//現状、引数には対象の敵の座標をいれる
+					this->Effect_Hit((*it)->pos);
+					this->Kill();
+					break;
+				}
+			}
 		}
 	}
 	//-------------------------------------------------------------------

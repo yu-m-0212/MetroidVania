@@ -45,6 +45,7 @@ namespace  Shot01
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		bool flag_Erase;			//壁や敵に衝突したとき、消滅するか否か
+		bool flag_reflect;			//反射した弾か否か
 		int limit_Erase;			//消滅するまでの時間
 		int power;					//攻撃力
 		int add_un_hit;	 			//プレイヤに与える無敵時間
