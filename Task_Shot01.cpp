@@ -42,7 +42,8 @@ namespace  Shot01
 		this->flag_reflect = false;				//反射した弾か否か
 		this->power = 0;						//攻撃力
 		this->limit_Erase = 0;					//消滅するまでの時間
-		this->add_un_hit = 60;					//プレイヤに与える無敵時間
+		this->add_un_hit_player = 60;			//プレイヤに与える無敵時間
+		this->add_un_hit_boss = 8;				//ボスに与える無敵時間
 		this->angle = 0.0f;						//角度
 		this->eff = new Task_Effect::Object();	//メソッド呼び出し
 		//★タスクの生成
@@ -84,7 +85,7 @@ namespace  Shot01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at, this->add_un_hit);
+					(*it)->Received(this, at, this->add_un_hit_player);
 					//ショットのみ消滅
 					//格闘は複数体にあたる
 					if (this->flag_Erase)
@@ -159,7 +160,29 @@ namespace  Shot01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at, this->add_un_hit);
+					(*it)->Received(this, at, this->add_un_hit_player);
+					//対応したヒット時のエフェクトを生成
+					//現状、引数には対象の敵の座標をいれる
+					this->Effect_Hit((*it)->pos);
+					this->Kill();
+					break;
+				}
+			}
+		}
+		//反射した弾はボスとも判定を行う
+		if (this->flag_reflect)
+		{
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			auto targets = ge->GetTask_Group_G<BChara>("ボス");
+			if (nullptr == pl) { return; }
+			for (auto it = targets->begin();
+				it != targets->end();
+				++it) {
+				//相手に接触の有無を確認させる
+				if ((*it)->CheckHit(me)) {
+					//相手にダメージの処理を行わせる
+					BChara::AttackInfo at = { this->power,0,0 };
+					(*it)->Received(this, at, this->add_un_hit_boss);
 					//対応したヒット時のエフェクトを生成
 					//現状、引数には対象の敵の座標をいれる
 					this->Effect_Hit((*it)->pos);

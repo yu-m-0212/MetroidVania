@@ -222,6 +222,9 @@
     <ClCompile Include="Boss.cpp">
       <Filter>MyPG\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Boss_Head.cpp">
+      <Filter>MyPG\Boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -372,6 +375,9 @@
       <Filter>MyPG\Boss</Filter>
     </ClInclude>
     <ClInclude Include="Boss.h">
+      <Filter>MyPG\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Boss_Head.h">
       <Filter>MyPG\Boss</Filter>
     </ClInclude>
   </ItemGroup>

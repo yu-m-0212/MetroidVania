@@ -13,7 +13,6 @@ public:
 	typedef weak_ptr<BChara>		WP;
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 
-	//構造体
 	//キャラクタの行動状態フラグ
 	enum State
 	{
@@ -29,8 +28,8 @@ public:
 		Shoot,			//	射撃(地上)
 		Jumpshoot,		//	射撃(空中上昇)
 		Fallshoot,		//	射撃(空中降下)
-		Jump,Jump2,		//	ジャンプ
-		Fall,Fall2,		//	落下
+		Jump, Jump2,		//	ジャンプ
+		Fall, Fall2,		//	落下
 		Landing,		//	着地
 		Damage,			//	被弾
 		Walk,			//	歩行
@@ -40,6 +39,19 @@ public:
 		Lose,			//	消える・昇天
 		Caution,		//	エネミー警戒時
 		TargetLost,		//	対象を見失ったとき
+		//以下ボス用状態
+		//ボスタスクかクラスに入れたい
+		Hiding_Side,						//潜伏横（ボス用）
+		Hiding_Under,						//潜伏下（ボス用）
+		Appear_Side,						//出現横（ボス用）
+		Appear_Under,						//出現下（ボス用）
+		Wait_Side,							//待機横（ボス用）
+		Wait_Under,							//待機下（ボス用）
+		Shot_Side_,							//攻撃横（ボス用）
+		Shot_Under,							//攻撃下（ボス用）
+		Return_Side,						//戻る横（ボス用）
+		Return_Under,						//戻る下（ボス用）
+		Choice_Vertically_Or_Horizontally	//縦横の選択
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };

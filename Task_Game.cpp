@@ -23,6 +23,7 @@
 #include  "Task_Corpse.h"
 #include  "Task_Gun.h"
 #include  "Task_Display_Effect.h"
+#include  "Task_Boss_Head.h"
 #include  "Task_Boss_Upper.h"
 #include  "Task_Boss_Upper_Middle.h"
 #include  "Task_Boss_Center.h"
@@ -108,14 +109,16 @@ namespace  Game
 		//プレイヤの目の前に生成する場合
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		//ボスの生成
+		auto boss_head = Boss_Head::Object::Create(true);
+		boss_head->pos = ML::Vec2(700.0f, 4700.0f);
 		auto boss_upper = Boss_Upper::Object::Create(true);
-		boss_upper->pos = ML::Vec2(700.0f, 4200.0f);
+		boss_upper->pos = ML::Vec2(700.0f, 4792.0f);
 		auto boss_upper_middle = Boss_Upper_Middle::Object::Create(true);
-		boss_upper_middle->pos = ML::Vec2(700.0f, 4292.0f);
+		boss_upper_middle->pos = ML::Vec2(700.0f, 4884.0f);
 		auto boss_center = Boss_Center::Object::Create(true);
-		boss_center->pos = ML::Vec2(700.0f, 4384.0f);
+		boss_center->pos = ML::Vec2(700.0f, 4976.0f);
 		auto lower = Boss_Lower::Object::Create(true);
-		lower->pos = ML::Vec2(700.0f, 4476.0f);
+		lower->pos = ML::Vec2(700.0f, 5068.0f);
 		//BGMの再生
 		DM::Sound_Play(this->res->name_environmental_game, true);
 		return  true;

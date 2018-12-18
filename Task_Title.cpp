@@ -68,6 +68,7 @@ namespace  Title
 		this->height_anim_back = 30.0f;									//背景アニメ揺れ幅
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);		//泡のY軸座標初期位置
 		this->pos_button = ML::Vec2(float(ge->screenWidth / 2), 800);	//座標ボタン
+		this->cnt_available_controll = 0;								//操作を受け付けるまでのカウンタ
 		this->controllerName = "P1";									//コントローラー宣言
 		this->eff = new Task_Effect::Object();							//メソッド呼び出し
 		ge->pause = true;												//生成時は操作を受け付けない

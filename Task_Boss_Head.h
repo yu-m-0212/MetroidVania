@@ -1,17 +1,17 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//ボス（ロウアー）
+//ボス（ヘッド）
 //-------------------------------------------------------------------
 #include "BChara.h"
 #include "Boss.h"
 #include "Task_Shot01.h"
 
-namespace  Boss_Lower
+namespace  Boss_Head
 {
 	//タスクに割り当てるグループ名と固有名
 	const  string  defGroupName("ボス");		//グループ名
-	const  string  defName("ボス（ロウアー）");		//タスク名
+	const  string  defName("ボス（ヘッド）");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -24,9 +24,9 @@ namespace  Boss_Lower
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
-	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		//共有する変数はここに追加する
-		string name_image;	//画像リソース
+		//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+			//共有する変数はここに追加する
+		string name_image;	//リソース名
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -45,18 +45,34 @@ namespace  Boss_Lower
 		void  UpDate();		//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
-	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		int cnt_move;			//カウンタ行動
-		int interval_shot;		//生成時間ショット
-
-		int add_un_hit;			//プレイヤに与える無敵時間
-
-		float speed_chase;		//速度追従
-		ML::Vec2 vec_shot;		//移動量ショット
-		ML::Box2D hit_shot;		//矩形ショット
-
-		Boss* boss;				//メソッド呼び出し
-		Shot01::Object* shot;	//メソッド呼び出し
+		//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
+		//攻撃情報
+		int add_un_hit;						//プレイヤに与える無敵時間
+		//横揺れ
+		float speed_shake;					//速度横揺れ
+		float std_pos_x;					//横揺れ基準値
+		float cnt_shake;					//カウンタ横揺れ
+		float interval_shake;				//間隔横揺れ
+		//ショット生成
+		int num_shot;						//弾の生成数
+		float angle_create_shot;			//弾を生成する角度の間隔
+		//ショット情報
+		ML::Vec2 vec_shot;					//移動量ショット
+		ML::Box2D hit_shot;					//矩形ショット
+		//状態遷移用変数
+		bool flag_alive_base;				//土台の生死
+		int interval_to_appear;				//登場するまでの時間
+		int interval_create_effect;			//エフェクトの生成間隔
+		int interval_shot;					//ショットに移る時間
+		int interval_return;				//ショットから戻るまでの時間
+		int limit_move_vertically;			//縦向き時の登場、退場移動時間
+		float speed_move_under;				//縦向き時の登場・退場速度
+		float speed_chase_hiding;			//潜行中プレイヤに接近する割合
+		ML::Box2D hit_vertically_long;		//縦長の時の矩形（hitBaseに代入して使用）
+		ML::Box2D hit_horizontally_long;	//横長の時の矩形（hitBaseに代入して使用）
+		//インスタンス
+		Boss* boss;							//ボスクラスポインタ
+		Shot01::Object* shot;				//ショットオブジェクトポインタ
 	public:
 		//コンストラクタ
 		Object();

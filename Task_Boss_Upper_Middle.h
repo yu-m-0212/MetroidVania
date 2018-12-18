@@ -11,7 +11,7 @@ namespace  Boss_Upper_Middle
 {
 	//タスクに割り当てるグループ名と固有名
 	const  string  defGroupName("ボス");		//グループ名
-	const  string  defName("NoName");		//タスク名
+	const  string  defName("ボス（アッパーミドル）");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -39,7 +39,6 @@ namespace  Boss_Upper_Middle
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -50,6 +49,8 @@ namespace  Boss_Upper_Middle
 		int cnt_move;			//カウンタ行動
 		int interval_shot;		//生成時間ショット
 
+		int add_un_hit;			//プレイヤに与える無敵時間
+
 		float speed_chase;		//速度追従
 		ML::Vec2 vec_shot;		//移動量ショット
 		ML::Box2D hit_shot;		//矩形ショット
@@ -57,5 +58,16 @@ namespace  Boss_Upper_Middle
 		Boss* boss;				//メソッド呼び出し
 		Shot01::Object* shot;	//メソッド呼び出し
 	public:
+		//コンストラクタ
+		Object();
+		//思考&状況判断(ステータス決定)
+		void Think();
+		//モーションに対応した処理
+		void Move();
+		//接触時の応答処理（必ず受け身の処理として実装する）
+		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
+		void Received(BChara* from_, AttackInfo at_, const int&);
+		//アニメーション制御
+		BChara::DrawInfo Anim();
 	};
 }

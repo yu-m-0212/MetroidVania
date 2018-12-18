@@ -8,8 +8,9 @@
 //ボスタスク内で共有する値
 #define MAX_INTERVAL_SHOT 600	//ショット生成時間の上限値
 #define LIMIT_SHOT 300			//消滅時間ショット
-#define SPEED_SHOT -5.0f		//速度ショット
+#define SPEED_SHOT 5.0f			//速度ショット
 #define POWER_SHOT 1			//攻撃力ショット
+#define HP_BOSS 3				//HPボス
 
 class Boss : public BTask
 {

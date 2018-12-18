@@ -48,7 +48,8 @@ namespace  Shot01
 		bool flag_reflect;			//反射した弾か否か
 		int limit_Erase;			//消滅するまでの時間
 		int power;					//攻撃力
-		int add_un_hit;	 			//プレイヤに与える無敵時間
+		int add_un_hit_player;		//プレイヤに与える無敵時間
+		int add_un_hit_boss;		//ボスに与える無敵時間
 		float angle;				//角度
 		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:

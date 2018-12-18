@@ -1,18 +1,18 @@
 //-------------------------------------------------------------------
-//
+//ボス（ヘッド）
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_Boss_Upper.h"
 #include  "Task_Boss_Head.h"
+#include  "Task_Player.h"
 
-namespace  Boss_Upper
+namespace  Boss_Head
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->name_image = "upper";
+		this->name_image = "head";
 		DG::Image_Create(this->name_image, "./data/image/Boss01.png");
 		return true;
 	}
@@ -33,20 +33,33 @@ namespace  Boss_Upper
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->state = Stand;								//状態管理
-		this->render2D_Priority[1] = 0.6f;					//描画順
-		this->hitBase = ML::Box2D(-92, -46, 184, 92);		//マップとの判定矩形
-		this->recieveBase = this->hitBase;					//キャラクタとの判定矩形
-		this->speed_chase = 0.1f;							//速度追従
-		this->shot = new Shot01::Object();					//メソッド呼び出し
-		this->boss = new Boss();							//メソッド呼び出し
-		this->vec_shot = ML::Vec2(-SPEED_SHOT, 0.0f);		//移動量ショット
-		this->hit_shot = ML::Box2D(-8, -8, 16, 16);			//矩形ショット
-		this->cnt_move = 0;									//カウンタ行動
-		this->interval_shot = -1;							//生成時間ショット
-		this->hp = HP_BOSS;									//HPボス
-		this->add_un_hit = 60;								//プレイヤに与える無敵時間
-		
+		this->state = Appear_Under;									//状態管理
+		this->render2D_Priority[1] = 0.6f;							//描画順
+		this->hitBase = ML::Box2D(-92, -46, 184, 92);				//マップとの判定矩形
+		this->recieveBase = this->hitBase;							//キャラクタとの判定矩形
+		this->std_pos_x = 700.0f;									//横揺れ基準値
+		this->speed_shake = 64.0f;									//速度横揺れ
+		this->cnt_shake = 0.0f;										//カウンタ横揺れ
+		this->interval_shake = 12.0f;								//間隔横揺れ
+		this->shot = new Shot01::Object();							//ショットオブジェクトインスタンス
+		this->boss = new Boss();									//ボスクラスインスタンス
+		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);				//移動量ショット
+		this->hit_shot = ML::Box2D(-8, -8, 16, 16);					//矩形ショット
+		this->interval_shot = 360;									//生成時間ショット
+		this->hp = HP_BOSS;											//HPボス
+		this->add_un_hit = 60;										//プレイヤに与える無敵時間
+		this->num_shot = 5;											//弾の生成数
+		this->angle_create_shot = 18.0f;							//弾を生成する間隔
+		this->flag_alive_base = true;								//土台の生死
+		this->interval_to_appear = 180;								//登場するまでの時間
+		this->interval_create_effect = 30;							//エフェクトの生成間隔
+		this->interval_return = 180;								//ショットから戻るまでの時間
+		this->limit_move_vertically = 120;							//縦向き時の登場、退場移動時間
+		this->speed_move_under = 5.0f;								//縦向き時の登場、退場速度
+		this->speed_chase_hiding = 0.05f;							//潜行中プレイヤに接近する割合
+		this->hit_vertically_long = ML::Box2D(-92, -46, 184, 92);	//縦長の時の矩形（hitBaseに代入して使用）
+		this->hit_horizontally_long = ML::Box2D(-46, -92, 92, 184);	//横長の時の矩形（hitBaseに代入して使用）
+
 		//★タスクの生成
 
 		return  true;
@@ -71,6 +84,8 @@ namespace  Boss_Upper
 	{
 		//ポーズ
 		if (ge->pause) { return; }
+		//カウンタ
+		this->cnt_shake += 1.0f;
 		this->moveCnt++;
 		this->animCnt++;
 		//無敵時間の減少
@@ -79,6 +94,8 @@ namespace  Boss_Upper
 		this->Think();
 		//現モーションに対応した制御
 		this->Move();
+		//移動処理
+		this->pos += this->moveVec;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -93,15 +110,30 @@ namespace  Boss_Upper
 	//思考&状況判断(ステータス決定)
 	void Object::Think()
 	{
-		BChara::State nm = this->state; //とりあえず今の状態を指定
-										//思考（入力）や状況に応じてモーションを変更することを目的としている。
-										//モーションの変更以外の処理は行わない
+		//とりあえず今の状態を指定
+		BChara::State nm = this->state; 
+		//思考（入力）や状況に応じてモーションを変更することを目的としている。
+		//モーションの変更以外の処理は行わない
 		switch (nm)
 		{
-		case Stand:		//立っている
+		case Appear_Under:
+			if (this->moveCnt > this->limit_move_vertically) { nm = Wait_Under; }
 			break;
-		case Damage:	//被弾
-			if (this->time_un_hit == 0) { nm = Stand; }
+		case Wait_Under:
+			if (this->moveCnt > this->interval_shot) { nm = Shot_Under; }
+			break;
+		case Shot_Under:
+			if (this->moveCnt > this->interval_return) { nm = Return_Under; }
+			break;
+		case Return_Under:
+			if (this->moveCnt > this->limit_move_vertically) { nm = Choice_Vertically_Or_Horizontally; }
+			break;
+		case Hiding_Under:
+			if (this->moveCnt > this->interval_to_appear) { nm = Appear_Under; }
+			break;
+		case Choice_Vertically_Or_Horizontally:
+			//仮に縦向きのみを選択する
+			nm = Hiding_Under;
 			break;
 		case Lose:		//死亡
 			break;
@@ -117,18 +149,7 @@ namespace  Boss_Upper
 		//複数の状態で共通して行う処理はここに記述する
 		//例外がある場合はswitch文の下方に記述する
 
-		//基準となるタスクに追従する
-		auto head = 
-			ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName,Boss_Head::defName);
-		//存在するか確認
-		if (nullptr == head) { return; }
-		//目標に向かって移動する
-		this->pos.x += this->boss->Chase_Target(this->pos.x, head->pos.x, this->speed_chase);
-		this->pos.y = head->pos.y + float(this->hitBase.h);
-		//状態を受け取る
-		this->state = head->state;
-
-		//当たり判定
+		//当たり判定 
 		ML::Box2D me = this->recieveBase.OffsetCopy(this->pos);
 		auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
 		if (nullptr == targets) { return; }
@@ -143,33 +164,76 @@ namespace  Boss_Upper
 				break;
 			}
 		}
-
-		//基準となるタスクの状態に応じて攻撃する
+		//左右に揺れる
+		//このタスクの動きを基準とする
 		switch (this->state)
 		{
 		default:
 			break;
 		case Wait_Under:
-			//ショット生成用カウンタを進める
-			this->cnt_move++;
-			//ショットの生成時間が初期値なら値を入れる
-			if (this->interval_shot == -1)
-			{
-				this->interval_shot = rand() % MAX_INTERVAL_SHOT;
-			}
-			//生成時間になったらショットを生成する
-			if (this->cnt_move == this->interval_shot)
-			{
-				this->shot->Create_Shot(this->pos, this->vec_shot, this->hit_shot, LIMIT_SHOT, POWER_SHOT, true);
-				//カウンタと生成時間をリセットする
-				this->cnt_move = 0;
-				this->interval_shot = -1;
-			}
+			this->pos.x = this->std_pos_x + sinf(this->cnt_shake / this->interval_shake)*this->speed_shake;
 			break;
+		case Hiding_Under:
+			auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
+			//潜行中はプレイヤの座標にやんわり合わせる
+			float to_vec_x= pl->pos.x - this->pos.x;
+			this->pos.x += to_vec_x * this->speed_chase_hiding;
+			//状態遷移の直前に揺れの基準点を現在の座標に補正する
+			if (this->moveCnt == this->interval_to_appear)
+			{
+				this->std_pos_x = this->pos.x;
+			}
 		}
 		//-------------------------------------------------------------------
 		//モーション毎に固有の処理
-
+		switch (this->state)
+		{
+		default:
+			break;
+		case Hiding_Under:
+			break;
+		case Appear_Under:
+			//定位置まで移動する
+			if (this->moveCnt < this->limit_move_vertically)
+			{
+				this->moveVec.y = -this->speed_move_under;
+			}
+			else
+			{
+				this->moveVec.y = 0.0f;
+			}
+			break;
+		case Shot_Under:
+			if (this->moveCnt == 0)
+			{
+				auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
+				if (nullptr == pl) { return; }
+				//目標座標を出してから方向のみを抽出する
+				ML::Vec2 to_vec = pl->pos - this->pos;
+				to_vec = to_vec.Normalize();
+				//角度の増加量
+				float increase = ML::ToRadian(this->angle_create_shot);
+				//弾の生成
+				for (int i = -this->num_shot / 2; i <= this->num_shot / 2; i++)
+				{
+					//角度の基準値に増加量を生成順に与える
+					float ang = acos(to_vec.x) + increase * i;
+					ML::Vec2 vec = ML::Vec2(cos(ang), sin(ang));
+					this->shot->Create_Shot(this->pos, vec*SPEED_SHOT, this->hit_shot, LIMIT_SHOT, POWER_SHOT, true);
+				}
+			}
+			break;
+		case Return_Under:
+			if (this->moveCnt < this->limit_move_vertically)
+			{
+				this->moveVec.y = +this->speed_move_under;
+			}
+			else
+			{
+				this->moveVec.y = 0.0f;
+			}
+			break;
+		}
 	}
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
@@ -209,12 +273,14 @@ namespace  Boss_Upper
 		case Stand:
 			rtv = imageTable[0];
 			break;
-		case Damage:
-			rtv = imageTable[1];
-			break;
 		case Lose:
 			rtv = imageTable[2];
 			break;
+		}
+		//ヒット表示
+		if (this->time_un_hit > 0)
+		{
+			rtv.src.y += rtv.src.h;
 		}
 		return rtv;
 		/*return imageTable[int(this->state)];*/

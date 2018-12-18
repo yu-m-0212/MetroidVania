@@ -73,6 +73,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>true</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -105,6 +106,7 @@
     <ClCompile Include="MyPG.cpp" />
     <ClCompile Include="Task_Back.cpp" />
     <ClCompile Include="Task_Boss_Center.cpp" />
+    <ClCompile Include="Task_Boss_Head.cpp" />
     <ClCompile Include="Task_Boss_Lower.cpp" />
     <ClCompile Include="Task_Boss_Upper.cpp" />
     <ClCompile Include="Task_Boss_Upper_Middle.cpp" />
@@ -158,6 +160,7 @@
     <ClInclude Include="MyPG.h" />
     <ClInclude Include="Task_Back.h" />
     <ClInclude Include="Task_Boss_Center.h" />
+    <ClInclude Include="Task_Boss_Head.h" />
     <ClInclude Include="Task_Boss_Lower.h" />
     <ClInclude Include="Task_Boss_Upper.h" />
     <ClInclude Include="Task_Boss_Upper_Middle.h" />

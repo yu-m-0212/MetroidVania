@@ -138,7 +138,6 @@ namespace  Enemy01
 	//u‚Q‚c•`‰æv‚PƒtƒŒ[ƒ€–ˆ‚És‚¤ˆ—
 	void  Object::Render2D_AF()
 	{
-		
 		BChara::DrawInfo di = this->Anim();
 		//–³“GŽžŠÔ’†‚Í“_–Å
 		if (this->time_un_hit > 0) 

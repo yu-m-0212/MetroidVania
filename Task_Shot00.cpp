@@ -77,7 +77,7 @@ namespace  Shot00
 		
 		//移動
 		this->pos += this->moveVec;
-		//当たり判定
+		//雑魚との接触判定
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("敵");
@@ -90,6 +90,44 @@ namespace  Shot00
 					if ((*it)->CheckHit(me)) {
 						//効果音の再生
 						DM::Sound_Play(this->res->name_sound_hit,false);
+						//相手にダメージの処理を行わせる
+						BChara::AttackInfo at = { this->power,0,0 };
+						(*it)->Received(this, at, this->un_hit);
+						//ショットのみ消滅
+						//格闘は複数体にあたる
+						if (this->flag_Erase)
+						{
+							//対応したヒット時のエフェクトを生成
+							//現状、引数には対象の敵の座標をいれる
+							this->Effect_Hit((*it)->pos);
+							this->Kill();
+						}
+						else
+						{
+							//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
+							if ((*it)->moveCnt == 0)
+							{
+								this->Effect_Hit((*it)->pos);
+							}
+						}
+						break;
+					}
+				}
+			}
+		}
+		//ボスとの接触判定
+		{
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			auto targets = ge->GetTask_Group_G<BChara>("ボス");
+			if (nullptr != targets)
+			{
+				for (auto it = targets->begin();
+					it != targets->end();
+					++it) {
+					//相手に接触の有無を確認させる
+					if ((*it)->CheckHit(me)) {
+						//効果音の再生
+						DM::Sound_Play(this->res->name_sound_hit, false);
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { this->power,0,0 };
 						(*it)->Received(this, at, this->un_hit);

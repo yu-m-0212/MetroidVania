@@ -266,7 +266,10 @@ namespace  Player
 		//–³“GŽžŠÔ‚Ì”­¶
 		this->time_un_hit = un_hit_;
 		//ƒ_ƒ[ƒWˆ—
-		this->hp -= at_.power;
+		if (!ge->debugMode)
+		{
+			this->hp -= at_.power;
+		}
 		//‰æ–ÊŒø‰Ê
 		auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName,Map2D::defName);
 		map->Set_Dist_Quake(this->dist_quake);
