@@ -27,6 +27,10 @@ namespace  Task_Effect
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
 		string effectImage;
+		string base_file_path_sound;	//サウンドファイルパスベース
+		string name_sound_defeat;		//名前効果音爆発
+		string name_sound_hit;			//効果音ヒット
+		string name_sound_barrier;		//効果音バリア
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -57,7 +61,8 @@ namespace  Task_Effect
 			Bubble,			//泡
 			Appear,			//登場
 			Defeat_Enemy,	//撃破（エネミー）
-			Debris			//破片
+			Debris,			//破片
+			Spark			//火花
 		};
 		State_Effect state_effect;	//状態管理
 		int num_bubble;				//泡の大きさを指定する
@@ -70,9 +75,11 @@ namespace  Task_Effect
 		int limit_erase_bubble;		//時間消滅まで泡
 		int limit_erase_appear;		//時間消滅まで登場
 		int limit_erase_debris;		//消滅までの時間破片
+		int limit_erase_spark;		//消滅までの時間火花
 		int choice_state;			//外部から状態を指定する際、使用
 		float speed_surfacing;		//泡の浮上速度
 		float speed_Debris;			//速度破片
+		float speed_spark;			//速度火花
 		float wide_bubble;			//泡の揺れ幅
 		float dist;					//撃破エフェクトの中心からの距離
 		float angle;				//表示する角度

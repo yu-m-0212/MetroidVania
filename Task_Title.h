@@ -26,6 +26,7 @@ namespace  Title
 		//共有する変数はここに追加する
 		string	back_title;					//画像背景
 		string	button_title;				//画像Optionボタン
+		string	logo_title;					//画像タイトル
 
 		string	base_file_path;				//ベースファイルパス
 		string	name_sound_bubble;			//効果音泡
@@ -66,6 +67,7 @@ namespace  Title
 		float interval_button;		//ボタンアニメ周期
 		float interval_anim_back;	//背景アニメ周期
 		ML::Vec2 pos_button;		//座標ボタン
+		ML::Vec2 pos_title;			//座標タイトル
 		Task_Effect::Object* eff;	//メソッド呼び出し
 		string controllerName;		//コントローラー宣言
 	};

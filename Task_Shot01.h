@@ -46,11 +46,15 @@ namespace  Shot01
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		bool flag_Erase;			//壁や敵に衝突したとき、消滅するか否か
 		bool flag_reflect;			//反射した弾か否か
+		int cnt_anim;				//アニメカウンタ
+		int speed_anim;				//アニメスピード
 		int limit_Erase;			//消滅するまでの時間
 		int power;					//攻撃力
+		int rate_reflect_power;		//反射した弾に与える攻撃力倍率
 		int add_un_hit_player;		//プレイヤに与える無敵時間
 		int add_un_hit_boss;		//ボスに与える無敵時間
 		float angle;				//角度
+		float rate_speed_reflect;	//反射した際、与える加速倍率
 		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		//コンストラクタ

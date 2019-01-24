@@ -6,9 +6,23 @@
 
 //ゲーム内全域で使用する構造体などを定義する
 //-----------------------------------------------------------------------------------------------
-#define SIZE_CHIP 32		//マップチップサイズ
-#define SIZE_MAP_W 300	//サイズマップ横
-#define SIZE_MAP_H 300	//サイズマップ縦
+#define SIZE_CHIP 32					//マップチップサイズ
+#define SIZE_MAP_W 300					//サイズマップ横
+#define SIZE_MAP_H 300					//サイズマップ縦
+#define VOLUME_ALL_GAME 1000			//ゲーム全体の基礎音量
+//音量管理マネージャーを要件等
+//BGM
+#define VOLUME_BGM_BUBBLE_TITLE 850
+#define VOLUME_BGM_MAIN_GAME 850		//本編BGM音量
+#define VOLUME_BGM_BOSS 800				//ボスBGM音量
+//SE
+//プレイヤ
+#define VOLUME_SE_HIT_SHOT_PLAYER 850	//プレイヤショットヒット
+#define VOLUME_SE_DAMAGE_PLAYER 900		//被弾
+#define VOLUME_SE_SHOT 900				//ショット
+#define VOLUME_SE_LADING_PLAYER 900		//着地
+//ボス
+#define VOLUME_SE_HIT_REFLECTION 900	//ボスが反射弾を受けた際の音量
 //-----------------------------------------------------------------------------------------------
 namespace  MyPG
 {

@@ -49,6 +49,6 @@ namespace  Item02
 		//アニメーション制御
 		BChara::DrawInfo Anim();
 		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_);
+		void Recieved(BChara* from_, AttackInfo at_);
 	};
 }

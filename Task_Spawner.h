@@ -1,15 +1,16 @@
 #pragma warning(disable:4996)
 #pragma once
 //-------------------------------------------------------------------
-//前回死亡した地点に置かれる遺体
+//スポナー
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Task_Game.h"
 
-namespace  Corpse
+namespace  Spawner
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("遺体");	//グループ名
-	const  string  defName("NoName");	//タスク名
+	const  string  defGroupName("スポナー");		//グループ名
+	const  string  defName("ボススポナー");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
 	{
@@ -22,14 +23,14 @@ namespace  Corpse
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
+	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
-		string corpseImage;
-		string uiImage;
+		string name_bgm_boss;	//ボスBGM
+		string name_image;		//判定矩形画像
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
 	{
-	//変更不可◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆◆
 	public:
 		virtual  ~Object();
 		typedef  shared_ptr<Object>		SP;
@@ -38,6 +39,8 @@ namespace  Corpse
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
+
+		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -45,16 +48,12 @@ namespace  Corpse
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		float transparency;		//描画透明度
-		float max_speed_fall;	//最大速度降下
+		int time_create_boss;	//ボスの生成タイミング
+		int time_bgm;			//ボスBGMの再生開始時間
+		bool flag_spawn_boss;	//ボス出現フラグ
+		ML::Vec2 init_pos_boss;	//ボスの初期座標
 	public:
-		//コンストラクタ
-		Object();
-		//接触時の応答処理（必ず受け身の処理として実装する）
-		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-		void Recieved(BChara* from_, AttackInfo at_,const int&);
-		//生成メソッド
-		//引数	：	（座標,向き）
-		void Create_Corpse(const ML::Vec2&, const BChara::Angle_LR&);
+		//ボスの出現フラグを返す
+		bool Get_Flag_Spawn_Boss();
 	};
 }

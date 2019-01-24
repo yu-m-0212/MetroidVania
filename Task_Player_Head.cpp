@@ -4,6 +4,7 @@
 #include  "MyPG.h"
 #include  "Task_Player.h"
 #include  "Task_Player_Head.h"
+#include  "Task_Display_Effect.h"
 
 namespace  Player_Head
 {
@@ -64,6 +65,10 @@ namespace  Player_Head
 	{
 		this->animCnt++;
 		if (ge->pause) { return; }
+		//‰æ–ÊŒø‰Ê’†‚Í‘€ì‚µ‚È‚¢
+		auto display_effect =
+			ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+		if (nullptr != display_effect) { return; }
 		this->moveCnt++;
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }

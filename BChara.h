@@ -16,29 +16,30 @@ public:
 	//キャラクタの行動状態フラグ
 	enum State
 	{
-		Unnon = -1,		//	無効(使えません）
-		Stand,			//	停止
-		Dash,			//	ダッシュ
-		SlowDown,		//	減速
-		Air,			//	空中攻撃
-		PreStomp,		//	ストンプの予備動作
-		LandStomp,		//	ストンプ
-		AirStomp,		//	空中からの降下
-		StompLanding,	//	ストンプ着地
-		Shoot,			//	射撃(地上)
-		Jumpshoot,		//	射撃(空中上昇)
-		Fallshoot,		//	射撃(空中降下)
+		Unnon = -1,			//	無効(使えません）
+		Stand,				//	停止
+		Dash,				//	ダッシュ
+		SlowDown,			//	減速
+		Air,				//	空中攻撃
+		PreStomp,			//	ストンプの予備動作
+		LandStomp,			//	ストンプ
+		AirStomp,			//	空中からの降下
+		StompLanding,		//	ストンプ着地
+		Shoot,				//	射撃(地上)
+		Jumpshoot,			//	射撃(空中上昇)
+		Fallshoot,			//	射撃(空中降下)
 		Jump, Jump2,		//	ジャンプ
 		Fall, Fall2,		//	落下
-		Landing,		//	着地
-		Damage,			//	被弾
-		Walk,			//	歩行
-		Turn,			//	旋回
-		TakeOff,		//	飛び立つ瞬間
-		Bound,			//	ダメージを受けて吹き飛んでいる
-		Lose,			//	消える・昇天
-		Caution,		//	エネミー警戒時
-		TargetLost,		//	対象を見失ったとき
+		Landing,			//	着地
+		Damage,				//	被弾
+		Walk,				//	歩行
+		Turn,				//	旋回
+		TakeOff,			//	飛び立つ瞬間
+		Bound,				//	ダメージを受けて吹き飛んでいる
+		End_Pattern_Boss,	//	ボスエンドパターン
+		Lose,				//	消える・昇天
+		Caution,			//	エネミー警戒時
+		TargetLost,			//	対象を見失ったとき
 		//以下ボス用状態
 		//ボスタスクかクラスに入れたい
 		Hiding_Side,						//潜伏横（ボス用）
@@ -73,24 +74,25 @@ public:
 	//徐々に非公開にすること
 	//BCharaメソッドに使用するものはここに持たせること
 	Angle_LR	angle_LR;
-	State		state;			//現在の行動を示すフラグ
-	ML::Vec2    pos;			//キャラクタ位置
-	ML::Vec2	moveVec;		//移動ベクトル
-	ML::Box2D   hitBase;		//マップとの判定範囲(キャラクタとの接触は別に行う)
-	ML::Box2D	recieveBase;	//キャラクタとの判定範囲(マップ用から変更がない場合はhitbaseで初期化する)
-	int			moveCnt;		//行動カウンタ
-	int			time_un_hit;	//無敵時間カウンタ
-	int			animCnt;		//アニメーションカウンタ
-	int			hp;				//ヘルスポイント
-	float		gravity;		//フレーム単位の加算量
-	float		maxSpeed;		//左右方向への移動の最大速
-	float		addSpeed;		//左右方向への移動の加算量
+	State		state;				//現在の行動を示すフラグ
+	ML::Vec2    pos;				//キャラクタ位置
+	ML::Vec2	moveVec;			//移動ベクトル
+	ML::Box2D   hitBase;			//マップとの判定範囲(キャラクタとの接触は別に行う)
+	ML::Box2D	recieveBase;		//キャラクタとの判定範囲(マップ用から変更がない場合はhitbaseで初期化する)
+	int			moveCnt;			//行動カウンタ
+	int			time_un_hit;		//無敵時間カウンタ
+	int			animCnt;			//アニメーションカウンタ
+	int			hp;					//ヘルスポイント
+	int			limit_hit_reflect;	//反射被弾状態のリミット
+	float		gravity;			//フレーム単位の加算量
+	float		maxSpeed;			//左右方向への移動の最大速
+	float		addSpeed;			//左右方向への移動の加算量
 private:
-	ML::Vec2	move_back;		//攻撃のふっとび量
-	bool		tip;			//ノックバックの発生しない攻撃の場合、弾生成時にtrue
-	bool		range_Wide;		//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
-	bool		flag_erase;		//遺体に触れたとき、true
-	float		angle;			//角度
+	ML::Vec2	move_back;			//攻撃のふっとび量
+	bool		tip;				//ノックバックの発生しない攻撃の場合、弾生成時にtrue
+	bool		range_Wide;			//攻撃が広範囲か否か(ふっとび方向を決める際に使用)
+	bool		flag_erase;			//遺体に触れたとき、true
+	float		angle;				//角度
 public:
 	//メソッド
 	//メンバ変数に最低限の初期化を行う
@@ -114,6 +116,7 @@ public:
 		, range_Wide(false)
 		, flag_erase(false)
 		, angle(0)
+		, limit_hit_reflect(0)
 	{
 	}
 	virtual  ~BChara(){}
@@ -137,10 +140,13 @@ public:
 	virtual bool CheckFrontFoot_LR();
 	//接触判定
 	virtual bool CheckHit(const ML::Box2D& hit);
+	//自身から見た対象の位置を左右で返す
+	//引数	：	（現在の向き,比較対象のX座標）
+	BChara::Angle_LR Check_LR(const BChara::Angle_LR&,const float&);
 	//モーションを更新（変更なしの場合	false)
 	bool  UpdateMotion(State  nm_);
 	//接触時の応答処理（これ自体はダミーのようなモノ）
-	virtual	void Received(BChara* from_, AttackInfo at_,const int&)
+	virtual	void Recieved(BChara* from_, AttackInfo at_,const int&)
 	{
 		ML::MsgBox("Recieved 実装されていません");
 	}

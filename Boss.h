@@ -6,11 +6,15 @@
 #include "GameEngine_Ver3_7.h"
 
 //ボスタスク内で共有する値
-#define MAX_INTERVAL_SHOT 600	//ショット生成時間の上限値
-#define LIMIT_SHOT 300			//消滅時間ショット
-#define SPEED_SHOT 5.0f			//速度ショット
-#define POWER_SHOT 1			//攻撃力ショット
-#define HP_BOSS 3				//HPボス
+#define MAX_INTERVAL_SHOT 300				//ショット生成時間の上限値
+#define LIMIT_SHOT 300						//消滅時間ショット
+#define SPEED_SHOT 5.0f						//速度ショット
+#define POWER_SHOT 1						//攻撃力ショット
+#define HP_BOSS_PARTS 15					//HPボス
+#define LIMIT_HIT_REFLECT 60				//反射被弾状態の時間制限
+#define INTERVAL_CREATE_END_EFFECT_DEF 10	//頭以外のエンドパターンエフェクト生成間隔
+#define INTERVAL_CREATE_END_EFFECT_HEAD 5	//頭タスクのエンドパターンエフェクト生成間隔
+#define LIMIT_END_PATTERN_BOSS 60			//ボスエンドパターンからの遷移時間
 
 class Boss : public BTask
 {

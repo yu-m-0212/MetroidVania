@@ -38,4 +38,8 @@ namespace DM
 	void  Sound_Erase(const string name_);
 	//指定した音声をフェードアウトさせる
 	void  Sound_FadeOut(const string name_);
+
+	//勝手に追加した分
+	//再生時に音量も指定する
+	void Sound_Play_Volume(const string name_, bool loop_, const long vol_);
 }

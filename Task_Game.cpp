@@ -28,6 +28,7 @@
 #include  "Task_Boss_Upper_Middle.h"
 #include  "Task_Boss_Center.h"
 #include  "Task_Boss_Lower.h"
+#include  "Task_Spawner.h"
 
 namespace  Game
 {
@@ -40,10 +41,9 @@ namespace  Game
 		this->base_file_path_game = "./data/sound/wav/";
 
 		//環境音
-		this->name_environmental_game = "environmental_game";
-		DM::Sound_CreateStream(this->name_environmental_game,
-			this->base_file_path_game + "environmental_game.wav");
-		DM::Sound_Volume(this->name_environmental_game, 1000);
+		this->name_bgm_main_game = "environmental_game";
+		DM::Sound_CreateStream(this->name_bgm_main_game,
+			this->base_file_path_game + "bgm_main_game.wav");
 
 		return true;
 	}
@@ -51,7 +51,7 @@ namespace  Game
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DM::Sound_Erase(this->name_environmental_game);
+		DM::Sound_Erase(this->name_bgm_main_game);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -73,6 +73,7 @@ namespace  Game
 		this->time_kill_game = 150;							//自身を消滅させるタイミング
 		this->tutorials = new Tutorials::Object();			//ポインタメッセージ
 		this->eff = new Task_Effect::Object();				//ポインタエフェクト
+		this->pos_spawer = ML::Vec2(7876.0f, 7648.0f);		//スポナー座標
 		
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
@@ -87,7 +88,9 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		pl->pos = ML::Vec2(224.0f, 4460.0f);
+		pl->pos = ML::Vec2(224.0f,4400.0f);
+		/*pl->pos=ML::Vec2(7643.0f,5835.0f);*/
+		/*pl->pos = ML::Vec2(8382.0f,7200.0f);*/
 		this->eff->Create_Effect(6, pl->pos);
 		//カメラマンの生成
 		auto  spr = Sprite::Object::Create(true);
@@ -103,30 +106,22 @@ namespace  Game
 		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
 		//背景の生成
 		Back::Object::Create(true);
-		//仮ゴールキャラクタの生成
-		auto goal = Goal::Object::Create(true);
-		goal->pos = ML::Vec2(7870, 5106);
 		//プレイヤの目の前に生成する場合
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
-		//ボスの生成
-		auto boss_head = Boss_Head::Object::Create(true);
-		boss_head->pos = ML::Vec2(700.0f, 4700.0f);
-		auto boss_upper = Boss_Upper::Object::Create(true);
-		boss_upper->pos = ML::Vec2(700.0f, 4792.0f);
-		auto boss_upper_middle = Boss_Upper_Middle::Object::Create(true);
-		boss_upper_middle->pos = ML::Vec2(700.0f, 4884.0f);
-		auto boss_center = Boss_Center::Object::Create(true);
-		boss_center->pos = ML::Vec2(700.0f, 4976.0f);
-		auto lower = Boss_Lower::Object::Create(true);
-		lower->pos = ML::Vec2(700.0f, 5068.0f);
+		//ボススポナーの生成
+		auto spawner =
+			Spawner::Object::Create(true);
+		spawner->pos = this->pos_spawer;
 		//BGMの再生
-		DM::Sound_Play(this->res->name_environmental_game, true);
+		DM::Sound_Play_Volume(this->res->name_bgm_main_game, true,VOLUME_BGM_MAIN_GAME);
 		return  true;
 	}
 	//-------------------------------------------------------------------
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
+		delete this->tutorials;
+		delete this->eff;
 		//★データ＆タスク解放
 
 		ge->KillAll_G("タイトル"); 
@@ -152,6 +147,7 @@ namespace  Game
 		ge->KillAll_G("背景");
 		ge->KillAll_G("ポーズ");
 
+		ge->KillAll_G("スポナー");
 		ge->KillAll_G("ボス");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
@@ -169,7 +165,7 @@ namespace  Game
 			}
 		}
 		//サウンドの停止
-		DM::Sound_Stop(this->res->name_environmental_game);
+		DM::Sound_Stop(this->res->name_bgm_main_game);
 		return  true;
 	}
 	//-------------------------------------------------------------------
@@ -199,8 +195,10 @@ namespace  Game
 			//フェードイン
 			if (this->cnt_transition == 0)
 			{
-				auto display_effect = Display_Effect::Object::Create(true);
-				DM::Sound_FadeOut(this->res->name_environmental_game);
+				auto display_effect =
+					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				display_effect->Create_Display_Effect(0);
+				DM::Sound_FadeOut(this->res->name_bgm_main_game);
 			}
 			this->cnt_transition++;
 			//リトライ生成
@@ -227,8 +225,10 @@ namespace  Game
 			//フェードイン
 			if (this->cnt_transition == 0)
 			{
-				Display_Effect::Object::Create(true);
-				DM::Sound_FadeOut(this->res->name_environmental_game);
+				auto display_effect =
+					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				display_effect->Create_Display_Effect(0);
+				DM::Sound_FadeOut(this->res->name_bgm_main_game);
 			}
 			this->cnt_transition++;
 			//一定時間で自身を消滅させる
@@ -236,6 +236,13 @@ namespace  Game
 			{
 				this->Kill();
 			}
+		}
+		//ボス出現時にBGMをフェードアウト
+		auto spawner =
+			ge->GetTask_One_G<Spawner::Object>(Spawner::defGroupName);
+		if (spawner->Get_Flag_Spawn_Boss())
+		{
+			DM::Sound_FadeOut(this->res->name_bgm_main_game);
 		}
 	}
 	//-------------------------------------------------------------------

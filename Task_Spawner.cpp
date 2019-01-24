@@ -1,28 +1,37 @@
 //-------------------------------------------------------------------
-//カメラ
+//スポナー
 //-------------------------------------------------------------------
 #include  "MyPG.h"
-#include  "Task_Sprite.h"
-#include  "Task_Map2D.h"
-#include  "Task_Player.h"
+#include  "Task_Spawner.h"
+
+#include  "Task_Boss_Head.h"
+#include  "Task_Boss_Upper.h"
+#include  "Task_Boss_Upper_Middle.h"
+#include  "Task_Boss_Center.h"
+#include  "Task_Boss_Lower.h"
+
 #include  "Task_Display_Effect.h"
 
-namespace  Sprite
+namespace  Spawner
 {
 	Resource::WP  Resource::instance;
 	//-------------------------------------------------------------------
 	//リソースの初期化
 	bool  Resource::Initialize()
 	{
-		this->imageName = "SpriteImg";
-		DG::Image_Create(this->imageName, "./data/image/妖精.png");
+		this->name_image = "image";
+		DG::Image_Create(this->name_image, "./data/image/UI.png");
+
+		this->name_bgm_boss = "bgm_boss";
+		DM::Sound_CreateStream(this->name_bgm_boss, "./data/sound/wav/bgm_boss.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
 	//リソースの解放
 	bool  Resource::Finalize()
 	{
-		DG::Image_Erase(this->imageName);
+		DG::Image_Erase(this->name_image);
+		DM::Sound_Erase(this->name_bgm_boss);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -35,12 +44,13 @@ namespace  Sprite
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.5f;		//描画順
-		this->controllerName = "P1";			//コントローラー名初期化
-		this->speed_to_Vec = 0.05f;				//目標への移動量
-		this->dist_to_Vec = 200.0f;				//プレイヤからの距離
-		this->dist_height = float(SIZE_CHIP*8);	//プレイヤからの上方位置
-
+		this->hitBase = ML::Box2D(-512, -1, 1024, 2);		//表示矩形
+		this->recieveBase = this->hitBase;					//判定矩形
+		this->time_create_boss = 180;						//ボスの生成タイミング
+		this->time_bgm = 240;								//ボスBGMの再生開始時間
+		this->flag_spawn_boss = false;						//ボス出現フラグ
+		this->init_pos_boss = ML::Vec2(8382.0f, 7800.0f);	//ボスの初期座標
+		
 		//★タスクの生成
 
 		return  true;
@@ -50,7 +60,6 @@ namespace  Sprite
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
@@ -62,100 +71,78 @@ namespace  Sprite
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		//ポーズ
-		if (ge->pause) { return; }
-		//プレイヤとの相対距離を取得
-		//対象が存在するか確認してからアクセス
-		if (auto tg = this->target.lock())
+		//プレイヤと接触でフラグ成立
+		auto pl =
+			ge->GetTask_One_G<Player::Object>(Player::defGroupName);
+		if (nullptr == pl) { return; }
+		//判定矩形を用意
+		ML::Box2D pl_base = pl->hitBase;
+		pl_base.Offset(pl->pos);
+		if (this->flag_spawn_boss == false &&
+			this->CheckHit(pl_base))
 		{
-			//プレイヤのやや上方を追従する
-			ML::Vec2  toVec = ML::Vec2(tg->pos.x,tg->pos.y-this->dist_height) - this->pos;
-			//画面効果中はスティックによる操作をしない
+			this->flag_spawn_boss = true;
+			//レターボックスの生成
 			auto display_effect =
 				ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
-			if (nullptr == display_effect)
-			{
-				//右スティックの向きに合わせて自分の移動先を変更
-				auto in = DI::GPad_GetState(this->controllerName);
-				float angle = atan2(in.RStick.axis.y, in.RStick.axis.x);
-				//スティックが入力されている場合のみ
-				if (!angle == 0.0f)
-				{
-					toVec += ML::Vec2(cos(angle)*this->dist_to_Vec, sin(angle)*this->dist_to_Vec);
-				}
-			}
-			//ターゲットに近づく
-			this->pos += toVec * this->speed_to_Vec;
+			if (nullptr != display_effect) { return; }
+			display_effect->Create_Display_Effect(1);
 		}
-		//カメラの位置を再調整
+		//フラグ成立後の処理
+		if (!this->flag_spawn_boss) { return; }
+		//行動カウンタのインクリメント
+		if (this->moveCnt <= this->time_bgm)
 		{
-			//自分を画面の何処に置くか（今回は画面中央）
-			int  px = ge->camera2D.w / 2;
-			int  py = ge->camera2D.h / 2;
-			//自分を画面中央に置いた時のカメラの左上座標を求める
-			int  cpx = int(this->pos.x) - px;
-			int  cpy = int(this->pos.y) - py;
-			//カメラの座標を更新
-			ge->camera2D.x = cpx;
-			ge->camera2D.y = cpy;
+			this->moveCnt++;
 		}
-		//マップ外を写さないようにする調整処理
-		auto   map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
-		if (nullptr != map) {
-			map->AjastCameraPos();
+		//ボスの生成
+		if (this->moveCnt == this->time_create_boss)
+		{
+			//ボスの生成
+			auto boss_head = Boss_Head::Object::Create(true);
+			boss_head->pos = this->init_pos_boss;
+			auto boss_upper = Boss_Upper::Object::Create(true);
+			boss_upper->pos = ML::Vec2(boss_head->pos.x, boss_head->pos.y + float(boss_upper->hitBase.h));
+			auto boss_upper_middle = Boss_Upper_Middle::Object::Create(true);
+			boss_upper_middle->pos = ML::Vec2(boss_upper->pos.x, boss_upper->pos.y + float(boss_upper_middle->hitBase.h));
+			auto boss_center = Boss_Center::Object::Create(true);
+			boss_center->pos = ML::Vec2(boss_upper_middle->pos.x, boss_upper_middle->pos.y + float(boss_center->hitBase.h));
+			auto boss_lower = Boss_Lower::Object::Create(true);
+			boss_lower->pos = ML::Vec2(boss_center->pos.x, boss_center->pos.y + float(boss_lower->hitBase.h));
+		}
+		//ボスBGMの再生
+		if (this->moveCnt == this->time_bgm)
+		{
+			DM::Sound_Play_Volume(this->res->name_bgm_boss,true,VOLUME_BGM_BOSS);
+		}
+		//ゲームクリアかリトライでBGMフェードアウト
+		if (ge->clear)
+		{
+			DM::Sound_FadeOut(this->res->name_bgm_boss);
+		}
+		if (ge->failure)
+		{
+			DM::Sound_FadeOut(this->res->name_bgm_boss);
 		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		//デバッグモードのみ表示
-		if (!ge->debugMode) { return; }
-		ML::Box2D  draw(-16, -16, 32, 32);
-		draw.Offset(this->pos);
-		ML::Box2D  src(0, 0, 32, 32);
-
-		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1, 1, 1));
-	}
-	//追従対象を指定
-	void Object::Set_Target(const weak_ptr<BChara> pl_)
-	{
-		this->target = pl_;
-	}
-	//マップ外と上方向のあたり判定
-	bool Object::Check_Out_OF_Map_Top()
-	{
-		RECT  r = { ge->camera2D.w / 2, ge->camera2D.y - 1, ge->camera2D.w / 2 + 1, ge->camera2D.y + 1 };
-		//矩形がマップ外に出ていたら丸め込みを行う
-		auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
-		RECT  m = {
-			map->hitBase.x,
-			map->hitBase.y,
-			map->hitBase.x + map->hitBase.w,
-			map->hitBase.y + map->hitBase.h };
-		if (r.left   < m.left) { r.left = m.left; }
-		if (r.top    < m.top) { r.top = m.top; }
-		if (r.right  > m.right) { r.right = m.right; }
-		if (r.bottom > m.bottom) { r.bottom = m.bottom; }
-
-		//ループ範囲調整
-		int sx, sy, ex, ey;
-		sx = r.left / SIZE_CHIP;
-		sy = r.top / SIZE_CHIP;
-		ex = (r.right - 1) / SIZE_CHIP;
-		ey = (r.bottom - 1) / SIZE_CHIP;
-
-		//範囲内の障害物を探す
-		//視界の範囲外は-1
-		for (int y = sy; y <= ey; ++y) {
-			for (int x = sx; x <= ex; ++x) {
-				if (0 > map->arr[y][x]) {
-					return true;
-				}
-			}
+		//デバッグモードの時、判定矩形を表示
+		if (ge->debugMode)
+		{
+			ML::Box2D draw = this->hitBase;
+			ML::Box2D  src(64, 0, 64, 64);
+			draw.Offset(this->pos);
+			draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+			DG::Image_Draw(this->res->name_image, draw, src, ML::Color(0.5f, 0.0f, 1.0f, 0.0f));
 		}
-		return false;
+	}
+	//ボスの出現フラグを返す
+	bool Object::Get_Flag_Spawn_Boss()
+	{
+		return this->flag_spawn_boss;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

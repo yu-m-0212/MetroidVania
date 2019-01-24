@@ -117,7 +117,7 @@ namespace  Retry
 				auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 				if (nullptr == display_effect)
 				{
-					Display_Effect::Object::Create(true);
+					display_effect->Create_Display_Effect(0);
 				}
 				this->title_or_game = 0;
 			}
@@ -128,7 +128,7 @@ namespace  Retry
 				auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 				if (nullptr == display_effect)
 				{
-					Display_Effect::Object::Create(true);
+					display_effect->Create_Display_Effect(0);
 				}
 				this->title_or_game = 1;
 			}

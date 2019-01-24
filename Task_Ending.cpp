@@ -34,7 +34,7 @@ namespace  Ending
 		this->res = Resource::Create();
 
 		//šƒf[ƒ^‰Šú‰»
-		this->render2D_Priority[1] = 1.0f;												//•`‰æ‡
+		this->render2D_Priority[1] = 0.1f;												//•`‰æ‡
 		this->transition = false;														//ƒtƒ‰ƒO‰æ–Ê‘JˆÚ
 		this->cnt_transition = 0;														//ƒJƒEƒ“ƒ^‰æ–Ê‘JˆÚ
 		this->time_kill_this = 150;														//ŠÔ©g‚ğÁ–Å‚³‚¹‚é
@@ -77,7 +77,9 @@ namespace  Ending
 		{
 			if (this->cnt_transition == 0)
 			{
-				Display_Effect::Object::Create(true);
+				auto display_effect =
+					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				display_effect->Create_Display_Effect(0);
 			}
 			this->cnt_transition++;
 		}

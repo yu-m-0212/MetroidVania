@@ -1047,4 +1047,11 @@ namespace DM
 			it->second->FadeOut(30);
 		}
 	}
+
+	//Ä¶‚É‰¹—Ê‚àw’è‚·‚é
+	void Sound_Play_Volume(const string name_, bool loop_, const long vol_)
+	{
+		Sound_Play(name_, loop_);
+		Sound_Volume(name_,vol_);
+	}
 }

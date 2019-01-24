@@ -24,8 +24,6 @@ namespace  Shot00
 		static   WP  instance;
 		static  Resource::SP  Create();
 		string imageName;
-		string base_file_path_shot;	//基礎ファイルパス
-		string name_sound_hit;		//効果音ヒット
 	};
 	//-------------------------------------------------------------------//オブジェクト
 	class  Object : public  BChara

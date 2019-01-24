@@ -40,7 +40,6 @@ namespace  Item00
 		this->limit_message = 180;															//時間制限メッセージ
 		this->center = ML::Vec2(float(ge->screenWidth / 2), float(ge->screenHeight / 2));	//画面中央
 		this->tutorials = new Tutorials::Object();											//ポインタチュートリアル
-		this->eff = new Task_Effect::Object();												//ポインタエフェクト
 		//★タスクの生成
 		return  true;
 	}
@@ -48,12 +47,10 @@ namespace  Item00
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
+		delete this->tutorials;
 		//★データ＆タスク解放
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
-			//★引き継ぎタスクの生成
-			auto pl = ge->GetTask_One_G<Player::Object>("プレイヤ");
-			if (nullptr == pl) { return true; }
-			this->eff->Create_Effect(4, pl->pos);
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
 		}
 
 		return  true;
@@ -88,7 +85,7 @@ namespace  Item00
 	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-	void Object::Received(BChara* from_, AttackInfo at_, const int& un_hit_)
+	void Object::Recieved(BChara* from_, AttackInfo at_, const int& un_hit_)
 	{
 		if (this->state != Stand) 
 		{

@@ -32,23 +32,18 @@ namespace  Player
 
 		this->name_sound_landing = "sound_landing";
 		DM::Sound_CreateSE(this->name_sound_landing, this->base_file_path_sound + "landing_player01.wav");
-		DM::Sound_Volume(this->name_sound_landing, 1000);
 
 		this->name_sound_jump = "jump_sound";
 		DM::Sound_CreateSE(this->name_sound_jump, this->base_file_path_sound + "jump_player01.wav");
-		DM::Sound_Volume(this->name_sound_jump, 1000);
 
 		this->name_sound_shot = "shot_sound";
 		DM::Sound_CreateSE(this->name_sound_shot, this->base_file_path_sound + "shot_player01.wav");
-		DM::Sound_Volume(this->name_sound_shot, 1000);
-
-		this->name_sound_barrier = "sound_barrier";
-		DM::Sound_CreateSE(this->name_sound_barrier, this->base_file_path_sound + "activate_barrier_player01.wav");
-		DM::Sound_Volume(this->name_sound_barrier, 1000);
-
+		
 		this->name_not_recharge = "not_recharge";
 		DM::Sound_CreateSE(this->name_not_recharge, this->base_file_path_sound + "not_recharge_barrier_player01.wav");
-		DM::Sound_Volume(this->name_not_recharge, 1000);
+
+		this->name_damage_player = "damage_player";
+		DM::Sound_CreateSE(this->name_damage_player, this->base_file_path_sound + "damage_player.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -59,8 +54,8 @@ namespace  Player
 		DM::Sound_Erase(this->name_sound_landing);
 		DM::Sound_Erase(this->name_sound_jump);
 		DM::Sound_Erase(this->name_sound_shot);
-		DM::Sound_Erase(this->name_sound_barrier);
 		DM::Sound_Erase(this->name_not_recharge);
+		DM::Sound_Erase(this->name_damage_player);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -131,7 +126,8 @@ namespace  Player
 	void  Object::UpDate()
 	{
 		//フェードアウトしてから、操作を始める
-		auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+		auto display_effect =
+			ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 		if (nullptr != display_effect) { return; }
 		//クリア、敗北時
 		if (ge->clear || ge->failure) { return; }
@@ -169,7 +165,7 @@ namespace  Player
 					if ((*it)->CheckHit(me)) {
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
-						(*it)->Received(this, at,0);
+						(*it)->Recieved(this, at,0);
 						break;
 					}
 				}
@@ -188,7 +184,7 @@ namespace  Player
 					if ((*it)->CheckHit(me)) {
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { 0,0,0 };
-						(*it)->Received(this, at,0);
+						(*it)->Recieved(this, at,0);
 						//一度だけエフェクトを生成する
 						if (!(*it)->Get_Flag_Erase())
 						{
@@ -258,11 +254,12 @@ namespace  Player
 	//-----------------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-	void Object::Received(BChara* from_, AttackInfo at_,const int& un_hit_)
+	void Object::Recieved(BChara* from_, AttackInfo at_,const int& un_hit_)
 	{
-		if (this->time_un_hit > 0) {
-			return;//無敵時間中はダメージを受けない
-		}
+		//無敵時間中はダメージを受けない
+		if (this->time_un_hit > 0) { return; }
+		//SEの再生
+		DM::Sound_Play_Volume(this->res->name_damage_player, false, VOLUME_SE_DAMAGE_PLAYER);
 		//無敵時間の発生
 		this->time_un_hit = un_hit_;
 		//ダメージ処理
@@ -272,8 +269,7 @@ namespace  Player
 		}
 		//画面効果
 		auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName,Map2D::defName);
-		map->Set_Dist_Quake(this->dist_quake);
-		map->Set_Limit_Quake(limit_quake);
+		map->Set_Quake(this->dist_quake, this->limit_quake);
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+6.5f, -2.0f); }
 		else							{ this->moveVec = ML::Vec2(-6.5f, -2.0f); }
@@ -338,17 +334,19 @@ namespace  Player
 			break;
 		case  Shoot:	//射撃
 			if (in.R1.off) {nm = Stand;}
-			if (in.B1.down&&barrier) { PreStomp; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (!this->CheckFoot()) { nm = Fallshoot; }
+			if (in.B1.down&&barrier) { PreStomp; }
 			break;
 		case Jumpshoot:	//空中射撃
 			if (in.R1.off) { nm = Fall; }
 			if (this->moveVec.y >= 0) { nm = Fallshoot; }
+			if (in.B1.down&&barrier) { PreStomp; }
 			break;
 		case Fallshoot:	//落下射撃
 			if (in.R1.off) { nm = Fall; }
 			if (this->CheckFoot()) { nm = Shoot; }
+			if (in.B1.down&&barrier) { PreStomp; }
 			break;
 		case PreStomp:
 			if (this->moveCnt > 0) { nm = LandStomp; }
@@ -534,7 +532,7 @@ namespace  Player
 				//初速設定
 				this->moveVec.y = this->height_jump;
 				//SE再生
-				DM::Sound_Play(this->res->name_sound_jump,false);
+				DM::Sound_Play_Volume(this->res->name_sound_jump,false,VOLUME_ALL_GAME);
 			}
 			//向きの変更は倒した瞬間
 			if (this->moveCnt<this->limit_JumpAngleChange&&in.LStick.L.down)
@@ -570,7 +568,7 @@ namespace  Player
 			//SE再生
 			if (this->moveCnt == 0)
 			{
-				DM::Sound_Play(this->res->name_sound_landing, false);
+				DM::Sound_Play_Volume(this->res->name_sound_landing, false,VOLUME_SE_LADING_PLAYER);
 			}
 			break;
 		case PreStomp:
@@ -585,13 +583,11 @@ namespace  Player
 				{
 					this->Stomp_Std();
 					this->gauge_melee = 0;
-					//SE再生
-					DM::Sound_Play(this->res->name_sound_barrier, false);
 				}
 				//未リチャージ
 				else
 				{
-					DM::Sound_Play(this->res->name_not_recharge, false);
+					DM::Sound_Play_Volume(this->res->name_not_recharge, false,VOLUME_ALL_GAME);
 				}
 			}
 			break;
@@ -750,7 +746,7 @@ namespace  Player
 				shot->Set_Angle(angle);
 			}
 			//SE再生
-			DM::Sound_Play(this->res->name_sound_shot,false);
+			DM::Sound_Play_Volume(this->res->name_sound_shot,false,VOLUME_SE_SHOT);
 		}
 	}
 	//行動ショット中
@@ -795,8 +791,7 @@ namespace  Player
 		stompLandingRect->Set_Range_Wide(1);
 		//画面を揺らすための設定を行う
 		auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
-		map->Set_Dist_Quake(this->dist_quake);
-		map->Set_Limit_Quake(this->limit_quake);
+		map->Set_Quake(this->dist_quake, this->limit_quake);
 		//エフェクトの生成
 		this->eff->Create_Effect(2, this->pos);
 	}

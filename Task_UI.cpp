@@ -5,6 +5,7 @@
 #include	"Task_UI.h"
 #include	"Task_Player.h"
 #include	"Task_Enemy01.h"
+#include	"Task_Display_Effect.h"
 
 namespace  UI
 {
@@ -67,9 +68,14 @@ namespace  UI
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		//画面効果中は表示しない
+		auto display_effect =
+			ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+		if (nullptr != display_effect) { return; }
+		//不正アクセス防止
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
-		auto es = ge->GetTask_One_G<Enemy01::Object>(Enemy01::defGroupName);
+		//コントローラー宣言
 		auto in = DI::GPad_GetState(this->controllerName);
 		//ベースの表示
 		{
@@ -135,6 +141,7 @@ namespace  UI
 		//以下デバッグ----------------------------------------------------
 		if (ge->debugMode)
 		{
+			auto es = ge->GetTask_One_G<Enemy01::Object>(Enemy01::defGroupName);
 			ML::Box2D debugBox01(825, 0, 625, 450);
 			string debugText01 =
 				"state = " + to_string(pl->state) + "\n" +

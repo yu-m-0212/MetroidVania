@@ -40,13 +40,15 @@ namespace  Map2D
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
-		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
-		void  UpDate();		//「実行」１フレーム毎に行う処理
+		bool  Initialize();		//「初期化」タスク生成時に１回だけ行う処理
+		void  UpDate();			//「実行」１フレーム毎に行う処理
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
+	public:
+		Object();
+	private:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		int					cnt_Quake;						//カウンタ画面揺れ
 		int					dist_Quake;						//画面揺れ幅
@@ -77,5 +79,8 @@ namespace  Map2D
 		void Set_Dist_Quake(const int&);
 		//画面を揺らす時間を指定する
 		void Set_Limit_Quake(const int&);
+		//画面揺れを一括して設定する
+		//引数	：	（縦揺れの幅,揺れる時間）
+		void Set_Quake(const int&, const int&);
 	};
 }

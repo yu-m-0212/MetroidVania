@@ -21,6 +21,9 @@ namespace  Title
 		this->button_title = "button";
 		DG::Image_Create(this->button_title, "./data/image/ui.png");
 
+		this->logo_title = "logo_title";
+		DG::Image_Create(this->logo_title, "./data/image/logo_title.png");
+
 		this->base_file_path = "./data/sound/wav/";
 
 		this->name_sound_bubble = "sound_bubble";
@@ -39,6 +42,7 @@ namespace  Title
 	{
 		DG::Image_Erase(this->back_title);
 		DG::Image_Erase(this->button_title);
+		DG::Image_Erase(this->logo_title);
 		DM::Sound_Erase(this->name_sound_bubble);
 		DM::Sound_Erase(this->name_environmental_title);
 		return true;
@@ -67,7 +71,7 @@ namespace  Title
 		this->posY_std = -240.0f;										//背景Y軸座標基準値
 		this->height_anim_back = 30.0f;									//背景アニメ揺れ幅
 		this->init_bubble_pos_y = float(ge->screenHeight + 96.0f);		//泡のY軸座標初期位置
-		this->pos_button = ML::Vec2(float(ge->screenWidth / 2), 800);	//座標ボタン
+		this->pos_button = ML::Vec2(1400.0f, 600.0f);					//座標ボタン
 		this->cnt_available_controll = 0;								//操作を受け付けるまでのカウンタ
 		this->controllerName = "P1";									//コントローラー宣言
 		this->eff = new Task_Effect::Object();							//メソッド呼び出し
@@ -76,8 +80,8 @@ namespace  Title
 		//★タスクの生成
 
 		//BGMの再生
-		DM::Sound_Play(this->res->name_sound_bubble, true);
-		DM::Sound_Play(this->res->name_environmental_title, true);
+		DM::Sound_Play_Volume(this->res->name_sound_bubble, true,VOLUME_BGM_BUBBLE_TITLE);
+		DM::Sound_Play_Volume(this->res->name_environmental_title, true,VOLUME_ALL_GAME);
 
 		return  true;
 	}
@@ -138,7 +142,7 @@ namespace  Title
 			auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 			if (nullptr == display_effect)
 			{
-				Display_Effect::Object::Create(true);
+				display_effect->Create_Display_Effect(0);
 			};
 			//サウンドのフェードアウト
 			DM::Sound_FadeOut(this->res->name_sound_bubble);
@@ -172,6 +176,12 @@ namespace  Title
 			draw.Offset(this->pos_button);
 			ML::Box2D  src(0, 250, 850, 250);
 			DG::Image_Draw(this->res->button_title, draw, src,ML::Color(float(sin(this->cnt_anim_button/this->interval_button)),1,1,1));
+		}
+		//タイトルの描画
+		{
+			ML::Box2D draw(0,0,1920, 1080);
+			ML::Box2D  src(0, 0, 1920, 1080);
+			DG::Image_Draw(this->res->logo_title, draw, src);
 		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

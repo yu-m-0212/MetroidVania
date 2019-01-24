@@ -96,7 +96,7 @@ namespace  Enemy00
 				{
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 1,0,0 };
-					(*it)->Received(this, at,0);
+					(*it)->Recieved(this, at,0);
 					break;
 				}
 			}
@@ -127,7 +127,7 @@ namespace  Enemy00
 	}
 	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_)
+	void Object::Recieved(BChara* from_, AttackInfo at_)
 	{
 		if (this->pos.x - from_->pos.x > 0)
 		{

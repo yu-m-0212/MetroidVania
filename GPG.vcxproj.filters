@@ -225,6 +225,9 @@
     <ClCompile Include="Task_Boss_Head.cpp">
       <Filter>MyPG\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Spawner.cpp">
+      <Filter>MyPG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -379,6 +382,9 @@
     </ClInclude>
     <ClInclude Include="Task_Boss_Head.h">
       <Filter>MyPG\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Spawner.h">
+      <Filter>MyPG</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

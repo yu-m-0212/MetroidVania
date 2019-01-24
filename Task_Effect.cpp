@@ -17,6 +17,16 @@ namespace  Task_Effect
 	{
 		this->effectImage = "effectImage";
 		DG::Image_Create(this->effectImage,"./data/image/effect.png");
+		//ファイルパス
+		this->base_file_path_sound = "./data/sound/wav/";
+		this->name_sound_defeat = "sound_defeat";
+		this->name_sound_hit = "hit_shot";
+		this->name_sound_barrier = "sound_barrier";
+		//音の生成
+		//wavファイルの中でも再生できないものあり
+		DM::Sound_CreateSE(this->name_sound_defeat, this->base_file_path_sound + "explosion_enemy01.wav");
+		DM::Sound_CreateSE(this->name_sound_hit, this->base_file_path_sound + "hit_shot_player01.wav");
+		DM::Sound_CreateSE(this->name_sound_barrier, this->base_file_path_sound + "activate_barrier_player01.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -24,6 +34,9 @@ namespace  Task_Effect
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->effectImage);
+		DM::Sound_Erase(this->name_sound_defeat);
+		DM::Sound_Erase(this->name_sound_hit);
+		DM::Sound_Erase(this->name_sound_barrier);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -51,8 +64,10 @@ namespace  Task_Effect
 		this->limit_erase_bubble = 600;			//時間消滅まで泡
 		this->limit_erase_appear = 180;			//時間消滅まで登場
 		this->limit_erase_debris = 120;			//消滅までの時間破片
+		this->limit_erase_spark = 180;			//消滅までの時間火花
 		this->speed_surfacing = 3.0f;			//速度浮上
 		this->speed_Debris = 6.0f;				//速度破片
+		this->speed_spark = 6.0f;				//速度火花
 		this->gravity = ML::Gravity(SIZE_CHIP);	//重力加速度
 		this->render2D_Priority[1] = 0.3f;		//描画順
 		this->choice_state = -1;				//外部から状態を指定する際、使用
@@ -95,14 +110,20 @@ namespace  Task_Effect
 				{
 					this->angle = this->angle - 135.0f;
 				}
+				//SEの再生
+				DM::Sound_Play_Volume(this->res->name_sound_hit, false, VOLUME_SE_HIT_SHOT_PLAYER);
 				break;
 			case 2:		//バリア
 				this->state_effect = Barrier;
 				this->limit_erase = this->limit_erase_barrier;
+				//SEの再生
+				DM::Sound_Play_Volume(this->res->name_sound_barrier, false, VOLUME_ALL_GAME);
 				break;
-			case 3:
+			case 3:		//エネミー撃破
 				this->state_effect = Defeat_Enemy;
 				this->limit_erase = this->limit_erase_defeat;
+				//SEの再生
+				DM::Sound_Play_Volume(this->res->name_sound_defeat, false, VOLUME_ALL_GAME);
 				break;
 			case 4:		//回復
 				this->state_effect = Heal;
@@ -126,6 +147,12 @@ namespace  Task_Effect
 				this->limit_erase = this->limit_erase_debris;
 				//初速
 				this->moveVec.y = sin(this->angle)*this->speed_Debris;
+				break;
+			case 8:		//火花
+				this->state_effect = Spark;
+				this->limit_erase = this->limit_erase_spark;
+				//初速
+				this->moveVec.y = sin(this->angle)*this->speed_spark;
 				break;
 			}
 		}
@@ -164,9 +191,9 @@ namespace  Task_Effect
 		//各エフェクトをテーブルで用意する
 		BChara::DrawInfo imageTable[]
 		{
-			{ Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc },//ストンプ着地の衝撃1		[ 0]
-			{ Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc },//ストンプ着地の衝撃2		[ 1]
-			{ Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc },//ストンプ着地の衝撃3		[ 2]
+			{ Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc },//ストンプ着地の衝撃1			[ 0]
+			{ Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc },//ストンプ着地の衝撃2			[ 1]
+			{ Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc },//ストンプ着地の衝撃3			[ 2]
 			{ Box2D(-96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc },//パンチ風切り1				[ 3]
 			{ Box2D(-96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc },//パンチ風切り2				[ 4]
 			{ Box2D(-96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc },//パンチ風切り3				[ 5]
@@ -184,9 +211,9 @@ namespace  Task_Effect
 			{ Box2D(-96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc },//衝撃波3					[17]
 			{ Box2D(-96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc },//衝撃波4					[18]
 			{ Box2D(-96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc },//衝撃波5					[19]
-			{ Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1	[20]
-			{ Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2	[21]
-			{ Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3	[22]
+			{ Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1		[20]
+			{ Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2		[21]
+			{ Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3		[22]
 			{ Box2D(-16, -16,  32,  32),Box2D(1632,   0,  32,  32),dc },//エネミー撃破1				[23]
 			{ Box2D(-16, -16,  32,  32),Box2D(1632,  32,  32,  32),dc },//エネミー撃破2				[24]
 			{ Box2D(-16, -16,  32,  32),Box2D(1632,  64,  32,  32),dc },//エネミー撃破3				[25]
@@ -199,6 +226,7 @@ namespace  Task_Effect
 			{ Box2D(-16, -16,  32,  32),Box2D(1664,  96,  32,  32),dc },//爆発破片4					[32]
 			{ Box2D(-16, -16,  32,  32),Box2D(1664, 128,  32,  32),dc },//爆発破片5					[33]
 			{ Box2D(-16, -16,  32,  32),Box2D(1664, 160,  32,  32),dc },//爆発破片6					[34]
+			{ Box2D( -6,  -6,  12,  12),Box2D(1728,   0,  12,  12),dc },//火花						[35]
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -246,6 +274,9 @@ namespace  Task_Effect
 			effectCnt = this->animCnt / (this->limit_erase_debris / 6);
 			effectCnt %= 6;
 			rtv = imageTable[effectCnt + 29];
+			break;
+		case Spark:
+			rtv = imageTable[35];
 			break;
 		}
 		//	向きに応じて画像を左右反転する
@@ -298,6 +329,9 @@ namespace  Task_Effect
 			break;
 		case Debris:
 			this->moveVec = this->eff->Move_Parabola(this->speed_Debris,this->moveVec.y,this->gravity,this->angle);
+			break;
+		case Spark:
+			this->moveVec = this->eff->Move_Parabola(this->speed_spark, this->moveVec.y, this->gravity, this->angle);
 			break;
 		}
 	}

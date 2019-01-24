@@ -7,6 +7,7 @@
 #include  "Task_Player.h"
 #include  "Task_Shot00.h"
 #include  "Task_Effect.h"
+#include  "Task_Boss_Head.h"
 
 namespace  Shot01
 {
@@ -40,12 +41,16 @@ namespace  Shot01
 		this->recieveBase = this->hitBase;		//キャラクタとの接触矩形
 		this->flag_Erase = true;				//接触時消えるか
 		this->flag_reflect = false;				//反射した弾か否か
-		this->power = 0;						//攻撃力
+		this->power = 0;						//攻撃力（生成時に指定する）
+		this->rate_reflect_power = 3;			//反射した弾に与える攻撃力倍率
+		this->rate_speed_reflect = 2.0f;		//反射したときに与える加速倍率
 		this->limit_Erase = 0;					//消滅するまでの時間
 		this->add_un_hit_player = 60;			//プレイヤに与える無敵時間
 		this->add_un_hit_boss = 8;				//ボスに与える無敵時間
 		this->angle = 0.0f;						//角度
 		this->eff = new Task_Effect::Object();	//メソッド呼び出し
+		this->cnt_anim = 0;						//アニメカウンタ
+		this->speed_anim = 15;					//アニメスピード
 		//★タスクの生成
 
 		return  true;
@@ -63,6 +68,8 @@ namespace  Shot01
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//アニメーションはポーズ中も行う
+		this->cnt_anim++;
 		//ポーズ
 		if (ge->pause) { return; }
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
@@ -73,7 +80,8 @@ namespace  Shot01
 
 		//移動
 		this->pos += this->moveVec;
-		//当たり判定
+		//プレイヤとの判定
+		if(!this->flag_reflect)
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto targets = ge->GetTask_Group_G<BChara>("プレイヤ");
@@ -85,7 +93,7 @@ namespace  Shot01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at, this->add_un_hit_player);
+					(*it)->Recieved(this, at, this->add_un_hit_player);
 					//ショットのみ消滅
 					//格闘は複数体にあたる
 					if (this->flag_Erase)
@@ -123,6 +131,10 @@ namespace  Shot01
 					this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
 					//反射フラグ反転
 					this->flag_reflect = true;
+					//反射した弾攻撃力補正をかける
+					this->power *= this->rate_reflect_power;
+					//反射した弾の速度を上げる
+					this->moveVec *= this->rate_speed_reflect;
 				}
 			}
 		}
@@ -134,8 +146,7 @@ namespace  Shot01
 				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
 				if (true == map->CheckHit(hit))
 				{
-					//対応したヒット時のエフェクトを生成し消滅する
-					this->Effect_Hit(this->pos);
+					//壁に当たったときはエフェクトを生成しない
 					this->Kill();
 				}
 			}
@@ -160,7 +171,7 @@ namespace  Shot01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at, this->add_un_hit_player);
+					(*it)->Recieved(this, at, this->add_un_hit_player);
 					//対応したヒット時のエフェクトを生成
 					//現状、引数には対象の敵の座標をいれる
 					this->Effect_Hit((*it)->pos);
@@ -182,7 +193,11 @@ namespace  Shot01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { this->power,0,0 };
-					(*it)->Received(this, at, this->add_un_hit_boss);
+					(*it)->Recieved(this, at, this->add_un_hit_boss);
+					//揺れ速度が一定時間上がる
+					auto head =
+						ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
+					head->limit_hit_reflect = LIMIT_HIT_REFLECT;
 					//対応したヒット時のエフェクトを生成
 					//現状、引数には対象の敵の座標をいれる
 					this->Effect_Hit((*it)->pos);
@@ -198,10 +213,20 @@ namespace  Shot01
 	{
 		ML::Box2D draw = this->hitBase;
 		draw.Offset(this->pos);
-		ML::Box2D src(0, 0, 32, 32);
+		ML::Box2D src(0, 192, 16, 16);
+		//反射された弾はプレイヤの色に変更する
+		if (this->flag_reflect)
+		{
+			src.y = 208;
+		}
+		//アニメーション
+		int anim;
+		anim = this->cnt_anim / this->speed_anim;
+		anim %= 2;
+		src.x = this->hitBase.w*anim;
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
-		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
+		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	//呼び出したタスクから寿命を設定する
 	void Object::Set_Limit(const int& cl_)

@@ -138,6 +138,23 @@ bool BChara::CheckHit(const ML::Box2D& hit_)
 	ML::Box2D me = this->recieveBase.OffsetCopy(this->pos);
 	return me.Hit(hit_);
 }
+//自身から見た対象の位置を左右で返す
+//引数	：	（現在の向き,比較対象のX座標）
+BChara::Angle_LR BChara::Check_LR(const BChara::Angle_LR& now_, const float& x_)
+{
+	if (x_ < this->pos.x)
+	{
+		return Left;
+	}
+	else if (this->pos.x < x_)
+	{
+		return Right;
+	}
+	else
+	{
+		return now_;
+	}
+}
 //-----------------------------------------------------------------------------
 //アクセサメソッド
 

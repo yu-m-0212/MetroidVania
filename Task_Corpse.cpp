@@ -120,7 +120,7 @@ namespace  Corpse
 	}
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-	void Object::Received(BChara* from_, AttackInfo at_, const int&)
+	void Object::Recieved(BChara* from_, AttackInfo at_, const int&)
 	{
 		//一度だけプレイヤを回復する
 		if (!this->Get_Flag_Erase())

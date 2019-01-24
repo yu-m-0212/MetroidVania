@@ -51,12 +51,15 @@ namespace  Boss_Upper_Middle
 
 		int add_un_hit;			//プレイヤに与える無敵時間
 
-		float speed_chase;		//速度追従
+		float speed_chase;		//実処理を行う追従速度
+		float speed_chase_def;	//通常時の追従速度
+		float speed_chase_ref;	//反射被弾時の追従速度
 		ML::Vec2 vec_shot;		//移動量ショット
 		ML::Box2D hit_shot;		//矩形ショット
 
-		Boss* boss;				//メソッド呼び出し
-		Shot01::Object* shot;	//メソッド呼び出し
+		Boss* boss;					//メソッド呼び出し
+		Shot01::Object* shot;		//メソッド呼び出し
+		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		//コンストラクタ
 		Object();
@@ -66,7 +69,7 @@ namespace  Boss_Upper_Middle
 		void Move();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-		void Received(BChara* from_, AttackInfo at_, const int&);
+		void Recieved(BChara* from_, AttackInfo at_, const int&);
 		//アニメーション制御
 		BChara::DrawInfo Anim();
 	};

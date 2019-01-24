@@ -6,6 +6,8 @@
 #include "BChara.h"
 #include "Boss.h"
 #include "Task_Shot01.h"
+#include "Task_Map2D.h"
+#include "Task_Effect.h"
 
 namespace  Boss_Head
 {
@@ -26,7 +28,12 @@ namespace  Boss_Head
 		static  Resource::SP  Create();
 		//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 			//共有する変数はここに追加する
-		string name_image;	//リソース名
+		string name_image;					//リソース名
+		string base_file_path_sound;		//基礎ファイルパス
+		string name_sound_wait_under_00;	//待機中SE00
+		string name_sound_wait_under_01;	//待機中SE01
+		string name_sound_hiding_under;		//潜行中SE
+		string name_sound_hit_reflect;		//反射弾被弾時
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -49,7 +56,9 @@ namespace  Boss_Head
 		//攻撃情報
 		int add_un_hit;						//プレイヤに与える無敵時間
 		//横揺れ
-		float speed_shake;					//速度横揺れ
+		float speed_shake;					//実処理を行う横揺れ速度
+		float speed_shake_def;				//通常時の横揺れ速度
+		float speed_shake_ref;				//反射被弾時の横揺れ速度
 		float std_pos_x;					//横揺れ基準値
 		float cnt_shake;					//カウンタ横揺れ
 		float interval_shake;				//間隔横揺れ
@@ -65,14 +74,18 @@ namespace  Boss_Head
 		int interval_create_effect;			//エフェクトの生成間隔
 		int interval_shot;					//ショットに移る時間
 		int interval_return;				//ショットから戻るまでの時間
-		int limit_move_vertically;			//縦向き時の登場、退場移動時間
+		int limit_move_vertically;			//縦向き時の登場移動時間
 		float speed_move_under;				//縦向き時の登場・退場速度
 		float speed_chase_hiding;			//潜行中プレイヤに接近する割合
 		ML::Box2D hit_vertically_long;		//縦長の時の矩形（hitBaseに代入して使用）
 		ML::Box2D hit_horizontally_long;	//横長の時の矩形（hitBaseに代入して使用）
+		//画面揺れ用変数
+		int dist_quake_boss;				//ボス用画面揺れ幅
+		int limit_quake_boss;				//ボス用画面揺れ時間
 		//インスタンス
 		Boss* boss;							//ボスクラスポインタ
 		Shot01::Object* shot;				//ショットオブジェクトポインタ
+		Task_Effect::Object* eff;			//エフェクトオブジェクトポインタ
 	public:
 		//コンストラクタ
 		Object();
@@ -82,7 +95,7 @@ namespace  Boss_Head
 		void Move();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-		void Received(BChara* from_, AttackInfo at_, const int&);
+		void Recieved(BChara* from_, AttackInfo at_, const int&);
 		//アニメーション制御
 		BChara::DrawInfo Anim();
 	};

@@ -21,8 +21,8 @@ namespace  Game
 	{
 		bool  Initialize();
 		bool  Finalize();
-		Resource();
 	public:
+		Resource();
 		~Resource();
 		typedef  shared_ptr<Resource>	SP;
 		typedef  weak_ptr<Resource>		WP;
@@ -30,7 +30,7 @@ namespace  Game
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
 		string base_file_path_game;		//基礎ファイルパス
-		string name_environmental_game;	//環境音本編
+		string name_bgm_main_game;		//BGM本編
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BTask
@@ -54,6 +54,7 @@ namespace  Game
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
 		ML::Vec2 pos_dead;				//前回の死亡地点
+		ML::Vec2 pos_spawer;			//ボススポナー座標
 		BChara::Angle_LR angle_dead;	//死亡時の向き
 		int cnt_transition;				//カウンタ遷移用
 		int time_create_next_task;		//引継ぎタスクの生成タイミング

@@ -26,8 +26,6 @@ namespace  Enemy01
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
 		string imageName;				//名前画像
-		string base_file_path_sound;	//サウンドファイルパスベース
-		string name_sound_defeat;		//名前効果音爆発
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -68,7 +66,7 @@ namespace  Enemy01
 		bool Search_Player();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-		void Received(BChara* from_, AttackInfo at_,const int&);
+		void Recieved(BChara* from_, AttackInfo at_,const int&);
 		//アニメーション制御
 		BChara::DrawInfo Anim();	
 		//エネミーの生成

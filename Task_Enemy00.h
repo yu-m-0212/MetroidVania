@@ -57,7 +57,7 @@ namespace  Enemy00
 		//モーションに対応した処理
 		void Move();				
 		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_);
+		void Recieved(BChara* from_, AttackInfo at_);
 		//アニメーション制御
 		BChara::DrawInfo Anim();	
 	};

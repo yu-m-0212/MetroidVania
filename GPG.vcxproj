@@ -130,6 +130,7 @@
     <ClCompile Include="Task_Retry.cpp" />
     <ClCompile Include="Task_Shot00.cpp" />
     <ClCompile Include="Task_Shot01.cpp" />
+    <ClCompile Include="Task_Spawner.cpp" />
     <ClCompile Include="Task_Sprite.cpp" />
     <ClCompile Include="Task_Title.cpp" />
     <ClCompile Include="Task_Tutorials.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="Task_Retry.h" />
     <ClInclude Include="Task_Shot00.h" />
     <ClInclude Include="Task_Shot01.h" />
+    <ClInclude Include="Task_Spawner.h" />
     <ClInclude Include="Task_Sprite.h" />
     <ClInclude Include="Task_Title.h" />
     <ClInclude Include="Task_Tutorials.h" />

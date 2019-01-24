@@ -55,7 +55,7 @@ namespace  Item01
 		//アニメーション制御
 		BChara::DrawInfo Anim();
 		//接触時の応答処理（必ず受け身の処理として実装する）
-		void Received(BChara* from_, AttackInfo at_, const int& un_hit_);
+		void Recieved(BChara* from_, AttackInfo at_, const int& un_hit_);
 		//アイテム01の生成
 		//引数	：	（初期座標）
 		void Create_Item01(const ML::Vec2&);

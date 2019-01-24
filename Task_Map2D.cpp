@@ -33,7 +33,7 @@ namespace  Map2D
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.9f;		//描画順
+		this->render2D_Priority[1] = 0.8f;		//描画順
 		this->imageName = "MapChipImg";			//イメージ名の初期化
 		this->cnt_Quake = 0;					//画面を揺らす周期
 		this->dist_Quake = 0;					//画面揺れ幅
@@ -303,6 +303,13 @@ namespace  Map2D
 	void Object::Set_Limit_Quake(const int& limit_)
 	{
 		this->limit_Quake = limit_;
+	}
+	//画面揺れを一括して設定する
+	//引数	：	（縦揺れの幅,揺れる時間）
+	void Object::Set_Quake(const int& dist_, const int& limit_)
+	{
+		this->Set_Dist_Quake(dist_);
+		this->Set_Limit_Quake(limit_);
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

@@ -29,8 +29,8 @@ namespace  Player
 		string		name_sound_landing;		//効果音着地
 		string		name_sound_jump;		//効果音ジャンプ
 		string		name_sound_shot;		//効果音ショット
-		string		name_sound_barrier;		//効果音バリア
 		string		name_not_recharge;		//効果音未リチャージバリア
+		string		name_damage_player;		//効果音被弾
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -84,7 +84,7 @@ namespace  Player
 		void  Move();
 		//接触時の応答処理（必ず受け身の処理として実装する）
 		//引数	：	(攻撃側,攻撃情報,与無敵時間)
-		void Received(BChara* from_, AttackInfo at_,const int&);
+		void Recieved(BChara* from_, AttackInfo at_,const int&);
 		//アニメーション制御
 		BChara::DrawInfo  Anim();
 		//ショット生成スタンダード

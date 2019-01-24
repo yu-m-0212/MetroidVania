@@ -83,7 +83,7 @@ namespace  Item02
 	}
 	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
-	void Object::Received(BChara* from_, AttackInfo at_)
+	void Object::Recieved(BChara* from_, AttackInfo at_)
 	{
 		if (this->state != Stand) {
 			return;

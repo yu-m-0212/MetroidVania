@@ -19,12 +19,6 @@ namespace  Enemy01
 	{
 		this->imageName = "Enemy01Img";
 		DG::Image_Create(this->imageName, "./data/image/enemy01.png");
-
-		this->base_file_path_sound = "./data/sound/wav/";
-		this->name_sound_defeat = "sound_defeat";
-		//wavファイルの中でも再生できないものあり
-		DM::Sound_CreateSE(this->name_sound_defeat, this->base_file_path_sound + "explosion_enemy01.wav");
-		DM::Sound_Volume(this->name_sound_defeat, 1000);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -32,7 +26,6 @@ namespace  Enemy01
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
-		DM::Sound_Erase(this->name_sound_defeat);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -57,7 +50,7 @@ namespace  Enemy01
 		this->max_speed_fall = 10.0f;						//最大落下速度
 		this->gravity = ML::Gravity(SIZE_CHIP) * 5;			//重力加速度&時間速度による加算量
 		this->interval_Caution = 60;						//プレイヤが視界から外れた後、再度警戒に入るまでの時間
-		this->interval_Attack = 120;						//弾を生成する間隔
+		this->interval_Attack = 45;							//弾を生成する間隔
 		this->interval_Flash = 4;							//点滅間隔
 		this->add_un_hit = 60;								//プレイヤに与える無敵時間
 		this->size_h_resource = 192;						//被弾時、ホワイトアウトする際の基準値
@@ -85,8 +78,6 @@ namespace  Enemy01
 			{
 				this->eff->Create_Effect(7, this->pos, float(rand() % 360), this->angle_LR);
 			}
-			//SEの再生
-			DM::Sound_Play(this->res->name_sound_defeat, false);
 		}
 		return  true;
 	}
@@ -121,7 +112,7 @@ namespace  Enemy01
 				if ((*it)->CheckHit(me)) {
 					//相手にダメージの処理を行わせる
 					BChara::AttackInfo at = { 1,0,0 };
-					(*it)->Received(this, at,this->add_un_hit);
+					(*it)->Recieved(this, at,this->add_un_hit);
 					break;
 				}
 			}
@@ -157,7 +148,7 @@ namespace  Enemy01
 	//-------------------------------------------------------------------
 	//接触時の応答処理（必ず受け身の処理として実装する）
 	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
-	void Object::Received(BChara* from_, AttackInfo at_,const int& un_hit_)
+	void Object::Recieved(BChara* from_, AttackInfo at_,const int& un_hit_)
 	{
 		//仮処理
 		//hpが減ると行動が早くなる
@@ -360,7 +351,7 @@ namespace  Enemy01
 				//呼び出した判定矩形に思考させるため状態を指定
 				shot->state = Shoot;
 				shot->hitBase = ML::Box2D(-16, -16, 32, 32);
-				shot->Set_Limit(300);
+				shot->Set_Limit(600);
 				shot->Set_Erase(0);
 				shot->Set_Power(1);
 				shot->angle_LR = this->angle_LR;

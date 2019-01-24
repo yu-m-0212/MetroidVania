@@ -4,6 +4,7 @@
 #include	"MyPG.h"
 #include	"Task_Gun.h"
 #include	"Task_Player.h"
+#include	"Task_Display_Effect.h"
 
 namespace  Gun
 {
@@ -64,7 +65,13 @@ namespace  Gun
 		this->moveCnt++;
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
+		//画面効果中は操作しない
+		auto display_effect =
+			ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+		if (nullptr != display_effect) { return; }
+		//コントローラー宣言
 		auto in = DI::GPad_GetState(this->controllerName);
+		//プレイヤの視点を受け取る
 		this->angle_LR = pl->angle_LR;
 		this->pos = pl->pos;
 		this->Think();
