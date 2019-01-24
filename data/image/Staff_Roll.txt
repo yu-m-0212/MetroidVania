@@ -1,13 +1,25 @@
 スタッフロール
 
-Images
-helpcomputer from OpenGameArt.org
+[Images]
 
-Sounds
-Free Sound Effect.com
-魔王魂
+	helpcomputer by OpenGameArt.org
 
-Softwear
-Tiled
-Visual Studio
-Photo Shop
+	Jerom by OpenGameArt.org
+
+[BGM]
+
+	hitoshi by Senses Circuit(https://www.senses-circuit.com)
+
+[SE]
+
+	Free Sound Effect.com
+
+	魔王魂
+
+[Softwear]
+
+	Tiled
+
+	Visual Studio
+
+	Photo Shop
