@@ -115,6 +115,7 @@ namespace  Player
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
+		delete this->eff;
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成

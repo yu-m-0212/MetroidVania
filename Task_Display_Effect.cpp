@@ -41,7 +41,7 @@ namespace  Display_Effect
 		this->cnt_transition = 0;							//画面遷移カウンタ
 		this->time_create_next_task = 100;					//次のタスクを生成するタイミング
 		this->time_start_fade_out = 150;					//フェードアウトを始めるタイミング
-		state = Non;										//状態管理
+		this->state_display = Non;							//状態管理
 		this->num_state = -1;								//状態管理番号
 		this->flag_switching_slide = false;					//スライドイン/アウトフラグ
 		this->move_letter=0;								//レターボックスアニメカウンタ
@@ -72,7 +72,7 @@ namespace  Display_Effect
 	void  Object::UpDate()
 	{
 		//外部から一度だけ状態を指定し、初期化
-		if (this->state == Non)
+		if (this->state_display == Non)
 		{
 			switch (this->num_state)
 			{
@@ -80,18 +80,18 @@ namespace  Display_Effect
 				break;
 				//フェードイン/アウト
 			case 0:
-				this->state = Fade;
+				this->state_display = Fade;
 				break;
 				//レターボックス
 			case 1:
-				this->state = Letter_Box;
+				this->state_display = Letter_Box;
 				break;
 			}
 		}
 		//汎用カウンタ
 		this->cnt_transition++;
 		//状態ごとの処理
-		switch (this->state)
+		switch (this->state_display)
 		{
 		default:
 			break;
@@ -150,7 +150,7 @@ namespace  Display_Effect
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
-		switch (this->state)
+		switch (this->state_display)
 		{
 		default:
 			break;

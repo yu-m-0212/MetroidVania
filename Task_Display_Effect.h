@@ -47,25 +47,25 @@ namespace  Display_Effect
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		enum State_Display_Effect
 		{
-			Non,					//未指定
-			Fade,					//フェードイン、アウト
-			Letter_Box				//レターボックス
+			Non,							//未指定
+			Fade,							//フェードイン、アウト
+			Letter_Box						//レターボックス
 		};
-		State_Display_Effect state;	//状態管理
-		int	num_state;				//外部から指定する際の状態番号
+		State_Display_Effect state_display;	//状態管理
+		int	num_state;						//外部から指定する際の状態番号
 
-		bool flag_switching_slide;	//スライドイン/アウトフラグ
-		int move_letter;			//レターボックスアニメカウンタ
-		int add_move_letter;		//レターボックススライド速度
-		int limit_move_letter;		//レターの移動量上限
-		int cnt_switch_letter;		//スライドイン/アウトの切り替え間隔カウンタ
-		int time_switch_letter;		//スライドイン/アウトの切り替えタイミング
+		bool flag_switching_slide;			//スライドイン/アウトフラグ
+		int move_letter;					//レターボックスアニメカウンタ
+		int add_move_letter;				//レターボックススライド速度
+		int limit_move_letter;				//レターの移動量上限
+		int cnt_switch_letter;				//スライドイン/アウトの切り替え間隔カウンタ
+		int time_switch_letter;				//スライドイン/アウトの切り替えタイミング
 
-		bool flag_in_out;			//0=in 1=out
-		int cnt_transition;			//画面遷移カウンタ
-		int time_create_next_task;	//引継ぎタスクを生成するタイミング
-		int time_start_fade_out;	//フェードアウトを始めるタイミング
-		float transparency;			//透明度
+		bool flag_in_out;					//0=in 1=out
+		int cnt_transition;					//画面遷移カウンタ
+		int time_create_next_task;			//引継ぎタスクを生成するタイミング
+		int time_start_fade_out;			//フェードアウトを始めるタイミング
+		float transparency;					//透明度
 	public:
 		//外部から状態を指定する
 		//引数	：	（整数）
