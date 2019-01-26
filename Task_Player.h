@@ -44,7 +44,6 @@ namespace  Player
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -78,6 +77,7 @@ namespace  Player
 		ML::Vec2 moveBack_stomp;	//ふっとび量ストンプ
 		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
+		Object();
 		//思考＆状況判断(ステータス決定）
 		void  Think();
 		//モーションに対応した処理

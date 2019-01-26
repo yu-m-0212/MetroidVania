@@ -15,6 +15,8 @@ namespace  Boss_Head
 	{
 		this->name_image = "head";
 		DG::Image_Create(this->name_image, "./data/image/Boss01.png");
+		this->name_rect = "rect";
+		DG::Image_Create(this->name_rect, "./data/image/UI.png");
 		//リソース名
 		this->base_file_path_sound = "./data/sound/wav/";
 		this->name_sound_hit_reflect = "sound_hit_reflect";
@@ -33,6 +35,7 @@ namespace  Boss_Head
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->name_image);
+		DG::Image_Erase(this->name_rect);
 		DM::Sound_Erase(this->name_sound_hit_reflect);
 		DM::Sound_Erase(this->name_sound_wait_under_00);
 		DM::Sound_Erase(this->name_sound_wait_under_01);
@@ -53,6 +56,7 @@ namespace  Boss_Head
 		this->render2D_Priority[1] = 0.85f;							//描画順
 		this->hitBase = ML::Box2D(-92, -145, 184, 290);				//表示矩形
 		this->recieveBase = ML::Box2D(-92, -46, 184, 92);			//キャラクタとの判定矩形
+		this->correction_pos_weak_point = -75;						//弱点矩形の本体からの座標補正
 		this->std_pos_x = 8382.0f;									//横揺れ基準値
 		this->speed_shake_def = 64.0f;								//通常時の横揺れ速度
 		this->speed_shake_ref = 128.0f;								//反射被弾時の横揺れ速度
@@ -75,7 +79,7 @@ namespace  Boss_Head
 		this->interval_return = 180;								//ショットから戻るまでの時間
 		this->limit_move_vertically = 57;							//縦向き時の登場移動時間
 		this->speed_move_under = 10.0f;								//縦向き時の登場、退場速度
-		this->speed_chase_hiding = 0.05f;							//潜行中プレイヤに接近する割合
+		this->speed_chase_hiding = 0.025f;							//潜行中プレイヤに接近する割合
 		this->hit_vertically_long = ML::Box2D(-92, -46, 184, 92);	//縦長の時の矩形（hitBaseに代入して使用）
 		this->hit_horizontally_long = ML::Box2D(-46, -92, 92, 184);	//横長の時の矩形（hitBaseに代入して使用）
 		this->dist_quake_boss = 5;									//ボス用画面揺れ幅
@@ -138,12 +142,23 @@ namespace  Boss_Head
 		//スクロール対応
 		di.draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
 		DG::Image_Draw(this->res->name_image, di.draw, di.src, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
+		//頭部判定矩形の表示
+		if (ge->debugMode)
+		{
+			ML::Box2D draw = this->recieveBase;
+			draw.Offset(this->pos);
+			ML::Box2D  src(64, 0, 64, 64);
+			draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+			//本体座標から弱点の位置補正
+			draw.y += this->correction_pos_weak_point;
+			DG::Image_Draw(this->res->name_rect, draw, src, ML::Color(0.5f, 1.0f, 0.0f, 0.0f));
+		}
 	}
 	//思考&状況判断(ステータス決定)
 	void Object::Think()
 	{
 		//とりあえず今の状態を指定
-		BChara::State nm = this->state; 
+		BChara::State nm = this->state;
 		//思考（入力）や状況に応じてモーションを変更することを目的としている。
 		//モーションの変更以外の処理は行わない
 		switch (nm)
@@ -418,6 +433,18 @@ namespace  Boss_Head
 		}
 		return rtv;
 		/*return imageTable[int(this->state)];*/
+	}
+	//潜行から登場までの時間を減少させる
+	//引数	：	（減少量）
+	void Object::Decrease_Interval_To_Appear(const int& decrease_)
+	{
+		this->interval_to_appear -= decrease_;
+	}
+	//登場からショットに移行するまでの時間を減少させる
+	//引数	：	（減少量）
+	void Object::Decrease_Interval_Shot(const int& decrease_)
+	{
+		this->interval_shot -= decrease_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

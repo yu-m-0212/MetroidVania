@@ -202,11 +202,8 @@ namespace  Shot00
 		default:
 			break;
 		case StompLanding:
+			//•¡”‚Ì“G‚Éƒqƒbƒg‚·‚é
 			this->flag_Erase = false;
-			if (pl->state == Damage)
-			{
-				this->Kill();
-			}
 			break;
 		case Shoot:
 			//“G‚ÉÕ“Ë‚µ‚½‚Æ‚«Á‚¦‚é‚©”Û‚©

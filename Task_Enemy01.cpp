@@ -351,6 +351,7 @@ namespace  Enemy01
 				//呼び出した判定矩形に思考させるため状態を指定
 				shot->state = Shoot;
 				shot->hitBase = ML::Box2D(-16, -16, 32, 32);
+				shot->recieveBase = ML::Box2D(-16, -16, 32, 32);
 				shot->Set_Limit(600);
 				shot->Set_Erase(0);
 				shot->Set_Power(1);

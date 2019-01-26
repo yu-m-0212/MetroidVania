@@ -54,38 +54,43 @@ namespace  Task_Effect
 		//状態管理
 		enum State_Effect
 		{
-			Non,			//未指定
-			Hit_Shot,		//ヒットショット（プレイヤ）
-			Barrier,		//バリア
-			Heal,			//回復
-			Bubble,			//泡
-			Appear,			//登場
-			Defeat_Enemy,	//撃破（エネミー）
-			Debris,			//破片
-			Spark			//火花
+			Non,				//未指定
+			Hit_Shot,			//ヒットショット（プレイヤ）
+			Barrier,			//バリア
+			Heal,				//回復
+			Bubble,				//泡
+			Appear,				//登場
+			Defeat_Enemy,		//撃破（エネミー）
+			Debris,				//破片
+			Spark,				//火花
+			Target_Circle_00,	//ボス登場演出サークル00
+			Target_Circle_01,	//ボス登場演出サークル01
+			Target_Bar,			//ボス登場演出数値バー
 		};
-		State_Effect state_effect;	//状態管理
-		int num_bubble;				//泡の大きさを指定する
-		int interval_bubble;		//泡の揺れ周期
-		int limit_erase;			//消滅までの時間
-		int limit_erase_hit_shot;	//時間消滅までヒットショット
-		int limit_erase_barrier;	//時間消滅までバリア
-		int limit_erase_defeat;		//時間消滅まで撃破
-		int limit_erase_heal;		//時間消滅まで回復
-		int limit_erase_bubble;		//時間消滅まで泡
-		int limit_erase_appear;		//時間消滅まで登場
-		int limit_erase_debris;		//消滅までの時間破片
-		int limit_erase_spark;		//消滅までの時間火花
-		int choice_state;			//外部から状態を指定する際、使用
-		float speed_surfacing;		//泡の浮上速度
-		float speed_Debris;			//速度破片
-		float speed_spark;			//速度火花
-		float wide_bubble;			//泡の揺れ幅
-		float dist;					//撃破エフェクトの中心からの距離
-		float angle;				//表示する角度
-		float gravity;				//重力加速度
-		Vec2 center;				//回転軸
-		Effect* eff;				//エフェクトクラス
+		State_Effect state_effect;		//状態管理
+		int num_bubble;					//泡の大きさを指定する
+		int interval_bubble;			//泡の揺れ周期
+		int limit_erase;				//消滅までの時間
+		int limit_erase_hit_shot;		//時間消滅までヒットショット
+		int limit_erase_barrier;		//時間消滅までバリア
+		int limit_erase_defeat;			//時間消滅まで撃破
+		int limit_erase_heal;			//時間消滅まで回復
+		int limit_erase_bubble;			//時間消滅まで泡
+		int limit_erase_appear;			//時間消滅まで登場
+		int limit_erase_debris;			//消滅までの時間破片
+		int limit_erase_spark;			//消滅までの時間火花
+		int limit_effect_target_boss;	//ボス警告エフェクトの消滅時間
+		int choice_state;				//外部から状態を指定する際、使用
+		float speed_surfacing;			//泡の浮上速度
+		float speed_Debris;				//速度破片
+		float speed_spark;				//速度火花
+		float wide_bubble;				//泡の揺れ幅
+		float dist;						//撃破エフェクトの中心からの距離
+		float angle;					//表示する角度
+		float add_angle_target_circle;	//ボス警告サークルの回転量
+		float gravity;					//重力加速度
+		Vec2 center;					//回転軸
+		Effect* eff;					//エフェクトクラス
 	public:
 		Object();
 		//エフェクトを生成する（角度を指定しない）

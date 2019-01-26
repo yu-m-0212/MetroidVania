@@ -15,6 +15,7 @@
 #define INTERVAL_CREATE_END_EFFECT_DEF 10	//頭以外のエンドパターンエフェクト生成間隔
 #define INTERVAL_CREATE_END_EFFECT_HEAD 5	//頭タスクのエンドパターンエフェクト生成間隔
 #define LIMIT_END_PATTERN_BOSS 60			//ボスエンドパターンからの遷移時間
+#define DECREASE_INTERVAL_DEFEAT 30			//各パーツを破壊するごとにこの値分、頭の行動が速くなる
 
 class Boss : public BTask
 {

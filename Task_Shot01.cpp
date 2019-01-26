@@ -122,19 +122,24 @@ namespace  Shot01
 		if (nullptr != shot_pl)
 		{
 			ML::Box2D  me = this->hitBase.OffsetCopy(this->pos);
-			ML::Box2D you = shot_pl->hitBase.OffsetCopy(shot_pl->pos);
+			ML::Box2D you = shot_pl->recieveBase.OffsetCopy(shot_pl->pos);
 			//©g‚ª‚Ü‚¾”½Ë’e‚Å‚Í‚È‚¢‚Æ‚«
 			if (!this->flag_reflect)
 			{
-				if (you.Hit(me) && shot_pl->state == StompLanding)
+				if (you.Hit(me))
 				{
-					this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
-					//”½Ëƒtƒ‰ƒO”½“]
-					this->flag_reflect = true;
-					//”½Ë‚µ‚½’eUŒ‚—Í•â³‚ğ‚©‚¯‚é
-					this->power *= this->rate_reflect_power;
-					//”½Ë‚µ‚½’e‚Ì‘¬“x‚ğã‚°‚é
-					this->moveVec *= this->rate_speed_reflect;
+					if (shot_pl->state==LandStomp||
+						shot_pl->state==AirStomp||
+						shot_pl->state==StompLanding)
+					{
+						this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
+						//”½Ëƒtƒ‰ƒO”½“]
+						this->flag_reflect = true;
+						//”½Ë‚µ‚½’eUŒ‚—Í•â³‚ğ‚©‚¯‚é
+						this->power *= this->rate_reflect_power;
+						//”½Ë‚µ‚½’e‚Ì‘¬“x‚ğã‚°‚é
+						this->moveVec *= this->rate_speed_reflect;
+					}
 				}
 			}
 		}

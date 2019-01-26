@@ -6,6 +6,8 @@
 #include  "Task_Effect.h"
 #include  "Task_Player.h"
 #include  "Task_Map2D.h"
+#include  "Task_Boss_Head.h"
+#include  "Task_Display_Effect.h"
 
 using namespace ML;
 namespace  Task_Effect
@@ -53,6 +55,7 @@ namespace  Task_Effect
 		this->limit_erase = 0;					//時間消滅まで
 		this->dist = 0.0f;						//回転する際の中心からの距離
 		this->angle = 0.0f;						//角度
+		this->add_angle_target_circle = 0.05f;	//ボス警告サークルの回転量
 		this->center = Vec2(0, 0);				//回転軸
 		this->num_bubble = 0;					//泡の大きさ
 		this->interval_bubble = 16;				//泡の揺れ周期
@@ -65,6 +68,7 @@ namespace  Task_Effect
 		this->limit_erase_appear = 180;			//時間消滅まで登場
 		this->limit_erase_debris = 120;			//消滅までの時間破片
 		this->limit_erase_spark = 180;			//消滅までの時間火花
+		this->limit_effect_target_boss = 240;	//ボス警告エフェクトの消滅時間
 		this->speed_surfacing = 3.0f;			//速度浮上
 		this->speed_Debris = 6.0f;				//速度破片
 		this->speed_spark = 6.0f;				//速度火花
@@ -154,6 +158,18 @@ namespace  Task_Effect
 				//初速
 				this->moveVec.y = sin(this->angle)*this->speed_spark;
 				break;
+			case 9:		//ボス演出サークル00
+				this->state_effect = Target_Circle_00;
+				this->limit_erase = this->limit_effect_target_boss;
+				break;
+			case 10:	//ボス演出サークル01
+				this->state_effect = Target_Circle_01;
+				this->limit_erase = this->limit_effect_target_boss;
+				break;
+			case 11:	//ボス演出バー
+				this->state_effect = Target_Bar;
+				this->limit_erase = this->limit_effect_target_boss;
+				break;
 			}
 		}
 		//ポーズ
@@ -191,42 +207,46 @@ namespace  Task_Effect
 		//各エフェクトをテーブルで用意する
 		BChara::DrawInfo imageTable[]
 		{
-			{ Box2D(-96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc },//ストンプ着地の衝撃1			[ 0]
-			{ Box2D(-96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc },//ストンプ着地の衝撃2			[ 1]
-			{ Box2D(-96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc },//ストンプ着地の衝撃3			[ 2]
-			{ Box2D(-96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc },//パンチ風切り1				[ 3]
-			{ Box2D(-96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc },//パンチ風切り2				[ 4]
-			{ Box2D(-96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc },//パンチ風切り3				[ 5]
-			{ Box2D(-96, -64, 192, 128),Box2D( 384,   0, 192, 128),dc },//パンチの衝撃1				[ 6]
-			{ Box2D(-96, -64, 192, 128),Box2D( 384, 128, 192, 128),dc },//パンチの衝撃2				[ 7]
-			{ Box2D(-96, -64, 192, 128),Box2D( 384, 256, 192, 128),dc },//パンチの衝撃3				[ 8]
-			{ Box2D(-96, -64, 192, 128),Box2D( 576,   0, 192, 128),dc },//遺体から回復1				[ 9]
-			{ Box2D(-96, -64, 192, 128),Box2D( 576, 128, 192, 128),dc },//遺体から回復2				[10]
-			{ Box2D(-96, -64, 192, 128),Box2D( 576, 256, 192, 128),dc },//遺体から回復3				[11]
-			{ Box2D(-96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc },//エネミー爆散1				[12]
-			{ Box2D(-96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc },//エネミー爆散2				[13]
-			{ Box2D(-96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc },//エネミー爆散3				[14]
-			{ Box2D(-96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc },//衝撃波1					[15]
-			{ Box2D(-96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc },//衝撃波2					[16]
-			{ Box2D(-96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc },//衝撃波3					[17]
-			{ Box2D(-96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc },//衝撃波4					[18]
-			{ Box2D(-96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc },//衝撃波5					[19]
-			{ Box2D(-48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1		[20]
-			{ Box2D(-48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2		[21]
-			{ Box2D(-48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3		[22]
-			{ Box2D(-16, -16,  32,  32),Box2D(1632,   0,  32,  32),dc },//エネミー撃破1				[23]
-			{ Box2D(-16, -16,  32,  32),Box2D(1632,  32,  32,  32),dc },//エネミー撃破2				[24]
-			{ Box2D(-16, -16,  32,  32),Box2D(1632,  64,  32,  32),dc },//エネミー撃破3				[25]
-			{ Box2D(-16, -16,  32,  32),Box2D(1632,  96,  32,  32),dc },//エネミー撃破4				[26]
-			{ Box2D(-16, -16,  32,  32),Box2D(1632, 128,  32,  32),dc },//エネミー撃破5				[27]
-			{ Box2D(-16, -16,  32,  32),Box2D(1632, 160,  32,  32),dc },//エネミー撃破6				[28]
-			{ Box2D(-16, -16,  32,  32),Box2D(1664,   0,  32,  32),dc },//爆発破片1					[29]
-			{ Box2D(-16, -16,  32,  32),Box2D(1664,  32,  32,  32),dc },//爆発破片2					[30]
-			{ Box2D(-16, -16,  32,  32),Box2D(1664,  64,  32,  32),dc },//爆発破片3					[31]
-			{ Box2D(-16, -16,  32,  32),Box2D(1664,  96,  32,  32),dc },//爆発破片4					[32]
-			{ Box2D(-16, -16,  32,  32),Box2D(1664, 128,  32,  32),dc },//爆発破片5					[33]
-			{ Box2D(-16, -16,  32,  32),Box2D(1664, 160,  32,  32),dc },//爆発破片6					[34]
-			{ Box2D( -6,  -6,  12,  12),Box2D(1728,   0,  12,  12),dc },//火花						[35]
+			{ Box2D( -96, -64, 192, 128),Box2D(   0,   0, 192, 128),dc },//ストンプ着地の衝撃1			[ 0]
+			{ Box2D( -96, -64, 192, 128),Box2D(   0, 128, 192, 128),dc },//ストンプ着地の衝撃2			[ 1]
+			{ Box2D( -96, -64, 192, 128),Box2D(   0, 256, 192, 128),dc },//ストンプ着地の衝撃3			[ 2]
+			{ Box2D( -96, -64, 192, 128),Box2D( 192,   0, 192, 128),dc },//パンチ風切り1					[ 3]
+			{ Box2D( -96, -64, 192, 128),Box2D( 192, 128, 192, 128),dc },//パンチ風切り2					[ 4]
+			{ Box2D( -96, -64, 192, 128),Box2D( 192, 256, 192, 128),dc },//パンチ風切り3					[ 5]
+			{ Box2D( -96, -64, 192, 128),Box2D( 384,   0, 192, 128),dc },//パンチの衝撃1					[ 6]
+			{ Box2D( -96, -64, 192, 128),Box2D( 384, 128, 192, 128),dc },//パンチの衝撃2					[ 7]
+			{ Box2D( -96, -64, 192, 128),Box2D( 384, 256, 192, 128),dc },//パンチの衝撃3					[ 8]
+			{ Box2D( -96, -64, 192, 128),Box2D( 576,   0, 192, 128),dc },//遺体から回復1					[ 9]
+			{ Box2D( -96, -64, 192, 128),Box2D( 576, 128, 192, 128),dc },//遺体から回復2					[10]
+			{ Box2D( -96, -64, 192, 128),Box2D( 576, 256, 192, 128),dc },//遺体から回復3					[11]
+			{ Box2D( -96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc },//エネミー爆散1					[12]
+			{ Box2D( -96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc },//エネミー爆散2					[13]
+			{ Box2D( -96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc },//エネミー爆散3					[14]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc },//衝撃波1						[15]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc },//衝撃波2						[16]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc },//衝撃波3						[17]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc },//衝撃波4						[18]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc },//衝撃波5						[19]
+			{ Box2D( -48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1			[20]
+			{ Box2D( -48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2			[21]
+			{ Box2D( -48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3			[22]
+			{ Box2D( -16, -16,  32,  32),Box2D(1632,   0,  32,  32),dc },//エネミー撃破1					[23]
+			{ Box2D( -16, -16,  32,  32),Box2D(1632,  32,  32,  32),dc },//エネミー撃破2					[24]
+			{ Box2D( -16, -16,  32,  32),Box2D(1632,  64,  32,  32),dc },//エネミー撃破3					[25]
+			{ Box2D( -16, -16,  32,  32),Box2D(1632,  96,  32,  32),dc },//エネミー撃破4					[26]
+			{ Box2D( -16, -16,  32,  32),Box2D(1632, 128,  32,  32),dc },//エネミー撃破5					[27]
+			{ Box2D( -16, -16,  32,  32),Box2D(1632, 160,  32,  32),dc },//エネミー撃破6					[28]
+			{ Box2D( -16, -16,  32,  32),Box2D(1664,   0,  32,  32),dc },//爆発破片1						[29]
+			{ Box2D( -16, -16,  32,  32),Box2D(1664,  32,  32,  32),dc },//爆発破片2						[30]
+			{ Box2D( -16, -16,  32,  32),Box2D(1664,  64,  32,  32),dc },//爆発破片3						[31]
+			{ Box2D( -16, -16,  32,  32),Box2D(1664,  96,  32,  32),dc },//爆発破片4						[32]
+			{ Box2D( -16, -16,  32,  32),Box2D(1664, 128,  32,  32),dc },//爆発破片5						[33]
+			{ Box2D( -16, -16,  32,  32),Box2D(1664, 160,  32,  32),dc },//爆発破片6						[34]
+			{ Box2D(  -6,  -6,  12,  12),Box2D(1728,   0,  12,  12),dc },//火花							[35]
+			{ Box2D(-128,-128, 256, 256),Box2D(1792,   0, 256, 256),dc },//ターゲットサークル1			[36]
+			{ Box2D(-128,-128, 256, 256),Box2D(2048,   0, 256, 256),dc },//ターゲットサークル2			[37]
+			{ Box2D(-192,-192, 384, 384),Box2D(2304,   0, 384, 384),dc },//ターゲットバー00				[38]
+			{ Box2D(-192,-192, 384, 384),Box2D(2304, 384, 384, 384),dc },//ターゲットバー01				[38]
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -277,6 +297,17 @@ namespace  Task_Effect
 			break;
 		case Spark:
 			rtv = imageTable[35];
+			break;
+		case Target_Circle_00:
+			rtv = imageTable[36];
+			break;
+		case Target_Circle_01:
+			rtv = imageTable[37];
+			break;
+		case Target_Bar:
+			effectCnt = this->animCnt / 2;
+			effectCnt %= 2;
+			rtv = imageTable[38+effectCnt];
 			break;
 		}
 		//	向きに応じて画像を左右反転する
@@ -332,6 +363,33 @@ namespace  Task_Effect
 			break;
 		case Spark:
 			this->moveVec = this->eff->Move_Parabola(this->speed_spark, this->moveVec.y, this->gravity, this->angle);
+			break;
+		case Target_Circle_00:
+		case Target_Circle_01:
+		case Target_Bar:
+			//ボスヘッドの頭上に常に移動する
+			auto boss_head =
+				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
+			ML::Vec2 pos_boss_head_top =
+				boss_head->pos - ML::Vec2(0.0f, boss_head->hitBase.h / 2);
+			this->pos = pos_boss_head_top;
+			//画面効果が消えたところで自身をキル
+			auto display_effect =
+				ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+			if (nullptr == display_effect)
+			{
+				this->Kill();
+			}
+			//外側のサークルは反時計周り
+			if (this->state_effect == Target_Circle_00)
+			{
+				this->angle -= this->add_angle_target_circle;
+			}
+			//内側のサークルは時計回り
+			else if (this->state_effect == Target_Circle_01)
+			{
+				this->angle += this->add_angle_target_circle;
+			}
 			break;
 		}
 	}

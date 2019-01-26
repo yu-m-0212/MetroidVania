@@ -12,7 +12,7 @@
 namespace  Boss_Head
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("ボス");		//グループ名
+	const  string  defGroupName("ボス");			//グループ名
 	const  string  defName("ボス（ヘッド）");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
@@ -29,6 +29,7 @@ namespace  Boss_Head
 		//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 			//共有する変数はここに追加する
 		string name_image;					//リソース名
+		string name_rect;					//判定矩形リソース名
 		string base_file_path_sound;		//基礎ファイルパス
 		string name_sound_wait_under_00;	//待機中SE00
 		string name_sound_wait_under_01;	//待機中SE01
@@ -75,6 +76,7 @@ namespace  Boss_Head
 		int interval_shot;					//ショットに移る時間
 		int interval_return;				//ショットから戻るまでの時間
 		int limit_move_vertically;			//縦向き時の登場移動時間
+		int correction_pos_weak_point;		//弱点矩形の本体からの座標補正
 		float speed_move_under;				//縦向き時の登場・退場速度
 		float speed_chase_hiding;			//潜行中プレイヤに接近する割合
 		ML::Box2D hit_vertically_long;		//縦長の時の矩形（hitBaseに代入して使用）
@@ -85,7 +87,7 @@ namespace  Boss_Head
 		//インスタンス
 		Boss* boss;							//ボスクラスポインタ
 		Shot01::Object* shot;				//ショットオブジェクトポインタ
-		Task_Effect::Object* eff;			//エフェクトオブジェクトポインタ
+		Task_Effect::Object* eff;			//エフェクトオブジェクトポインタz
 	public:
 		//コンストラクタ
 		Object();
@@ -98,5 +100,14 @@ namespace  Boss_Head
 		void Recieved(BChara* from_, AttackInfo at_, const int&);
 		//アニメーション制御
 		BChara::DrawInfo Anim();
+
+		//アクセサ
+
+		//潜行から登場までの時間を減少させる
+		//引数	：	（減少量）
+		void Decrease_Interval_To_Appear(const int&);
+		//登場からショットに移行するまでの時間を減少させる
+		//引数	：	（減少量）
+		void Decrease_Interval_Shot(const int&);
 	};
 }

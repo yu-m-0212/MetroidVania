@@ -88,8 +88,8 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		pl->pos = ML::Vec2(224.0f,4400.0f);
-		/*pl->pos=ML::Vec2(7643.0f,5835.0f);*/
+		//pl->pos = ML::Vec2(224.0f,4400.0f);
+		pl->pos=ML::Vec2(7643.0f,5835.0f);
 		/*pl->pos = ML::Vec2(8382.0f,7200.0f);*/
 		this->eff->Create_Effect(6, pl->pos);
 		//カメラマンの生成
@@ -100,7 +100,7 @@ namespace  Game
 		UI::Object::Create(true);
 		//チュートリアルの生成
 		tutorials->Create_Message("左スティックを横に倒すと移動", ML::Vec2(224, 4482), -1);
-		tutorials->Create_Message("×ボタンでジャンプ", ML::Vec2(1180, 4482), -1);
+		tutorials->Create_Message("Aボタンでジャンプ", ML::Vec2(1180, 4482), -1);
 		tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1);
 		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6792, 3650), -1);
 		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
@@ -109,8 +109,7 @@ namespace  Game
 		//プレイヤの目の前に生成する場合
 		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		//ボススポナーの生成
-		auto spawner =
-			Spawner::Object::Create(true);
+		auto spawner = Spawner::Object::Create(true);
 		spawner->pos = this->pos_spawer;
 		//BGMの再生
 		DM::Sound_Play_Volume(this->res->name_bgm_main_game, true,VOLUME_BGM_MAIN_GAME);

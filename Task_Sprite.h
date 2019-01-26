@@ -37,8 +37,6 @@ namespace  Sprite
 		static  Object::SP  Create(bool flagGameEnginePushBack_);
 		Resource::SP	res;
 	private:
-
-		Object();
 		bool  B_Initialize();
 		bool  B_Finalize();
 		bool  Initialize();	//「初期化」タスク生成時に１回だけ行う処理
@@ -53,6 +51,7 @@ namespace  Sprite
 		float dist_height;			//プレイヤから上方位置
 		weak_ptr<BChara> target;	//プレイヤを指すスマートポインター
 	public:
+		Object();
 		//追従対象を指定
 		void Set_Target(const weak_ptr<BChara>);
 		//マップ外を表示しない

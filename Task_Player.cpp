@@ -73,9 +73,9 @@ namespace  Player
 		this->recieveBase = this->hitBase;
 		this->angle_LR = Right;
 		this->controllerName = "P1";
-		this->barrier = false;								//バリアの使用制限
+		this->barrier = true;								//バリアの使用制限
 		this->state = Stand;								//キャラ初期状態
-		this->max_hp = 3;									//HP最大値
+		this->max_hp = 5;									//HP最大値
 		this->hp = this->max_hp;							//HP初期値
 		this->maxSpeed = 7.5f;								//最大移動速度（横）
 		this->addSpeed = 0.75f;								//歩行加速度（地面の影響である程度打ち消される
@@ -293,61 +293,59 @@ namespace  Player
 			if (in.LStick.R.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
-			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (!this->CheckFoot()) { nm = Fall; }//足元 障害　無し
+			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.off&&in.LStick.R.off) { nm = SlowDown; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
-			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
+			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case SlowDown:	//減速中
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
-			if (in.B1.down&&barrier) { nm = PreStomp; }
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
+			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  TakeOff:	//飛び立ち
 			if (this->moveCnt >= 3) { nm = Jump; }
+			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  Jump:		//上昇中
 			if (this->moveVec.y >= 0) { nm = Fall; }
 			if (in.R1.on) { nm = Jumpshoot; }
-			if (in.B1.down&&barrier) { nm = AirStomp; }
+			if (in.B1.down) { nm = AirStomp; }
 			break;
 		case  Fall:		//落下中
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
 			if (in.R1.on) { nm = Fallshoot; }
-			if (in.B1.down&&barrier) { nm = AirStomp; }
+			if (in.B1.down) { nm = AirStomp; }
 			break;
 		case  Landing:	//着地
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
-			if (in.B2.down) { nm = Jump; }
-			if (in.B1.down&&barrier) { nm = PreStomp; }
+			if (in.B2.down) { nm = TakeOff; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 6) { nm = Stand; }
+			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  Shoot:	//射撃
 			if (in.R1.off) {nm = Stand;}
 			if (in.B2.down) { nm = TakeOff; }
 			if (!this->CheckFoot()) { nm = Fallshoot; }
-			if (in.B1.down&&barrier) { PreStomp; }
 			break;
 		case Jumpshoot:	//空中射撃
 			if (in.R1.off) { nm = Fall; }
 			if (this->moveVec.y >= 0) { nm = Fallshoot; }
-			if (in.B1.down&&barrier) { PreStomp; }
 			break;
 		case Fallshoot:	//落下射撃
 			if (in.R1.off) { nm = Fall; }
 			if (this->CheckFoot()) { nm = Shoot; }
-			if (in.B1.down&&barrier) { PreStomp; }
 			break;
 		case PreStomp:
 			if (this->moveCnt > 0) { nm = LandStomp; }
@@ -361,10 +359,10 @@ namespace  Player
 			if (this->moveCnt > 0) { nm = Fall; }
 			break;
 		case StompLanding:
-			if (this->moveCnt >= this->limit_stompHoldTime) { nm = Stand; }
+			if (this->moveCnt > this->limit_stompHoldTime) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			break;
-		case	Damage:	//ダメージを受けて吹き飛んでいる
+		case Damage:	//ダメージを受けて吹き飛んでいる
 			if (this->moveCnt >= 12 &&
 				this->CheckFoot()) {nm = Stand;}
 			else if (this->moveCnt >= 12 &&
@@ -385,7 +383,9 @@ namespace  Player
 		switch (this->state) {
 		default:
 			//ジャンプボタンを押す長さでジャンプの高さが変わる
-			if ((this->state == Jump || this->state == Jumpshoot || this->state == AirStomp) 
+			if ((this->state == Jump ||
+				this->state == Jumpshoot ||
+				this->state == AirStomp)
 				&& in.B2.on)
 			{
 				this->gravity = ML::Gravity(32) * 2;
@@ -591,6 +591,35 @@ namespace  Player
 					DM::Sound_Play_Volume(this->res->name_not_recharge, false,VOLUME_ALL_GAME);
 				}
 			}
+			//歩行関連
+			//左向きに移動
+			if (in.LStick.L.on)
+			{
+				//後退時は移動速度が落ちる
+				if (this->angle_LR == Right)
+				{
+					this->moveVec.x = -this->maxSpeed / 2.0f;
+				}
+				//前進は通常速度
+				else
+				{
+					this->moveVec.x = max(-this->maxSpeed, this->moveVec.x - this->addSpeed);
+				}
+			}
+			//右向きに移動
+			if (in.LStick.R.on)
+			{
+				//後退
+				if (this->angle_LR == Left)
+				{
+					this->moveVec.x = +this->maxSpeed / 2.0f;
+				}
+				//前進
+				else
+				{
+					this->moveVec.x = min(this->maxSpeed, this->moveVec.x + this->addSpeed);
+				}
+			}
 			break;
 		case  Shoot:
 			this->Move_Shot();
@@ -778,9 +807,10 @@ namespace  Player
 	{
 		//足元に攻撃矩形を生成
 		auto stompLandingRect = Shot00::Object::Create(true);
-		stompLandingRect->state = StompLanding;
+		stompLandingRect->state = this->state;
 		//攻撃毎に攻撃範囲を生成時に指定
 		stompLandingRect->hitBase = this->range_stomp;
+		stompLandingRect->recieveBase = this->range_stomp;
 		stompLandingRect->pos = this->pos;
 		stompLandingRect->Set_Limit(this->limit_stomp);
 		stompLandingRect->Set_Erase(0);

@@ -12,6 +12,9 @@
 
 #include  "Task_Display_Effect.h"
 
+#include  "Task_Player.h"
+#include  "Task_Sprite.h"
+
 namespace  Spawner
 {
 	Resource::WP  Resource::instance;
@@ -50,6 +53,7 @@ namespace  Spawner
 		this->time_bgm = 240;								//ボスBGMの再生開始時間
 		this->flag_spawn_boss = false;						//ボス出現フラグ
 		this->init_pos_boss = ML::Vec2(8382.0f, 7800.0f);	//ボスの初期座標
+		this->eff = new Task_Effect::Object();				//エフェクトインスタンス
 		
 		//★タスクの生成
 
@@ -60,7 +64,7 @@ namespace  Spawner
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
+		delete this->eff;
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}
@@ -109,11 +113,28 @@ namespace  Spawner
 			boss_center->pos = ML::Vec2(boss_upper_middle->pos.x, boss_upper_middle->pos.y + float(boss_center->hitBase.h));
 			auto boss_lower = Boss_Lower::Object::Create(true);
 			boss_lower->pos = ML::Vec2(boss_center->pos.x, boss_center->pos.y + float(boss_lower->hitBase.h));
+			//演出中はカメラをボスに追従させる
+			auto sp =
+				ge->GetTask_One_G<Sprite::Object>(Sprite::defGroupName);
+			sp->Set_Target(boss_head);
+			//警告エフェクトの生成
+			//生成位置を宣言
+			ML::Vec2 init_pos_target_effect =
+				ML::Vec2(boss_head->pos.x, boss_head->pos.y - boss_head->hitBase.h / 2);
+			this->eff->Create_Effect(9, init_pos_target_effect);
+			this->eff->Create_Effect(10, init_pos_target_effect);
+			this->eff->Create_Effect(11, init_pos_target_effect);
 		}
 		//ボスBGMの再生
 		if (this->moveCnt == this->time_bgm)
 		{
 			DM::Sound_Play_Volume(this->res->name_bgm_boss,true,VOLUME_BGM_BOSS);
+			//ボスに追従させていたカメラをプレイヤに戻す
+			auto sp =
+				ge->GetTask_One_G<Sprite::Object>(Sprite::defGroupName);
+			auto pl =
+				ge->GetTask_One_G<Player::Object>(Player::defGroupName);
+			sp->Set_Target(pl);
 		}
 		//ゲームクリアかリトライでBGMフェードアウト
 		if (ge->clear)

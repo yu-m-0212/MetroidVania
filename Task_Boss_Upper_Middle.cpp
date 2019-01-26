@@ -245,6 +245,12 @@ namespace  Boss_Upper_Middle
 		//モーション毎に固有の処理
 		if (this->state == End_Pattern_Boss)
 		{
+			//死亡時に一度だけ、頭の行動速度を速める
+			if (this->moveCnt == 0)
+			{
+				head->Decrease_Interval_To_Appear(DECREASE_INTERVAL_DEFEAT);
+				head->Decrease_Interval_Shot(DECREASE_INTERVAL_DEFEAT);
+			}
 			//一定間隔で爆発エフェクトを生成
 			if (this->moveCnt % INTERVAL_CREATE_END_EFFECT_DEF == 0)
 			{
