@@ -24,6 +24,7 @@ namespace  Shot00
 		static   WP  instance;
 		static  Resource::SP  Create();
 		string imageName;
+		string name_se_reflect;	//反射された際の効果音
 	};
 	//-------------------------------------------------------------------//オブジェクト
 	class  Object : public  BChara
@@ -45,7 +46,7 @@ namespace  Shot00
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		bool flag_Erase;			//壁や敵に衝突したとき、消滅するか否か
+		bool flag_reflect;			//反射した弾か否か
 		int limit_Erase;			//消滅するまでの時間
 		int power;					//攻撃力
 		int un_hit;					//与無敵時間
@@ -62,9 +63,6 @@ namespace  Shot00
 		//攻撃毎に寿命を設ける際に使用
 		//引数	：	（寿命）
 		void Set_Limit(const int&);
-		//壁や敵に衝突したとき、消えるか否かを指定する
-		//引数	：	（0か1）
-		void Set_Erase(const int&);
 		//外部から生成する際、攻撃力を指定
 		//引数	：	（整数値）
 		void Set_Power(const int&);

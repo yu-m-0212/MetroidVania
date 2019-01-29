@@ -6,6 +6,7 @@
 #include  "Task_Shot00.h"
 #include  "Task_Player.h"
 #include  "Task_Effect.h"
+#include  "Task_Boss_Head.h"
 
 namespace  Shot00
 {
@@ -16,7 +17,8 @@ namespace  Shot00
 	{
 		this->imageName = "Shot00Img";
 		DG::Image_Create(this->imageName, "./data/image/Shot00.png");
-
+		this->name_se_reflect = "reflect_se";
+		DM::Sound_CreateSE(this->name_se_reflect, "./data/sound/wav/reflect_shot_player.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -24,6 +26,7 @@ namespace  Shot00
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_se_reflect);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -38,11 +41,11 @@ namespace  Shot00
 		//★データ初期化
 		this->render2D_Priority[1] = 0.4f;		//描画順
 		this->recieveBase = this->hitBase;		//キャラクタとの接触矩形
-		this->flag_Erase = true;				//接触したとき消滅するか
 		this->power = 0;						//攻撃力
 		this->un_hit = 8;						//相手に与える無敵時間
 		this->limit_Erase = 0;					//消滅するまでの時間
 		this->eff = new Task_Effect::Object();	//メソッド呼び出し
+		this->flag_reflect = false;				//反射したか否か
 		//★タスクの生成
 
 		return  true;
@@ -80,28 +83,14 @@ namespace  Shot00
 					it != targets->end();
 					++it) {
 					//相手に接触の有無を確認させる
-					if ((*it)->CheckHit(me)) 
+					if ((*it)->CheckHit(me))
 					{
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { this->power,0,0 };
 						(*it)->Recieved(this, at, this->un_hit);
-						//ショットのみ消滅
-						//格闘は複数体にあたる
-						if (this->flag_Erase)
-						{
-							//対応したヒット時のエフェクトを生成
-							//現状、引数には対象の敵の座標をいれる
-							this->Effect_Hit((*it)->pos);
-							this->Kill();
-						}
-						else
-						{
-							//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
-							if ((*it)->moveCnt == 0)
-							{
-								this->Effect_Hit((*it)->pos);
-							}
-						}
+						//当たった瞬間のみエフェクトを生成する
+						this->Effect_Hit((*it)->pos);
+						this->Kill();
 						break;
 					}
 				}
@@ -122,41 +111,65 @@ namespace  Shot00
 						//相手にダメージの処理を行わせる
 						BChara::AttackInfo at = { this->power,0,0 };
 						(*it)->Recieved(this, at, this->un_hit);
-						//ショットのみ消滅
-						//格闘は複数体にあたる
-						if (this->flag_Erase)
-						{
-							//対応したヒット時のエフェクトを生成
-							//現状、引数には対象の敵の座標をいれる
-							this->Effect_Hit((*it)->pos);
-							this->Kill();
-						}
-						else
-						{
-							//格闘は矩形が残る為、当たった瞬間のみエフェクトを生成する
-							if ((*it)->moveCnt == 0)
-							{
-								this->Effect_Hit((*it)->pos);
-							}
-						}
+						//エフェクトを生成し消滅
+						this->Effect_Hit((*it)->pos);
+						this->Kill();
 						break;
 					}
 				}
 			}
 		}
-		//射撃は壁に当たると消滅する
-		if (this->flag_Erase)
+		//ボスの頭部との接触判定
 		{
-			if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName)) 
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			auto boss_head = ge->GetTask_One_G<Boss_Head::Object>(Boss_Head::defGroupName);
+			if (nullptr == boss_head) { return; }
+			//反射されていない時のみボスとの処理を行う
+			if (!this->flag_reflect)
 			{
-				if (nullptr != map)
+				//ボスヘッドが気絶していればダメージ
+				if (boss_head->state == Stan)
 				{
-					ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
-					if (true == map->CheckHit(hit))
+					//相手に接触の有無を確認させる
+					if (boss_head->CheckHit(me))
 					{
-						//壁との接触ではエフェクトを生成しない
+						//相手にダメージの処理を行わせる
+						BChara::AttackInfo at = { this->power,0,0 };
+						boss_head->Recieved(this, at, this->un_hit);
+						//エフェクトを生成し消滅
+						this->Effect_Hit(boss_head->pos);
 						this->Kill();
+						//移動量の反転
+						this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
 					}
+				}
+				//ボスヘッドが気絶していなければ反射される
+				else
+				{
+					//相手に接触の有無を確認させる
+					if (boss_head->CheckHit(me))
+					{
+						//SEの再生
+						DM::Sound_Play_Volume(this->res->name_se_reflect, false, VOLUME_SE_REFLECT_SHOT);
+						//X方向のみの反転
+						this->moveVec.x = -this->moveVec.x;
+						this->angle = -this->angle;
+						//フラグ反転
+						this->flag_reflect = true;
+					}
+				}
+			}
+		}
+		//射撃は壁に当たると消滅する
+		if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName))
+		{
+			if (nullptr != map)
+			{
+				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
+				if (true == map->CheckHit(hit))
+				{
+					//壁との接触ではエフェクトを生成しない
+					this->Kill();
 				}
 			}
 		}
@@ -202,16 +215,10 @@ namespace  Shot00
 		default:
 			break;
 		case StompLanding:
-			//複数の敵にヒットする
-			this->flag_Erase = false;
 			break;
 		case Shoot:
-			//敵に衝突したとき消えるか否か
-			this->flag_Erase = true;
 			break;
 		case Air:
-			//敵に衝突したとき消えるか否か
-			this->flag_Erase = false;
 			//パンチ中はプレイヤの動きに合わせて判定矩形も前進する
 			this->moveVec = pl->moveVec;
 			//プレイヤが壁に衝突したら移動量を0に
@@ -228,8 +235,6 @@ namespace  Shot00
 			break;
 		case Jumpshoot:
 		case Fallshoot:
-			//敵に衝突したとき消えるか否か
-			this->flag_Erase = true;
 			break;
 		}
 	}
@@ -251,11 +256,6 @@ namespace  Shot00
 	void Object::Set_Limit(const int& cl_)
 	{
 		this->limit_Erase = cl_;
-	}
-	//壁や敵に衝突したとき、消えるか否かを指定する
-	void Object::Set_Erase(const int& erase_)
-	{
-		this->flag_Erase = erase_;
 	}
 	//外部から生成する際、攻撃力を指定
 	//引数	：	（整数値）

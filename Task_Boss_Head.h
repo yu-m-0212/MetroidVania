@@ -12,7 +12,7 @@
 namespace  Boss_Head
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("ボス");			//グループ名
+	const  string  defGroupName("ボス（ヘッド）");			//グループ名
 	const  string  defName("ボス（ヘッド）");		//タスク名
 	//-------------------------------------------------------------------
 	class  Resource
@@ -60,9 +60,11 @@ namespace  Boss_Head
 		float speed_shake;					//実処理を行う横揺れ速度
 		float speed_shake_def;				//通常時の横揺れ速度
 		float speed_shake_ref;				//反射被弾時の横揺れ速度
+		float speed_shake_stn;				//気絶時の横揺れ速度
 		float std_pos_x;					//横揺れ基準値
 		float cnt_shake;					//カウンタ横揺れ
 		float interval_shake;				//間隔横揺れ
+		float interval_shake_stan;			//気絶時の横揺れ速度
 		//ショット生成
 		int num_shot;						//弾の生成数
 		float angle_create_shot;			//弾を生成する角度の間隔
@@ -75,6 +77,8 @@ namespace  Boss_Head
 		int interval_create_effect;			//エフェクトの生成間隔
 		int interval_shot;					//ショットに移る時間
 		int interval_return;				//ショットから戻るまでの時間
+		int cnt_defeat_parts;				//胴体パーツを破壊すると加算し、上限に達すると気絶する
+		int limit_stan;						//気絶時間
 		int limit_move_vertically;			//縦向き時の登場移動時間
 		int correction_pos_weak_point;		//弱点矩形の本体からの座標補正
 		float speed_move_under;				//縦向き時の登場・退場速度
@@ -109,5 +113,9 @@ namespace  Boss_Head
 		//登場からショットに移行するまでの時間を減少させる
 		//引数	：	（減少量）
 		void Decrease_Interval_Shot(const int&);
+		//胴体パーツの破壊数を加算する
+		void Add_Defeat_Parts();
+		//胴体パーツの破壊数を取得する
+		int Get_Defeat_Parts();
 	};
 }

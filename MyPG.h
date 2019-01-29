@@ -21,6 +21,7 @@
 #define VOLUME_SE_DAMAGE_PLAYER 900		//被弾
 #define VOLUME_SE_SHOT 900				//ショット
 #define VOLUME_SE_LADING_PLAYER 900		//着地
+#define VOLUME_SE_REFLECT_SHOT 900		//ショット反射
 //ボス
 #define VOLUME_SE_HIT_REFLECTION 900	//ボスが反射弾を受けた際の音量
 //-----------------------------------------------------------------------------------------------

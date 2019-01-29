@@ -105,6 +105,7 @@
     <ClCompile Include="myLib.cpp" />
     <ClCompile Include="MyPG.cpp" />
     <ClCompile Include="Task_Back.cpp" />
+    <ClCompile Include="Task_Barrier.cpp" />
     <ClCompile Include="Task_Boss_Center.cpp" />
     <ClCompile Include="Task_Boss_Head.cpp" />
     <ClCompile Include="Task_Boss_Lower.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="myLib.h" />
     <ClInclude Include="MyPG.h" />
     <ClInclude Include="Task_Back.h" />
+    <ClInclude Include="Task_Barrier.h" />
     <ClInclude Include="Task_Boss_Center.h" />
     <ClInclude Include="Task_Boss_Head.h" />
     <ClInclude Include="Task_Boss_Lower.h" />

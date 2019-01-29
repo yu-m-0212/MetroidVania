@@ -60,16 +60,18 @@ namespace  Boss_Head
 		this->std_pos_x = 8382.0f;									//横揺れ基準値
 		this->speed_shake_def = 64.0f;								//通常時の横揺れ速度
 		this->speed_shake_ref = 128.0f;								//反射被弾時の横揺れ速度
+		this->speed_shake_stn = 32.0f;								//気絶時の横揺れ速度
 		this->speed_shake = this->speed_shake_def;					//実処理を行う追従速度
 		this->cnt_shake = 0.0f;										//カウンタ横揺れ
 		this->interval_shake = 12.0f;								//間隔横揺れ
+		this->interval_shake_stan = 24.0f;							//気絶時の横揺れ速度
 		this->shot = new Shot01::Object();							//ショットオブジェクトインスタンス
 		this->boss = new Boss();									//ボスクラスインスタンス
 		this->eff = new Task_Effect::Object();						//エフェクトオブジェクトインスタンス
 		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);				//移動量ショット
-		this->hit_shot = ML::Box2D(-8, -8, 16, 16);					//矩形ショット
+		this->hit_shot = ML::Box2D(-16, -16, 32, 32);				//矩形ショット
 		this->interval_shot = 360;									//生成時間ショット
-		this->hp = 50;												//HPボス
+		this->hp = 30;												//HPボス
 		this->add_un_hit = 60;										//プレイヤに与える無敵時間
 		this->num_shot = 5;											//弾の生成数
 		this->angle_create_shot = 18.0f;							//弾を生成する間隔
@@ -84,6 +86,8 @@ namespace  Boss_Head
 		this->hit_horizontally_long = ML::Box2D(-46, -92, 92, 184);	//横長の時の矩形（hitBaseに代入して使用）
 		this->dist_quake_boss = 5;									//ボス用画面揺れ幅
 		this->limit_quake_boss = 90;								//ボス用画面揺れ時間
+		this->cnt_defeat_parts = 0;									//胴体パーツを破壊すると加算し、上限に達すると気絶する
+		this->limit_stan = 300;										//気絶時間
 
 		//★タスクの生成
 
@@ -164,16 +168,18 @@ namespace  Boss_Head
 		switch (nm)
 		{
 		case Appear_Under:
-			if (this->moveCnt>this->limit_move_vertically) { nm = Wait_Under; }
+			if (this->moveCnt > this->limit_move_vertically) { nm = Wait_Under; }
 			break;
 		case Wait_Under:
 			if (this->moveCnt > this->interval_shot) { nm = Shot_Under; }
+			if (this->cnt_defeat_parts == DEFEAT_PARTS) { nm = Stan; }//各パーツが破壊されると気絶状態に遷移する
 			break;
 		case Shot_Under:
 			if (this->moveCnt > this->interval_return) { nm = Return_Under; }
+			if (this->cnt_defeat_parts == DEFEAT_PARTS) { nm = Stan; }//各パーツが破壊されると気絶状態に遷移する
 			break;
 		case Return_Under:
-			if (this->moveCnt>this->limit_move_vertically) { nm = Choice_Vertically_Or_Horizontally; }
+			if (this->moveCnt > this->limit_move_vertically) { nm = Choice_Vertically_Or_Horizontally; }
 			break;
 		case Hiding_Under:
 			if (this->moveCnt > this->interval_to_appear) { nm = Appear_Under; }
@@ -184,6 +190,9 @@ namespace  Boss_Head
 			break;
 		case End_Pattern_Boss:
 			if (this->moveCnt >= LIMIT_END_PATTERN_BOSS) { nm = Lose; }
+			break;
+		case Stan:		//気絶
+			if (this->moveCnt > this->limit_stan) { nm = Return_Under; }
 			break;
 		case Lose:		//死亡
 			break;
@@ -217,7 +226,10 @@ namespace  Boss_Head
 		}
 		//プレイヤの位置を左右で判断する
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
-		this->angle_LR = this->Check_LR(this->angle_LR, pl->pos.x);
+		if (nullptr != pl)
+		{
+			this->angle_LR = this->Check_LR(this->angle_LR, pl->pos.x);
+		}
 		//反射弾被弾のSE再生
 		//代入後、すぐにデクリメントされているため-1で対応
 		//再考の余地あり
@@ -276,6 +288,11 @@ namespace  Boss_Head
 			{
 				auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 				map->Set_Quake(this->dist_quake_boss, this->limit_quake_boss);
+				//登場時に全てのパーツが破壊されていたらここで回復する
+				if (this->cnt_defeat_parts == DEFEAT_PARTS)
+				{
+					this->cnt_defeat_parts = 0;
+				}
 			}
 			//定位置まで移動する
 			if (this->moveCnt<this->limit_move_vertically)
@@ -356,6 +373,11 @@ namespace  Boss_Head
 				this->moveVec.y = 0.0f;
 			}
 			break;
+		case Stan:
+			//気絶中はゆっくり横揺れする
+			//左右に揺れる
+			this->pos.x = this->std_pos_x + sinf(this->cnt_shake / this->interval_shake_stan)*this->speed_shake_stn;
+			break;
 		case End_Pattern_Boss:
 			if (this->moveCnt == 0)
 			{
@@ -379,6 +401,8 @@ namespace  Boss_Head
 	//引数	：	（攻撃側のポインタ,攻撃情報,与無敵時間）
 	void Object::Recieved(BChara* from_, AttackInfo at_, const int& un_hit_)
 	{
+		//気絶時以外はダメージを受けない
+		if (this->state != Stan) { return; }
 		//無敵時間中はダメージを受けない
 		if (this->time_un_hit > 0)
 		{
@@ -390,6 +414,8 @@ namespace  Boss_Head
 		this->hp -= at_.power;
 		//無敵時間
 		this->time_un_hit = un_hit_;
+		//SEの再生
+		DM::Sound_Play_Volume(this->res->name_sound_hit_reflect, false, VOLUME_SE_HIT_REFLECTION);
 		//このタスクではDamageに遷移しない
 		//ヒット表示は無敵時間の有無で管理する
 	}
@@ -445,6 +471,16 @@ namespace  Boss_Head
 	void Object::Decrease_Interval_Shot(const int& decrease_)
 	{
 		this->interval_shot -= decrease_;
+	}
+	//胴体パーツの破壊数を加算する
+	void Object::Add_Defeat_Parts()
+	{
+		this->cnt_defeat_parts++;
+	}
+	//胴体パーツの破壊数を取得する
+	int Object::Get_Defeat_Parts()
+	{
+		return this->cnt_defeat_parts;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

@@ -148,6 +148,7 @@ namespace  Game
 
 		ge->KillAll_G("スポナー");
 		ge->KillAll_G("ボス");
+		ge->KillAll_G("ボス（ヘッド）");
 		//★リソースを常駐を解除する（書かなくても勝手に解除される）
 		this->shot00_Resource.reset();
 		this->shot01_Resource.reset();

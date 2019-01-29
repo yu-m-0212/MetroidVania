@@ -228,6 +228,9 @@
     <ClCompile Include="Task_Spawner.cpp">
       <Filter>MyPG</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Barrier.cpp">
+      <Filter>MyPG\Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -385,6 +388,9 @@
     </ClInclude>
     <ClInclude Include="Task_Spawner.h">
       <Filter>MyPG</Filter>
+    </ClInclude>
+    <ClInclude Include="Task_Barrier.h">
+      <Filter>MyPG\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

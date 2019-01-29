@@ -52,7 +52,8 @@ public:
 		Shot_Under,							//攻撃下（ボス用）
 		Return_Side,						//戻る横（ボス用）
 		Return_Under,						//戻る下（ボス用）
-		Choice_Vertically_Or_Horizontally	//縦横の選択
+		Choice_Vertically_Or_Horizontally,	//縦横の選択
+		Stan								//気絶中（ボス頭用）
 	};
 	//左右の向き（2D横視点ゲーム専用）
 	enum Angle_LR { Left, Right };

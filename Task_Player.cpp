@@ -5,6 +5,7 @@
 #include	"Task_Player.h"
 #include	"Task_Sprite.h"
 #include	"Task_Shot00.h"
+#include	"Task_Barrier.h"
 #include	"Task_Map2D.h"
 #include	"Task_Effect.h"
 #include	"Task_Goal.h"
@@ -294,14 +295,12 @@ namespace  Player
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }//足元 障害　無し
-			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.off&&in.LStick.R.off) { nm = SlowDown; }
 			if (in.B2.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
-			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case SlowDown:	//減速中
 			if (in.LStick.L.on) { nm = Walk; }
@@ -310,16 +309,13 @@ namespace  Player
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
-			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  TakeOff:	//飛び立ち
 			if (this->moveCnt >= 3) { nm = Jump; }
-			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  Jump:		//上昇中
 			if (this->moveVec.y >= 0) { nm = Fall; }
 			if (in.R1.on) { nm = Jumpshoot; }
-			if (in.B1.down) { nm = AirStomp; }
 			break;
 		case  Fall:		//落下中
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
@@ -332,7 +328,6 @@ namespace  Player
 			if (in.B2.down) { nm = TakeOff; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 6) { nm = Stand; }
-			if (in.B1.down) { nm = LandStomp; }
 			break;
 		case  Shoot:	//射撃
 			if (in.R1.off) {nm = Stand;}
@@ -347,10 +342,6 @@ namespace  Player
 			if (in.R1.off) { nm = Fall; }
 			if (this->CheckFoot()) { nm = Shoot; }
 			break;
-		case PreStomp:
-			if (this->moveCnt > 0) { nm = LandStomp; }
-			if (!this->CheckFoot()) { nm = Fall; }
-			break;
 		case LandStomp:
 			if (this->moveCnt > 0) { nm = Stand; }
 			if (!this->CheckFoot()) { nm = Fall; }
@@ -358,16 +349,25 @@ namespace  Player
 		case AirStomp:
 			if (this->moveCnt > 0) { nm = Fall; }
 			break;
-		case StompLanding:
-			if (this->moveCnt > this->limit_stompHoldTime) { nm = Stand; }
-			if (!this->CheckFoot()) { nm = Fall; }
-			break;
 		case Damage:	//ダメージを受けて吹き飛んでいる
 			if (this->moveCnt >= 12 &&
 				this->CheckFoot()) {nm = Stand;}
 			else if (this->moveCnt >= 12 &&
 				!this->CheckFoot()){nm = Fall;}
 			break;
+		}
+		//バリアの発生を割り込ませる
+		if (in.B1.down)
+		{
+			//接地
+			if (this->CheckFoot())
+			{
+				nm = LandStomp;
+			}
+			else
+			{
+				nm = AirStomp;
+			}
 		}
 		//モーション更新
 		this->UpdateMotion(nm);
@@ -453,10 +453,8 @@ namespace  Player
 		//例外
 		case SlowDown:
 		case Landing:
-		case PreStomp:
 		case LandStomp:
 		case AirStomp:
-		case StompLanding:
 		case Damage:
 			break;
 		}
@@ -572,11 +570,8 @@ namespace  Player
 				DM::Sound_Play_Volume(this->res->name_sound_landing, false,VOLUME_SE_LADING_PLAYER);
 			}
 			break;
-		case PreStomp:
-			break;
 		case LandStomp:
 		case AirStomp:
-		case StompLanding:
 			if (this->moveCnt == 0)
 			{
 				//リチャージ済み
@@ -711,14 +706,10 @@ namespace  Player
 		case Jumpshoot:		rtv = imageTable[17];	break;
 		//	降下ショット--------------------------------------------------------------------
 		case Fallshoot:		rtv = imageTable[18];	break;
-		//	ストンプ予備動作----------------------------------------------------------------
-		case PreStomp:		rtv = imageTable[19];	break;
 		//	地上ストンプ--------------------------------------------------------------------
 		case LandStomp:		rtv = imageTable[20];	break;
 		//	空中ストンプ--------------------------------------------------------------------
 		case AirStomp:		rtv = imageTable[21];	break;
-		//	ストンプ着地--------------------------------------------------------------------
-		case StompLanding:	rtv = imageTable[22];	break;
 		//	ダメージ------------------------------------------------------------------------
 		case Damage:		rtv = imageTable[23];	break;
 		}
@@ -747,7 +738,6 @@ namespace  Player
 			//攻撃毎に攻撃範囲を生成時に指定
 			shot->hitBase = this->range_shot;
 			shot->Set_Limit(this->limit_shot);
-			shot->Set_Erase(1);
 			shot->Set_Power(this->power_shot);
 			shot->angle_LR = this->angle_LR;
 			shot->Set_Tip(1);
@@ -806,20 +796,19 @@ namespace  Player
 	void Object::Stomp_Std()
 	{
 		//足元に攻撃矩形を生成
-		auto stompLandingRect = Shot00::Object::Create(true);
-		stompLandingRect->state = this->state;
+		auto barrier = Barrier::Object::Create(true);
+		barrier->state = this->state;
 		//攻撃毎に攻撃範囲を生成時に指定
-		stompLandingRect->hitBase = this->range_stomp;
-		stompLandingRect->recieveBase = this->range_stomp;
-		stompLandingRect->pos = this->pos;
-		stompLandingRect->Set_Limit(this->limit_stomp);
-		stompLandingRect->Set_Erase(0);
-		stompLandingRect->Set_Power(this->power_stomp);
-		stompLandingRect->Set_Angle(0.0f);
+		barrier->hitBase = this->range_stomp;
+		barrier->recieveBase = this->range_stomp;
+		barrier->pos = this->pos;
+		barrier->Set_Limit(this->limit_stomp);
+		barrier->Set_Power(this->power_stomp);
+		barrier->Set_Angle(0.0f);
 		//範囲攻撃のふっとび量xは+の値で指定する（符号反転は当たった際に行う）
-		stompLandingRect->Set_Move_Back(this->moveBack_stomp);
+		barrier->Set_Move_Back(this->moveBack_stomp);
 		//範囲攻撃であることを知らせるフラグをtrue
-		stompLandingRect->Set_Range_Wide(1);
+		barrier->Set_Range_Wide(1);
 		//画面を揺らすための設定を行う
 		auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
 		map->Set_Quake(this->dist_quake, this->limit_quake);

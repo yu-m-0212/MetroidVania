@@ -45,7 +45,7 @@ namespace  Boss_Upper_Middle
 		this->boss = new Boss();							//メソッド呼び出し
 		this->eff = new Task_Effect::Object();				//メソッド呼び出し
 		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);		//移動量ショット
-		this->hit_shot = ML::Box2D(-8, -8, 16, 16);			//矩形ショット
+		this->hit_shot = ML::Box2D(-16, -16, 32, 32);		//矩形ショット
 		this->cnt_move = 0;									//カウンタ行動
 		this->interval_shot = -1;							//生成時間ショット
 		this->hp = HP_BOSS_PARTS;									//HPボス
@@ -131,6 +131,13 @@ namespace  Boss_Upper_Middle
 			if (this->moveCnt >= LIMIT_END_PATTERN_BOSS) { nm = Lose; }
 			break;
 		case Lose:		//死亡
+			//頭潜行時、全てのパーツが破壊されていたら自身を回復する
+			auto head =
+				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
+			if (head->state == Hiding_Under &&
+				head->Get_Defeat_Parts() == DEFEAT_PARTS) {
+				nm = Stand;
+			}
 			break;
 		}
 		//死亡処理
@@ -240,16 +247,22 @@ namespace  Boss_Upper_Middle
 				this->interval_shot = -1;
 			}
 			break;
+		case Hiding_Under:
+			//潜行時、全てのパーツが破壊されていたら自身を回復する
+			if (head->Get_Defeat_Parts() == DEFEAT_PARTS)
+			{
+				this->hp = HP_BOSS_PARTS;
+			}
+			break;
 		}
 		//-------------------------------------------------------------------
 		//モーション毎に固有の処理
 		if (this->state == End_Pattern_Boss)
 		{
-			//死亡時に一度だけ、頭の行動速度を速める
 			if (this->moveCnt == 0)
 			{
-				head->Decrease_Interval_To_Appear(DECREASE_INTERVAL_DEFEAT);
-				head->Decrease_Interval_Shot(DECREASE_INTERVAL_DEFEAT);
+				//破壊したパーツのカウンタを進める
+				head->Add_Defeat_Parts();
 			}
 			//一定間隔で爆発エフェクトを生成
 			if (this->moveCnt % INTERVAL_CREATE_END_EFFECT_DEF == 0)

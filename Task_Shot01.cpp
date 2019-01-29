@@ -6,6 +6,7 @@
 #include  "Task_Shot01.h"
 #include  "Task_Player.h"
 #include  "Task_Shot00.h"
+#include  "Task_Barrier.h"
 #include  "Task_Effect.h"
 #include  "Task_Boss_Head.h"
 
@@ -118,19 +119,19 @@ namespace  Shot01
 			}
 		}
 		//”½Ëˆ—
-		auto shot_pl = ge->GetTask_One_G<Shot00::Object>(Shot00::defGroupName);
-		if (nullptr != shot_pl)
+		auto barrier = ge->GetTask_One_GN<Barrier::Object>(Barrier::defGroupName,Barrier::defName);
+		if (nullptr != barrier)
 		{
 			ML::Box2D  me = this->hitBase.OffsetCopy(this->pos);
-			ML::Box2D you = shot_pl->recieveBase.OffsetCopy(shot_pl->pos);
+			ML::Box2D you = barrier->recieveBase.OffsetCopy(barrier->pos);
 			//©g‚ª‚Ü‚¾”½Ë’e‚Å‚Í‚È‚¢‚Æ‚«
 			if (!this->flag_reflect)
 			{
 				if (you.Hit(me))
 				{
-					if (shot_pl->state==LandStomp||
-						shot_pl->state==AirStomp||
-						shot_pl->state==StompLanding)
+					if (barrier->state==LandStomp||
+						barrier->state==AirStomp||
+						barrier->state==StompLanding)
 					{
 						this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
 						//”½Ëƒtƒ‰ƒO”½“]
