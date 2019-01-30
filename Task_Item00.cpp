@@ -14,6 +14,9 @@ namespace  Item00
 	{
 		this->imageName = "Item00Img";
 		DG::Image_Create(this->imageName, "./data/image/Item00.png");
+
+		this->name_se_pick_up_item = "se_pick_up_item";
+		DM::Sound_CreateSE(this->name_se_pick_up_item, "./data/sound/wav/pick_up_life_item.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -21,6 +24,7 @@ namespace  Item00
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_se_pick_up_item);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -47,6 +51,8 @@ namespace  Item00
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
+		//SE再生
+		DM::Sound_Play_Volume(this->res->name_se_pick_up_item, false, VOLUME_ALL_GAME);
 		delete this->tutorials;
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) 

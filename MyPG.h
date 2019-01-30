@@ -10,7 +10,7 @@
 #define SIZE_MAP_W 300					//サイズマップ横
 #define SIZE_MAP_H 300					//サイズマップ縦
 #define VOLUME_ALL_GAME 1000			//ゲーム全体の基礎音量
-//音量管理マネージャーを要件等
+//音量管理マネージャーを要検討
 //BGM
 #define VOLUME_BGM_BUBBLE_TITLE 850
 #define VOLUME_BGM_MAIN_GAME 850		//本編BGM音量
@@ -22,8 +22,12 @@
 #define VOLUME_SE_SHOT 900				//ショット
 #define VOLUME_SE_LADING_PLAYER 900		//着地
 #define VOLUME_SE_REFLECT_SHOT 900		//ショット反射
+#define VOLUME_SE_BARRIER 950			//バリアアビリティ
+//エネミー
+#define VOLUME_SE_SHOT_ENEMY 900		//エネミーショット
 //ボス
 #define VOLUME_SE_HIT_REFLECTION 900	//ボスが反射弾を受けた際の音量
+#define VOLUME_SE_APPEAR_UNDER 900		//ボス登場
 //-----------------------------------------------------------------------------------------------
 namespace  MyPG
 {

@@ -129,18 +129,13 @@ namespace  Shot01
 			{
 				if (you.Hit(me))
 				{
-					if (barrier->state==LandStomp||
-						barrier->state==AirStomp||
-						barrier->state==StompLanding)
-					{
-						this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
-						//反射フラグ反転
-						this->flag_reflect = true;
-						//反射した弾攻撃力補正をかける
-						this->power *= this->rate_reflect_power;
-						//反射した弾の速度を上げる
-						this->moveVec *= this->rate_speed_reflect;
-					}
+					this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
+					//反射フラグ反転
+					this->flag_reflect = true;
+					//反射した弾に攻撃力補正をかける
+					this->power *= this->rate_reflect_power;
+					//反射した弾の速度を上げる
+					this->moveVec *= this->rate_speed_reflect;
 				}
 			}
 		}
@@ -164,7 +159,7 @@ namespace  Shot01
 			this->Kill();
 			return;
 		}
-		//反射した弾はエネミーとも判定を行う
+		//反射した弾はエネミーと判定を行う
 		if (this->flag_reflect)
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
@@ -186,7 +181,7 @@ namespace  Shot01
 				}
 			}
 		}
-		//反射した弾はボスとも判定を行う
+		//反射した弾はボスと判定を行う
 		if (this->flag_reflect)
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
@@ -212,6 +207,25 @@ namespace  Shot01
 				}
 			}
 		}
+		//反射した弾のボスヘッドとの判定
+		if (this->flag_reflect)
+		{
+			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
+			auto head = ge->GetTask_One_G<Boss_Head::Object>(Boss_Head::defGroupName);
+			if (nullptr == head) { return; }
+			//相手に接触の有無を確認させる
+			if (head->CheckHit(me)) {
+				//相手にダメージの処理を行わせる
+				BChara::AttackInfo at = { this->power,0,0 };
+				head->Recieved(this, at, this->add_un_hit_boss);
+				//揺れ速度が一定時間上がる
+				head->limit_hit_reflect = LIMIT_HIT_REFLECT;
+				//対応したヒット時のエフェクトを生成
+				//現状、引数には対象の敵の座標をいれる
+				this->Effect_Hit(head->pos);
+				this->Kill();
+			}
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -232,6 +246,10 @@ namespace  Shot01
 		src.x = this->hitBase.w*anim;
 		//スクロール対応
 		draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
+		//自身の矩形の中心を宣言
+		ML::Vec2 my_center =
+			ML::Vec2(float(this->hitBase.w / 2), float(this->hitBase.h / 2));
+		DG::Image_Rotation(this->res->imageName, 0.0f, my_center);
 		DG::Image_Draw(this->res->imageName, draw, src, ML::Color(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	//呼び出したタスクから寿命を設定する

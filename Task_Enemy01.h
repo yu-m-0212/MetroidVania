@@ -26,6 +26,7 @@ namespace  Enemy01
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		//共有する変数はここに追加する
 		string imageName;				//名前画像
+		string name_se_shot;			//ショット効果音
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara

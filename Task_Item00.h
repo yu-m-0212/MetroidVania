@@ -26,6 +26,7 @@ namespace  Item00
 		static  Resource::SP  Create();
 		//‹¤—L‚·‚é•Ï”‚Í‚±‚±‚É’Ç‰Á‚·‚é
 		string imageName;
+		string name_se_pick_up_item;	//Œø‰Ê‰¹
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara

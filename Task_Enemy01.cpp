@@ -19,6 +19,9 @@ namespace  Enemy01
 	{
 		this->imageName = "Enemy01Img";
 		DG::Image_Create(this->imageName, "./data/image/enemy01.png");
+
+		this->name_se_shot = "se_shot_enemy";
+		DM::Sound_CreateSE(this->name_se_shot, "./data/sound/wav/se_shot_enemy.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -26,6 +29,7 @@ namespace  Enemy01
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_se_shot);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -361,6 +365,8 @@ namespace  Enemy01
 				ML::Vec2 toTarget = pl->pos - this->pos;
 				float angle = atan2(toTarget.y, toTarget.x);
 				shot->moveVec = ML::Vec2(cos(angle), sin(angle))*8.0f;
+				//SEÄ¶
+				DM::Sound_Play_Volume(this->res->name_se_shot, false, VOLUME_SE_SHOT_ENEMY);
 			}
 			break;
 		}

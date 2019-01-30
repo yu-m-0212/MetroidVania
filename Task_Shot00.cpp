@@ -123,46 +123,47 @@ namespace  Shot00
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
 			auto boss_head = ge->GetTask_One_G<Boss_Head::Object>(Boss_Head::defGroupName);
-			if (nullptr == boss_head) { return; }
-			//反射されていない時のみボスとの処理を行う
-			if (!this->flag_reflect)
+			if (nullptr != boss_head)
 			{
-				//ボスヘッドが気絶していればダメージ
-				if (boss_head->state == Stan)
+				//反射されていない時のみボスとの処理を行う
+				if (!this->flag_reflect)
 				{
-					//相手に接触の有無を確認させる
-					if (boss_head->CheckHit(me))
+					//ボスヘッドが気絶していればダメージ
+					if (boss_head->state == Stan)
 					{
-						//相手にダメージの処理を行わせる
-						BChara::AttackInfo at = { this->power,0,0 };
-						boss_head->Recieved(this, at, this->un_hit);
-						//エフェクトを生成し消滅
-						this->Effect_Hit(boss_head->pos);
-						this->Kill();
-						//移動量の反転
-						this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
+						//相手に接触の有無を確認させる
+						if (boss_head->CheckHit(me))
+						{
+							//相手にダメージの処理を行わせる
+							BChara::AttackInfo at = { this->power,0,0 };
+							boss_head->Recieved(this, at, this->un_hit);
+							//エフェクトを生成し消滅
+							this->Effect_Hit(boss_head->pos);
+							this->Kill();
+							//移動量の反転
+							this->moveVec = ML::Vec2(-this->moveVec.x, -this->moveVec.y);
+						}
 					}
-				}
-				//ボスヘッドが気絶していなければ反射される
-				else
-				{
-					//相手に接触の有無を確認させる
-					if (boss_head->CheckHit(me))
+					//ボスヘッドが気絶していなければ反射される
+					else
 					{
-						//SEの再生
-						DM::Sound_Play_Volume(this->res->name_se_reflect, false, VOLUME_SE_REFLECT_SHOT);
-						//X方向のみの反転
-						this->moveVec.x = -this->moveVec.x;
-						this->angle = -this->angle;
-						//フラグ反転
-						this->flag_reflect = true;
+						//相手に接触の有無を確認させる
+						if (boss_head->CheckHit(me))
+						{
+							//SEの再生
+							DM::Sound_Play_Volume(this->res->name_se_reflect, false, VOLUME_SE_REFLECT_SHOT);
+							//X方向のみの反転
+							this->moveVec.x = -this->moveVec.x;
+							this->angle = -this->angle;
+							//フラグ反転
+							this->flag_reflect = true;
+						}
 					}
 				}
 			}
 		}
 		//射撃は壁に当たると消滅する
-		if (auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName))
-		{
+		auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
 			if (nullptr != map)
 			{
 				ML::Box2D hit = this->hitBase.OffsetCopy(this->pos);
@@ -171,7 +172,6 @@ namespace  Shot00
 					//壁との接触ではエフェクトを生成しない
 					this->Kill();
 				}
-			}
 		}
 		//限界の時間を迎えたら消滅
 		if (this->moveCnt >= this->limit_Erase)

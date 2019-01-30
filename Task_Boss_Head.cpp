@@ -23,11 +23,13 @@ namespace  Boss_Head
 		this->name_sound_wait_under_00 = "sound_wait_under00";
 		this->name_sound_wait_under_01 = "sound_wait_under01";
 		this->name_sound_hiding_under = "sound_hiding_under";
+		this->name_sound_appear_under = "sound_appear_under";
 		//サウンドの生成
 		DM::Sound_CreateSE(this->name_sound_hit_reflect, this->base_file_path_sound + "hit_reflect.wav");
 		DM::Sound_CreateSE(this->name_sound_wait_under_00, this->base_file_path_sound + "wait_under_head00.wav");
 		DM::Sound_CreateSE(this->name_sound_wait_under_01, this->base_file_path_sound + "wait_under_head01.wav");
 		DM::Sound_CreateSE(this->name_sound_hiding_under, this->base_file_path_sound + "hiding_under.wav");
+		DM::Sound_CreateSE(this->name_sound_appear_under, this->base_file_path_sound + "appear_under.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -40,6 +42,7 @@ namespace  Boss_Head
 		DM::Sound_Erase(this->name_sound_wait_under_00);
 		DM::Sound_Erase(this->name_sound_wait_under_01);
 		DM::Sound_Erase(this->name_sound_hiding_under);
+		DM::Sound_Erase(this->name_sound_appear_under);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -71,7 +74,7 @@ namespace  Boss_Head
 		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);				//移動量ショット
 		this->hit_shot = ML::Box2D(-16, -16, 32, 32);				//矩形ショット
 		this->interval_shot = 360;									//生成時間ショット
-		this->hp = 30;												//HPボス
+		this->hp = 40;												//HPボス
 		this->add_un_hit = 60;										//プレイヤに与える無敵時間
 		this->num_shot = 5;											//弾の生成数
 		this->angle_create_shot = 18.0f;							//弾を生成する間隔
@@ -84,10 +87,10 @@ namespace  Boss_Head
 		this->speed_chase_hiding = 0.025f;							//潜行中プレイヤに接近する割合
 		this->hit_vertically_long = ML::Box2D(-92, -46, 184, 92);	//縦長の時の矩形（hitBaseに代入して使用）
 		this->hit_horizontally_long = ML::Box2D(-46, -92, 92, 184);	//横長の時の矩形（hitBaseに代入して使用）
-		this->dist_quake_boss = 5;									//ボス用画面揺れ幅
-		this->limit_quake_boss = 90;								//ボス用画面揺れ時間
+		this->dist_quake_boss_return_appear = ML::Vec2(0,5);		//ボス用登場退場画面揺れ幅
+		this->limit_quake_boss_return_appear = 90;					//ボス用登場退場画面揺れ時間
 		this->cnt_defeat_parts = 0;									//胴体パーツを破壊すると加算し、上限に達すると気絶する
-		this->limit_stan = 300;										//気絶時間
+		this->limit_stan = 360;										//気絶時間
 
 		//★タスクの生成
 
@@ -287,12 +290,14 @@ namespace  Boss_Head
 			if (this->moveCnt == 0)
 			{
 				auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
-				map->Set_Quake(this->dist_quake_boss, this->limit_quake_boss);
+				map->Set_Quake(this->dist_quake_boss_return_appear, this->limit_quake_boss_return_appear);
 				//登場時に全てのパーツが破壊されていたらここで回復する
 				if (this->cnt_defeat_parts == DEFEAT_PARTS)
 				{
 					this->cnt_defeat_parts = 0;
 				}
+				//SE再生
+				DM::Sound_Play_Volume(this->res->name_sound_appear_under, false, VOLUME_SE_APPEAR_UNDER);
 			}
 			//定位置まで移動する
 			if (this->moveCnt<this->limit_move_vertically)
@@ -361,7 +366,7 @@ namespace  Boss_Head
 			if (this->moveCnt == 0)
 			{
 				auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
-				map->Set_Quake(this->dist_quake_boss, this->limit_quake_boss);
+				map->Set_Quake(this->dist_quake_boss_return_appear, this->limit_quake_boss_return_appear);
 			}
 			//頭が地面に潜るまで下に移動
 			if (this->moveCnt<this->limit_move_vertically)
@@ -375,7 +380,6 @@ namespace  Boss_Head
 			break;
 		case Stan:
 			//気絶中はゆっくり横揺れする
-			//左右に揺れる
 			this->pos.x = this->std_pos_x + sinf(this->cnt_shake / this->interval_shake_stan)*this->speed_shake_stn;
 			break;
 		case End_Pattern_Boss:

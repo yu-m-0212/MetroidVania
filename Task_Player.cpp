@@ -74,7 +74,8 @@ namespace  Player
 		this->recieveBase = this->hitBase;
 		this->angle_LR = Right;
 		this->controllerName = "P1";
-		this->barrier = true;								//バリアの使用制限
+		this->barrier = false;								//バリアの使用制限
+		this->active_barrier = false;						//バリアのリチャージフラグ
 		this->state = Stand;								//キャラ初期状態
 		this->max_hp = 5;									//HP最大値
 		this->hp = this->max_hp;							//HP初期値
@@ -89,10 +90,10 @@ namespace  Player
 		this->speed_shot = 10;								//ショット速度
 		this->limit_stompHoldTime = 30;						//ストンプ着地時の硬直時間
 		this->limit_stomp = 15;								//ストンプ継続時間
-		this->limit_quake = 15;								//画面揺れ時間
 		this->limit_shot = 60;								//継続時間ショット
 		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
-		this->dist_quake = 5;								//画面揺れ幅
+		this->limit_quake_damage = 15;						//画面揺れ時間ダメージ
+		this->dist_quake_damage = ML::Vec2(0, 5);			//画面揺れ幅ダメージ
 		this->lv_stomp = 1;									//ストンプアップグレードレベル
 		this->interval_shot = 12;							//射撃の発射間隔（フレーム）
 		this->range_stomp = ML::Box2D(-112, -112, 224, 224);//範囲ストンプ
@@ -145,6 +146,13 @@ namespace  Player
 			if (this->gauge_melee < 100)
 			{
 				this->gauge_melee++;
+			}
+			//リチャージ完了エフェクトの生成
+			if (!this->active_barrier &&
+				this->gauge_melee == 100)
+			{
+				this->eff->Create_Effect(2, this->pos);
+				this->active_barrier = true;
 			}
 		}
 		//思考・状況判断
@@ -271,7 +279,7 @@ namespace  Player
 		}
 		//画面効果
 		auto map = ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName,Map2D::defName);
-		map->Set_Quake(this->dist_quake, this->limit_quake);
+		map->Set_Quake(this->dist_quake_damage, this->limit_quake_damage);
 		//吹き飛ばされる
 		if (this->pos.x > from_->pos.x) { this->moveVec = ML::Vec2(+6.5f, -2.0f); }
 		else							{ this->moveVec = ML::Vec2(-6.5f, -2.0f); }
@@ -320,7 +328,6 @@ namespace  Player
 		case  Fall:		//落下中
 			if (this->CheckFoot() == true) { nm = Landing; }//足元　障害　有り
 			if (in.R1.on) { nm = Fallshoot; }
-			if (in.B1.down) { nm = AirStomp; }
 			break;
 		case  Landing:	//着地
 			if (in.LStick.L.on) { nm = Walk; }
@@ -357,7 +364,8 @@ namespace  Player
 			break;
 		}
 		//バリアの発生を割り込ませる
-		if (in.B1.down)
+		if (this->barrier &&
+			in.B1.down)
 		{
 			//接地
 			if (this->CheckFoot())
@@ -809,11 +817,10 @@ namespace  Player
 		barrier->Set_Move_Back(this->moveBack_stomp);
 		//範囲攻撃であることを知らせるフラグをtrue
 		barrier->Set_Range_Wide(1);
-		//画面を揺らすための設定を行う
-		auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
-		map->Set_Quake(this->dist_quake, this->limit_quake);
 		//エフェクトの生成
-		this->eff->Create_Effect(2, this->pos);
+		this->eff->Create_Effect(12, this->pos);
+		//バリアのリチャージフラグ反転
+		this->active_barrier = false;
 	}
 	//バリアの取得状況を取得する
 	bool Object::Get_Barrier()
@@ -861,6 +868,12 @@ namespace  Player
 	void Object::Set_Barrier(const bool& flag_)
 	{
 		this->barrier = flag_;
+	}
+	//バリアのリチャージ
+	//引数	：	（bool）
+	void Object::Set_Barrier_Recharge(const bool& flag_)
+	{
+		this->active_barrier = flag_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

@@ -30,6 +30,7 @@ namespace  Title
 
 		string	base_file_path;				//ベースファイルパス
 		string	name_sound_bubble;			//効果音泡
+		string	name_sound_title_push;		//効果音タイトルプッシュ
 		string	name_environmental_title;	//環境音タイトル
 	};
 	//-------------------------------------------------------------------

@@ -57,6 +57,7 @@ namespace  Game
 		ML::Vec2 pos_spawer;			//ボススポナー座標
 		BChara::Angle_LR angle_dead;	//死亡時の向き
 		int cnt_transition;				//カウンタ遷移用
+		int time_create_fade;			//画面効果生成タイミング
 		int time_create_next_task;		//引継ぎタスクの生成タイミング
 		int time_kill_game;				//自身を消滅させるタイミング
 		Tutorials::Object* tutorials;	//ポインタメッセージ

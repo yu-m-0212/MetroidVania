@@ -66,9 +66,8 @@ namespace  Barrier
 		this->moveCnt++;
 		//Šeó‘Ô‚²‚Æ‚Ìˆ—
 		this->Move();
-		
-		//ˆÚ“®
-		this->pos += this->moveVec;
+		//ƒvƒŒƒCƒ„‚ÌÀ•W‚É‡‚í‚¹‚é
+		this->pos = pl->pos;
 		//ŽG‹›‚Æ‚ÌÚG”»’è
 		{
 			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);

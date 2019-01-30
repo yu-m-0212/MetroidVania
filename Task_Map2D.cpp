@@ -36,7 +36,8 @@ namespace  Map2D
 		this->render2D_Priority[1] = 0.8f;		//描画順
 		this->imageName = "MapChipImg";			//イメージ名の初期化
 		this->cnt_Quake = 0;					//画面を揺らす周期
-		this->dist_Quake = 0;					//画面揺れ幅
+		this->dist_Quake_x = 0;					//画面揺れ幅X軸
+		this->dist_Quake_y = 0;					//画面揺れ幅Y軸
 		this->limit_Quake = 0;					//画面を揺らす時間
 		this->enemy01 = new Enemy01::Object();	//ポインタエネミー
 		this->item00 = new Item00::Object();	//ポインタアイテム00
@@ -120,10 +121,11 @@ namespace  Map2D
 		for (int y = sy; y <= ey; ++y) {
 			for (int x = sx; x <= ex; ++x) {
 				ML::Box2D  draw(x * SIZE_CHIP, y * SIZE_CHIP, SIZE_CHIP, SIZE_CHIP);
-				//画面揺れ処理（マップチップの縦軸を揺らす）
+				//画面揺れ処理
 				if (this->limit_Quake > 0)
 				{
-					draw.y += int(sin(this->cnt_Quake)*this->dist_Quake);
+					draw.x += int(sin(this->cnt_Quake)*this->dist_Quake_x);
+					draw.y += int(sin(this->cnt_Quake)*this->dist_Quake_y);
 				}
 				//スクロール対応
 				draw.Offset(-ge->camera2D.x, -ge->camera2D.y);
@@ -295,9 +297,10 @@ namespace  Map2D
 		memcpy(this->arr, w_map, sizeof(this->arr));
 	}
 	//画面の揺れ幅を指定する
-	void Object::Set_Dist_Quake(const int& dist_)
+	void Object::Set_Dist_Quake(const ML::Vec2& dist_)
 	{
-		this->dist_Quake = dist_;
+		this->dist_Quake_x = dist_.x;
+		this->dist_Quake_y = dist_.y;
 	}
 	//画面を揺らす時間を指定する
 	void Object::Set_Limit_Quake(const int& limit_)
@@ -306,7 +309,7 @@ namespace  Map2D
 	}
 	//画面揺れを一括して設定する
 	//引数	：	（縦揺れの幅,揺れる時間）
-	void Object::Set_Quake(const int& dist_, const int& limit_)
+	void Object::Set_Quake(const ML::Vec2& dist_, const int& limit_)
 	{
 		this->Set_Dist_Quake(dist_);
 		this->Set_Limit_Quake(limit_);

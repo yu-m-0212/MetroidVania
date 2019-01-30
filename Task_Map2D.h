@@ -51,7 +51,8 @@ namespace  Map2D
 	private:
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		int					cnt_Quake;						//カウンタ画面揺れ
-		int					dist_Quake;						//画面揺れ幅
+		int					dist_Quake_x;					//画面揺れ幅X軸
+		int					dist_Quake_y;					//画面揺れ幅Y軸
 		int					limit_Quake;					//画面を揺らす時間
 		Enemy01::Object*	enemy01;						//ポインタエネミー
 		Item00::Object*		item00;							//ポインタアイテム00
@@ -76,11 +77,11 @@ namespace  Map2D
 
 		//アクセサ
 		//画面の揺れ幅を指定する
-		void Set_Dist_Quake(const int&);
+		void Set_Dist_Quake(const ML::Vec2&);
 		//画面を揺らす時間を指定する
 		void Set_Limit_Quake(const int&);
 		//画面揺れを一括して設定する
 		//引数	：	（縦揺れの幅,揺れる時間）
-		void Set_Quake(const int&, const int&);
+		void Set_Quake(const ML::Vec2&, const int&);
 	};
 }

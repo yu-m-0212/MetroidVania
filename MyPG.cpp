@@ -1,6 +1,7 @@
 ﻿#include "MyPG.h"
 #include "Task_Game.h"
 #include "Task_Title.h"
+#include "Task_Ending.h"
 
 namespace MyPG
 {
@@ -11,7 +12,7 @@ namespace MyPG
 			1080,							//	画面サイズY
 			1,								//	表示倍率
 			1,								//	マルチサンプル(1or2or4)
-			false,							//	フルスクリーンモード
+			true,							//	フルスクリーンモード
 			480,							//	2D描画用解像度X(現在非対応）
 			270,							//	2D描画用解像度Y(現在非対応）
 			"THE ANYONE (α)",				//	ウインドウタイトル
@@ -60,7 +61,7 @@ namespace MyPG
 		ge->camera[3] = ge->camera[2] = ge->camera[1] = ge->camera[0];
 
 		//デバッグ用情報の表示ON/OFF
-		DebugMode(true);
+		DebugMode(false);
 
 		//キーボードとゲームパッドの入力を受け取るオブジェクトを生成する
 		//キーボードパラメータ
@@ -88,7 +89,7 @@ namespace MyPG
 		DG::EffectState().param.bgColor = ML::Color(0, 1.0f, 1.0f, 1.0f);
 
 		//初期実行タスク生成＆ゲームエンジンに登録
-		auto  firstTask = Game::Object::Create(true);
+		auto  firstTask = Title::Object::Create(true);
 
 		//------------------------------------------------------------------------------------
 		//レイヤー毎の描画のON/OFF

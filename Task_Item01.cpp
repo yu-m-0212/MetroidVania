@@ -33,13 +33,14 @@ namespace  Item01
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.7f;						//描画順
-		this->limit_message = 180;								//メッセージの時間制限
-		this->hitBase = ML::Box2D(-16, -16, 32, 32);			//マップとの判定矩形
-		this->recieveBase = this->hitBase;						//キャラクタとの判定矩形
+		this->render2D_Priority[1] = 0.7f;								//描画順
+		this->limit_message = 180;										//メッセージの時間制限
+		this->hitBase = ML::Box2D(-16, -16, 32, 32);					//マップとの判定矩形
+		this->recieveBase = this->hitBase;								//キャラクタとの判定矩形
 		this->center = ML::Vec2(float(ge->screenWidth / 2.0f),
-			float(ge->screenHeight / 2.0f));					//画面の中心座標
-		this->tutorials = new Tutorials::Object();				//メソッド呼び出し
+			float(ge->screenHeight / 2.0f));							//画面の中心座標
+		this->init_pos_create_tutorial = ML::Vec2(7228.0f, 5120.0f);	//反射チュートリアルの生成座標
+		this->tutorials = new Tutorials::Object();						//メソッド呼び出し
 		//★タスクの生成
 		return  true;
 	}
@@ -48,8 +49,9 @@ namespace  Item01
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
+		//反射チュートリアルの生成
+		this->tutorials->Create_Message("バリアは敵の攻撃を跳ね返すことができる", this->init_pos_create_tutorial, -1);
 		delete this->tutorials;
-
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
 		}
@@ -98,6 +100,7 @@ namespace  Item01
 		this->UpdateMotion(Lose);
 		//バリアを有効にする
 		pl->Set_Barrier(true);
+		pl->Set_Barrier_Recharge(true);
 	}
 	//-------------------------------------------------------------------
 	//アニメーション制御

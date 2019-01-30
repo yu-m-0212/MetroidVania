@@ -24,11 +24,13 @@ namespace  Task_Effect
 		this->name_sound_defeat = "sound_defeat";
 		this->name_sound_hit = "hit_shot";
 		this->name_sound_barrier = "sound_barrier";
+		this->name_sound_barrier_recharge = "sound_barrier_recharge";
 		//音の生成
 		//wavファイルの中でも再生できないものあり
 		DM::Sound_CreateSE(this->name_sound_defeat, this->base_file_path_sound + "explosion_enemy01.wav");
 		DM::Sound_CreateSE(this->name_sound_hit, this->base_file_path_sound + "hit_shot_player01.wav");
 		DM::Sound_CreateSE(this->name_sound_barrier, this->base_file_path_sound + "activate_barrier_player01.wav");
+		DM::Sound_CreateSE(this->name_sound_barrier_recharge, this->base_file_path_sound + "barrier_recharge.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -39,6 +41,7 @@ namespace  Task_Effect
 		DM::Sound_Erase(this->name_sound_defeat);
 		DM::Sound_Erase(this->name_sound_hit);
 		DM::Sound_Erase(this->name_sound_barrier);
+		DM::Sound_Erase(this->name_sound_barrier_recharge);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -51,31 +54,38 @@ namespace  Task_Effect
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->state_effect = Non;				//状態管理
-		this->limit_erase = 0;					//時間消滅まで
-		this->dist = 0.0f;						//回転する際の中心からの距離
-		this->angle = 0.0f;						//角度
-		this->add_angle_target_circle = 0.05f;	//ボス警告サークルの回転量
-		this->center = Vec2(0, 0);				//回転軸
-		this->num_bubble = 0;					//泡の大きさ
-		this->interval_bubble = 16;				//泡の揺れ周期
-		this->wide_bubble = 5.0f;				//泡の揺れ幅
-		this->limit_erase_hit_shot = 18;		//時間消滅までヒットショット
-		this->limit_erase_barrier = 15;			//時間消滅までバリア
-		this->limit_erase_defeat = 36;			//時間消滅まで撃破
-		this->limit_erase_heal = 24;			//時間消滅まで回復
-		this->limit_erase_bubble = 600;			//時間消滅まで泡
-		this->limit_erase_appear = 180;			//時間消滅まで登場
-		this->limit_erase_debris = 120;			//消滅までの時間破片
-		this->limit_erase_spark = 180;			//消滅までの時間火花
-		this->limit_effect_target_boss = 240;	//ボス警告エフェクトの消滅時間
-		this->speed_surfacing = 3.0f;			//速度浮上
-		this->speed_Debris = 6.0f;				//速度破片
-		this->speed_spark = 6.0f;				//速度火花
-		this->gravity = ML::Gravity(SIZE_CHIP);	//重力加速度
-		this->render2D_Priority[1] = 0.3f;		//描画順
-		this->choice_state = -1;				//外部から状態を指定する際、使用
-		Effect* eff = new Effect();				//メソッド呼び出し
+		this->state_effect = Non;					//状態管理
+		this->limit_erase = 0;						//時間消滅まで
+		this->dist = 0.0f;							//回転する際の中心からの距離
+		this->angle = 0.0f;							//角度
+		this->add_angle_target_circle = 0.05f;		//ボス警告サークルの回転量
+		this->add_angle_barrier = 0.025f;			//バリアの回転量
+		this->center = Vec2(0, 0);					//回転軸
+		this->num_bubble = 0;						//泡の大きさ
+		this->interval_bubble = 16;					//泡の揺れ周期
+		this->wide_bubble = 5.0f;					//泡の揺れ幅
+		this->limit_erase_hit_shot = 18;			//時間消滅までヒットショット
+		this->limit_erase_barrier_recharge = 15;	//時間消滅までバリアリチャージ
+		this->limit_erase_defeat = 36;				//時間消滅まで撃破
+		this->limit_erase_heal = 24;				//時間消滅まで回復
+		this->limit_erase_bubble = 600;				//時間消滅まで泡
+		this->limit_erase_appear = 180;				//時間消滅まで登場
+		this->limit_erase_debris = 120;				//消滅までの時間破片
+		this->limit_erase_spark = 180;				//消滅までの時間火花
+		this->limit_effect_target_boss = 240;		//ボス警告エフェクトの消滅時間
+		this->limit_effect_barrier = 15;			//消滅までの時間バリア
+		this->limit_quake_defeat = 30;				//撃破エフェクトの画面揺れ時間
+		this->limit_quake_barrier = 15;				//バリアの画面揺れ時間
+		this->dist_quake_defeat = ML::Vec2(2, 2);	//撃破エフェクトの画面揺れ幅
+		this->dist_quake_barrier = ML::Vec2(0, 5);	//バリアの画面揺れ幅
+		this->speed_surfacing = 3.0f;				//速度浮上
+		this->speed_Debris = 6.0f;					//速度破片
+		this->speed_spark = 6.0f;					//速度火花
+		this->gravity = ML::Gravity(SIZE_CHIP);		//重力加速度
+		this->render2D_Priority[1] = 0.3f;			//描画順
+		this->choice_state = -1;					//外部から状態を指定する際、使用
+		Effect* eff = new Effect();					//メソッド呼び出し
+		this->rate_size_circle = 10;				//ターゲットサークルのサイズアニマル倍率
 
 		//★タスクの生成
 
@@ -117,18 +127,24 @@ namespace  Task_Effect
 				//SEの再生
 				DM::Sound_Play_Volume(this->res->name_sound_hit, false, VOLUME_SE_HIT_SHOT_PLAYER);
 				break;
-			case 2:		//バリア
-				this->state_effect = Barrier;
-				this->limit_erase = this->limit_erase_barrier;
-				//SEの再生
-				DM::Sound_Play_Volume(this->res->name_sound_barrier, false, VOLUME_ALL_GAME);
+			case 2:		//バリアリチャージ
+				this->state_effect = Barrier_Recharge;
+				this->limit_erase = this->limit_erase_barrier_recharge;
+				//SE再生
+				DM::Sound_Play_Volume(this->res->name_sound_barrier_recharge, false, VOLUME_ALL_GAME);
 				break;
 			case 3:		//エネミー撃破
+			{
 				this->state_effect = Defeat_Enemy;
 				this->limit_erase = this->limit_erase_defeat;
+				//画面揺れ
+				auto map =
+					ge->GetTask_One_GN<Map2D::Object>(Map2D::defGroupName, Map2D::defName);
+				map->Set_Quake(this->dist_quake_defeat, this->limit_quake_defeat);
 				//SEの再生
 				DM::Sound_Play_Volume(this->res->name_sound_defeat, false, VOLUME_ALL_GAME);
 				break;
+			}
 			case 4:		//回復
 				this->state_effect = Heal;
 				this->limit_erase = this->limit_erase_heal;
@@ -169,6 +185,15 @@ namespace  Task_Effect
 			case 11:	//ボス演出バー
 				this->state_effect = Target_Bar;
 				this->limit_erase = this->limit_effect_target_boss;
+				break;
+			case 12:	//バリア
+				this->state_effect = Barrier;
+				this->limit_erase = this->limit_effect_barrier;
+				//SEの再生
+				DM::Sound_Play_Volume(this->res->name_sound_barrier, false, VOLUME_SE_BARRIER);
+				//画面を揺らすための設定を行う
+				auto map = ge->GetTask_One_G<Map2D::Object>(Map2D::defGroupName);
+				map->Set_Quake(this->dist_quake_barrier, this->limit_quake_barrier);
 				break;
 			}
 		}
@@ -222,11 +247,11 @@ namespace  Task_Effect
 			{ Box2D( -96, -96, 192, 192),Box2D( 768,   0, 192, 192),dc },//エネミー爆散1					[12]
 			{ Box2D( -96, -96, 192, 192),Box2D( 768, 192, 192, 192),dc },//エネミー爆散2					[13]
 			{ Box2D( -96, -96, 192, 192),Box2D( 768, 384, 192, 192),dc },//エネミー爆散3					[14]
-			{ Box2D( -96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc },//衝撃波1						[15]
-			{ Box2D( -96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc },//衝撃波2						[16]
-			{ Box2D( -96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc },//衝撃波3						[17]
-			{ Box2D( -96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc },//衝撃波4						[18]
-			{ Box2D( -96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc },//衝撃波5						[19]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344,   0, 192, 192),dc },//バリアリチャージ1				[15]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 192, 192, 192),dc },//バリアリチャージ2				[16]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 384, 192, 192),dc },//バリアリチャージ3				[17]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 576, 192, 192),dc },//バリアリチャージ4				[18]
+			{ Box2D( -96, -96, 192, 192),Box2D(1344, 768, 192, 192),dc },//バリアリチャージ5				[19]
 			{ Box2D( -48, -48,  96,  96),Box2D(1536,   0,  96,  96),ML::Color(0.3f,1,1,1)},//泡1			[20]
 			{ Box2D( -48, -48,  96,  96),Box2D(1536,  96,  96,  96),ML::Color(0.3f,1,1,1)},//泡2			[21]
 			{ Box2D( -48, -48,  96,  96),Box2D(1536, 192,  96,  96),ML::Color(0.3f,1,1,1)},//泡3			[22]
@@ -246,7 +271,8 @@ namespace  Task_Effect
 			{ Box2D(-128,-128, 256, 256),Box2D(1792,   0, 256, 256),dc },//ターゲットサークル1			[36]
 			{ Box2D(-128,-128, 256, 256),Box2D(2048,   0, 256, 256),dc },//ターゲットサークル2			[37]
 			{ Box2D(-192,-192, 384, 384),Box2D(2304,   0, 384, 384),dc },//ターゲットバー00				[38]
-			{ Box2D(-192,-192, 384, 384),Box2D(2304, 384, 384, 384),dc },//ターゲットバー01				[38]
+			{ Box2D(-192,-192, 384, 384),Box2D(2304, 384, 384, 384),dc },//ターゲットバー01				[39]
+			{ Box2D( -96, -96, 192, 192),Box2D(2688,   0, 192, 192),ML::Color(0.5f,1.0f,1.0f,1.0f) },//バリア						[40]
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -266,7 +292,7 @@ namespace  Task_Effect
 			effectCnt %= 3;
 			rtv = imageTable[effectCnt + 6];
 			break;
-		case Barrier:
+		case Barrier_Recharge:
 			effectCnt	= this->animCnt / 3;
 			effectCnt %= 5;
 			rtv = imageTable[effectCnt+15];
@@ -300,14 +326,37 @@ namespace  Task_Effect
 			break;
 		case Target_Circle_00:
 			rtv = imageTable[36];
+			//大きい状態で登場し徐々にフォーカスする感じで縮小
+			rtv.draw.x *= this->rate_size_circle;
+			rtv.draw.y *= this->rate_size_circle;
+			rtv.draw.w *= this->rate_size_circle;
+			rtv.draw.h *= this->rate_size_circle;
+			if (this->rate_size_circle > 1)
+			{
+				//消滅時にちょうど1倍になる
+				this->rate_size_circle -= this->animCnt / (this->limit_effect_target_boss/this->rate_size_circle);
+			}
 			break;
 		case Target_Circle_01:
 			rtv = imageTable[37];
+			//大きい状態で登場し徐々にフォーカスする感じで縮小
+			rtv.draw.x *= this->rate_size_circle;
+			rtv.draw.y *= this->rate_size_circle;
+			rtv.draw.w *= this->rate_size_circle;
+			rtv.draw.h *= this->rate_size_circle;
+			if (this->rate_size_circle > 1)
+			{
+				//消滅時にちょうど1倍になる
+				this->rate_size_circle -= this->animCnt / (this->limit_effect_target_boss / this->rate_size_circle);
+			}
 			break;
 		case Target_Bar:
 			effectCnt = this->animCnt / 2;
 			effectCnt %= 2;
 			rtv = imageTable[38+effectCnt];
+			break;
+		case Barrier:
+			rtv = imageTable[40];
 			break;
 		}
 		//	向きに応じて画像を左右反転する
@@ -367,11 +416,12 @@ namespace  Task_Effect
 		case Target_Circle_00:
 		case Target_Circle_01:
 		case Target_Bar:
+		{
 			//ボスヘッドの頭上に常に移動する
 			auto boss_head =
 				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
 			ML::Vec2 pos_boss_head_top =
-				boss_head->pos - ML::Vec2(0.0f, boss_head->hitBase.h / 2);
+				boss_head->pos - ML::Vec2(0.0f, float(boss_head->hitBase.h / 2));
 			this->pos = pos_boss_head_top;
 			//画面効果が消えたところで自身をキル
 			auto display_effect =
@@ -389,6 +439,20 @@ namespace  Task_Effect
 			else if (this->state_effect == Target_Circle_01)
 			{
 				this->angle += this->add_angle_target_circle;
+			}
+			break;
+		}
+		case Barrier:
+			//プレイヤを追従する
+			this->pos = pl->pos;
+			//回転
+			if (pl->angle_LR == Left)
+			{
+				this->angle += this->add_angle_barrier;
+			}
+			else
+			{
+				this->angle -= this->add_angle_barrier;
 			}
 			break;
 		}

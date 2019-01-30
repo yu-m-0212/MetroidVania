@@ -69,7 +69,8 @@ namespace  Game
 		ge->failure = false;								//ミスフラグ初期化
 		ge->pause = false;									//ポーズフラグの初期化
 		this->cnt_transition = 0;							//カウンタ遷移用
-		this->time_create_next_task = 100;					//引継ぎタスクの生成タイミング
+		this->time_create_fade = 60;						//画面効果生成タイミング
+		this->time_create_next_task = 180;					//引継ぎタスクの生成タイミング
 		this->time_kill_game = 150;							//自身を消滅させるタイミング
 		this->tutorials = new Tutorials::Object();			//ポインタメッセージ
 		this->eff = new Task_Effect::Object();				//ポインタエフェクト
@@ -88,8 +89,8 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		//pl->pos = ML::Vec2(224.0f,4400.0f);
-		pl->pos=ML::Vec2(7643.0f,5835.0f);
+		pl->pos = ML::Vec2(224.0f,4400.0f);
+		//pl->pos=ML::Vec2(7643.0f,5835.0f);
 		/*pl->pos = ML::Vec2(8382.0f,7200.0f);*/
 		this->eff->Create_Effect(6, pl->pos);
 		//カメラマンの生成
@@ -222,15 +223,16 @@ namespace  Game
 		//ゲームクリア
 		if (ge->clear)
 		{
+			//画面遷移カウンタ
+			this->cnt_transition++;
 			//フェードイン
-			if (this->cnt_transition == 0)
+			if (this->cnt_transition == this->time_create_fade)
 			{
 				auto display_effect =
 					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 				display_effect->Create_Display_Effect(0);
 				DM::Sound_FadeOut(this->res->name_bgm_main_game);
 			}
-			this->cnt_transition++;
 			//一定時間で自身を消滅させる
 			if (this->cnt_transition > this->time_kill_game)
 			{

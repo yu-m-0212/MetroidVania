@@ -22,6 +22,9 @@ namespace  Retry
 		this->button_retry = "button_retry";
 		DG::Image_Create(this->button_retry, "./data/image/ui.png");
 		DG::Font_Create("fontRetry", "HGŠÛºÞ¼¯¸M-PRO", 8, 16);
+
+		this->name_se_retry = "se_retry";
+		DM::Sound_CreateSE(this->name_se_retry, "./data/sound/wav/title_push.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -31,6 +34,7 @@ namespace  Retry
 		DG::Image_Erase(this->back_retry);
 		DG::Image_Erase(this->button_retry);
 		DG::Font_Erase("fontRetry");
+		DM::Sound_Erase(this->name_se_retry);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -117,6 +121,7 @@ namespace  Retry
 				auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 				if (nullptr == display_effect)
 				{
+					DM::Sound_Play_Volume(this->res->name_se_retry,false, VOLUME_ALL_GAME);
 					display_effect->Create_Display_Effect(0);
 				}
 				this->title_or_game = 0;

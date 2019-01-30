@@ -1,25 +1,61 @@
-スタッフロール
+[PLANNER]
 
-[Images]
+	MOCHIMARU
+
+[LEVEL DESIGN]
+	
+	MOCHIMARU
+
+	CLASS MATE
+
+	TEACHERS
+
+[PROGRAMMER]
+
+	MOCHIMARU
+
+[MAIN ARTIST]
+	
+	MOCHIMARU
+
+[DEBUG PLAY]
+
+	MOCHIMARU
+
+	CLASS MATE
+
+	TEACHERS
+
+[MOVIE ENGINEER]
+
+	KODAMA
+
+[MATERIALS PROVIDED]
 
 	helpcomputer by OpenGameArt.org
 
 	Jerom by OpenGameArt.org
 
+	hc by OpenGameArt.org
+
 [BGM]
 
 	hitoshi by Senses Circuit(https://www.senses-circuit.com)
 
-[SE]
+[SOUND EFFECT]
 
 	Free Sound Effect.com
 
 	魔王魂
 
-[Softwear]
+[TOOLS]
 
 	Tiled
 
 	Visual Studio
 
 	Photo Shop
+
+[DIRECTOR]
+
+	MOCHIMARU

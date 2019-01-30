@@ -52,6 +52,7 @@ namespace  Player
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 		bool barrier;				//バリアの使用制限
+		bool active_barrier;		//バリアのリチャージフラグ
 		string controllerName;		//コントローラ宣言
 		float decSpeed;				//速度減衰量
 		float max_StompFallSpeed;	//ストンプ時の最大降下速度
@@ -63,10 +64,9 @@ namespace  Player
 		int limit_JumpAngleChange;	//ジャンプから一定時間内なら向きを変えられる
 		int limit_stomp;			//継続時間ストンプ
 		int limit_stompHoldTime;	//硬直時間ストンプ
-		int limit_quake;			//画面揺れ時間
 		int limit_shot;				//継続時間ショット
+		int limit_quake_damage;		//画面揺れ時間ダメージ
 		int lv_stomp;				//ストンプアップグレードレベル
-		int dist_quake;				//画面揺れ幅
 		int power_stomp;			//攻撃力ストンプ
 		int power_shot;				//攻撃力ショット
 		int gauge_melee;			//近接攻撃のリチャージ
@@ -75,6 +75,7 @@ namespace  Player
 		ML::Box2D range_stomp;		//範囲ストンプ
 		ML::Box2D range_shot;		//範囲ショット
 		ML::Vec2 moveBack_stomp;	//ふっとび量ストンプ
+		ML::Vec2 dist_quake_damage;	//画面揺れ幅ダメージ
 		Task_Effect::Object* eff;	//メソッド呼び出し
 	public:
 		Object();
@@ -117,5 +118,8 @@ namespace  Player
 		//バリアの取得状況を指定する
 		//引数	：	（bool）
 		void Set_Barrier(const bool&);
+		//バリアのリチャージ
+		//引数	：	（bool）
+		void Set_Barrier_Recharge(const bool&);
 	};
 }

@@ -30,6 +30,9 @@ namespace  Title
 		DM::Sound_CreateStream(this->name_sound_bubble, this->base_file_path + "bubbling.wav");
 		DM::Sound_Volume(this->name_sound_bubble, 1000);
 
+		this->name_sound_title_push = "sound_title_push";
+		DM::Sound_CreateSE(this->name_sound_title_push, this->base_file_path + "title_push.wav");
+
 		this->name_environmental_title = "environmental_title";
 		DM::Sound_CreateStream(this->name_environmental_title, this->base_file_path + "environmental_title.wav");
 		DM::Sound_Volume(this->name_environmental_title, 1000);
@@ -44,6 +47,7 @@ namespace  Title
 		DG::Image_Erase(this->button_title);
 		DG::Image_Erase(this->logo_title);
 		DM::Sound_Erase(this->name_sound_bubble);
+		DM::Sound_Erase(this->name_sound_title_push);
 		DM::Sound_Erase(this->name_environmental_title);
 		return true;
 	}
@@ -142,6 +146,9 @@ namespace  Title
 			auto display_effect = ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 			if (nullptr == display_effect)
 			{
+				//一度だけSEを再生
+				DM::Sound_Play_Volume(this->res->name_sound_title_push, false, VOLUME_ALL_GAME);
+				//画面効果の生成
 				display_effect->Create_Display_Effect(0);
 			};
 			//サウンドのフェードアウト

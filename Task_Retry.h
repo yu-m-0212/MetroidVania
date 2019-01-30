@@ -27,6 +27,7 @@ namespace  Retry
 		//共有する変数はここに追加する
 		string back_retry;
 		string button_retry;
+		string name_se_retry;	//リトライボタンプッシュ
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BTask
