@@ -192,7 +192,7 @@ namespace  Boss_Head
 			nm = Hiding_Under;
 			break;
 		case End_Pattern_Boss:
-			if (this->moveCnt >= LIMIT_END_PATTERN_BOSS) { nm = Lose; }
+			if (this->moveCnt >= LIMIT_END_PATTERN_BOSS_HEAD) { nm = Lose; }
 			break;
 		case Stan:		//気絶
 			if (this->moveCnt > this->limit_stan) { nm = Return_Under; }
@@ -379,6 +379,11 @@ namespace  Boss_Head
 			}
 			break;
 		case Stan:
+			//一度だけ、弱点を示すハイライトエフェクトを生成する
+			if (this->moveCnt == 0)
+			{
+				this->eff->Create_Effect(13, this->pos);
+			}
 			//気絶中はゆっくり横揺れする
 			this->pos.x = this->std_pos_x + sinf(this->cnt_shake / this->interval_shake_stan)*this->speed_shake_stn;
 			break;

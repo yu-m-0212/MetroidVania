@@ -67,7 +67,8 @@ namespace  Task_Effect
 			Target_Circle_00,	//ボス登場演出サークル00
 			Target_Circle_01,	//ボス登場演出サークル01
 			Target_Bar,			//ボス登場演出数値バー
-			Barrier				//バリア発生時
+			Barrier,			//バリア発生時
+			Highlight_Head		//ボススタンハイライト
 		};
 		State_Effect state_effect;			//状態管理
 		int num_bubble;						//泡の大きさを指定する
@@ -81,12 +82,14 @@ namespace  Task_Effect
 		int limit_erase_appear;				//時間消滅まで登場
 		int limit_erase_debris;				//消滅までの時間破片
 		int limit_erase_spark;				//消滅までの時間火花
+		int limit_erase_highlight_head;		//消滅までの時間ハイライト
 		int limit_effect_target_boss;		//ボス警告エフェクトの消滅時間
 		int limit_effect_barrier;			//消滅までの時間バリア
 		int limit_quake_defeat;				//消滅エフェクトの画面揺れ時間
 		int limit_quake_barrier;			//バリアの画面揺れ時間
 		int choice_state;					//外部から状態を指定する際、使用
 		int rate_size_circle;				//ターゲットサークルのサイズアニメーション倍率
+		float cnt_anim_highlight;			//ボススタン時のハイライトグラデーションカウンタ
 		float speed_surfacing;				//泡の浮上速度
 		float speed_Debris;					//速度破片
 		float speed_spark;					//速度火花

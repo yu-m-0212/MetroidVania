@@ -177,18 +177,19 @@ namespace  Title
 			ML::Box2D   src(0, 0, 3200, 1800);
 			DG::Image_Draw(this->res->back_title, draw, src);
 		}
-		//ボタンの描画
-		{
-			ML::Box2D draw(-425, -125, 850, 250);
-			draw.Offset(this->pos_button);
-			ML::Box2D  src(0, 250, 850, 250);
-			DG::Image_Draw(this->res->button_title, draw, src,ML::Color(float(sin(this->cnt_anim_button/this->interval_button)),1,1,1));
-		}
 		//タイトルの描画
 		{
 			ML::Box2D draw(0,0,1920, 1080);
 			ML::Box2D  src(0, 0, 1920, 1080);
 			DG::Image_Draw(this->res->logo_title, draw, src);
+		}
+		//ボタンは入力可能になってから描画する
+		if(!ge->pause)
+		{
+			ML::Box2D draw(-425, -125, 850, 250);
+			draw.Offset(this->pos_button);
+			ML::Box2D  src(0, 250, 850, 250);
+			DG::Image_Draw(this->res->button_title, draw, src, ML::Color(float(sin(this->cnt_anim_button / this->interval_button)), 1, 1, 1));
 		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

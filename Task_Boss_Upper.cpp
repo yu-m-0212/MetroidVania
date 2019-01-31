@@ -109,7 +109,7 @@ namespace  Boss_Upper
 			if (this->time_un_hit == 0) { nm = Stand; }
 			break;
 		case End_Pattern_Boss:
-			if (this->moveCnt >= LIMIT_END_PATTERN_BOSS) { nm = Lose; }
+			if (this->moveCnt >= LIMIT_END_PATTERN_BOSS_PARTS) { nm = Lose; }
 			break;
 		case Lose:		//死亡
 			//頭潜行時、全てのパーツが破壊されていたら自身を回復する

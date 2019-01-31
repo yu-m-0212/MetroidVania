@@ -89,9 +89,9 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		pl->pos = ML::Vec2(224.0f,4400.0f);
-		//pl->pos=ML::Vec2(7643.0f,5835.0f);
-		/*pl->pos = ML::Vec2(8382.0f,7200.0f);*/
+		//pl->pos = ML::Vec2(224.0f,4400.0f);
+		pl->pos=ML::Vec2(7643.0f,5835.0f);
+		//pl->pos = ML::Vec2(8382.0f,7200.0f);
 		this->eff->Create_Effect(6, pl->pos);
 		//カメラマンの生成
 		auto  spr = Sprite::Object::Create(true);

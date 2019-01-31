@@ -74,8 +74,8 @@ namespace  Player
 		this->recieveBase = this->hitBase;
 		this->angle_LR = Right;
 		this->controllerName = "P1";
-		this->barrier = false;								//バリアの使用制限
-		this->active_barrier = false;						//バリアのリチャージフラグ
+		this->barrier = true;								//バリアの使用制限
+		this->active_barrier = true;						//バリアのリチャージフラグ
 		this->state = Stand;								//キャラ初期状態
 		this->max_hp = 5;									//HP最大値
 		this->hp = this->max_hp;							//HP初期値
