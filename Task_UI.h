@@ -4,6 +4,7 @@
 //UI表示
 //-------------------------------------------------------------------
 #include "BChara.h"
+#include "Effect.h"
 
 namespace  UI
 {
@@ -45,8 +46,26 @@ namespace  UI
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		int cnt;				//アニメーションカウンタ
-		string controllerName;	//コントローラー宣言
+		int cnt;					//アニメーションカウンタ
+		
+		string controllerName;		//コントローラー宣言
+		
+		ML::Vec2 pos_hp_boss;		//ボスのHPバー座標
+		bool flag_highlight_bar;	//ボスHPバー強調表示フラグ
+		int max_range_hp_bar;		//ボスHPの表示最大幅
+		int cnt_highllight_bar;		//ボスHPバー表示時間カウンタ
+		int limit_highlight_bar;	//ボスHPバー強調表示時間
+		float cnt_gradation_bar;	//ボスHPバーグラデーションカウンタ
+
+		int max_dist_quake_x_bar;		//HPバーX軸揺れ最大値
+		int max_dist_quake_y_bar;		//HPバーy軸揺れ最大値
+		int interval_quake_bar;			//HPバー揺れ間隔
+
+		Effect* eff;				//エフェクトクラスインスタンス
 	public:
+		//アクセサ
+
+		//HPバーの強調表示を外部から指定する
+		void Set_Highlight_Bar();
 	};
 }

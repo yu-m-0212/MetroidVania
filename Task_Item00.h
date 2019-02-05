@@ -26,7 +26,8 @@ namespace  Item00
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
 		string imageName;
-		string name_se_pick_up_item;	//効果音
+		string name_se_pick_up_ability_00;	//取得時のSE00
+		string name_se_pick_up_ability_01;	//取得時のSE01
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -50,6 +51,8 @@ namespace  Item00
 	private:
 		int add_Hp;						//プレイヤのHP増加量
 		int limit_message;				//制限時間メッセージ
+		int time_play_second_se;			//SEの再生タイミング
+		int time_erase;						//自身の消滅タイミング
 		ML::Vec2 center;				//画面中央
 		Tutorials::Object* tutorials;	//ポインタチュートリアル
 	public:

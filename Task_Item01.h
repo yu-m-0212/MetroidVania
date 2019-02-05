@@ -24,7 +24,8 @@ namespace  Item01
 		static   WP  instance;
 		static  Resource::SP  Create();
 		//共有する変数はここに追加する
-		string name_image;	//画像リソース
+		string name_image;				//画像リソース
+		string name_se_pick_up_item;	//効果音
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -49,6 +50,7 @@ namespace  Item01
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
 		int limit_message;					//メッセージの時間制限
+		int time_erase;						//自身の消滅タイミング
 		ML::Vec2 center;					//画面中央座標
 		ML::Vec2 init_pos_create_tutorial;	//反射チュートリアルの生成座標
 		Tutorials::Object* tutorials;		//メソッド呼び出し

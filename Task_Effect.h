@@ -55,20 +55,22 @@ namespace  Task_Effect
 		//状態管理
 		enum State_Effect
 		{
-			Non,				//未指定
-			Hit_Shot,			//ヒットショット（プレイヤ）
-			Barrier_Recharge,	//バリアリチャージ
-			Heal,				//回復
-			Bubble,				//泡
-			Appear,				//登場
-			Defeat_Enemy,		//撃破（エネミー）
-			Debris,				//破片
-			Spark,				//火花
-			Target_Circle_00,	//ボス登場演出サークル00
-			Target_Circle_01,	//ボス登場演出サークル01
-			Target_Bar,			//ボス登場演出数値バー
-			Barrier,			//バリア発生時
-			Highlight_Head		//ボススタンハイライト
+			Non,						//未指定
+			Hit_Shot,					//ヒットショット（プレイヤ）
+			Barrier_Recharge,			//バリアリチャージ
+			Heal,						//回復
+			Bubble,						//泡
+			Appear,						//登場
+			Defeat_Enemy,				//撃破（エネミー）
+			Debris,						//破片
+			Spark,						//火花
+			Target_Circle_00,			//ボス登場演出サークル00
+			Target_Circle_01,			//ボス登場演出サークル01
+			Target_Bar,					//ボス登場演出数値バー
+			Barrier,					//バリア発生時
+			Highlight_Head,				//ボススタンハイライト
+			Boss_Chance_Mark_In_Line,	//ボス弱点表示内側
+			Boss_Chance_Mark_Out_Line,	//ボス弱点表示外側
 		};
 		State_Effect state_effect;			//状態管理
 		int num_bubble;						//泡の大きさを指定する
@@ -85,6 +87,7 @@ namespace  Task_Effect
 		int limit_erase_highlight_head;		//消滅までの時間ハイライト
 		int limit_effect_target_boss;		//ボス警告エフェクトの消滅時間
 		int limit_effect_barrier;			//消滅までの時間バリア
+		int limit_effect_boss_chance_mark;	//消滅までの時間ボス弱点
 		int limit_quake_defeat;				//消滅エフェクトの画面揺れ時間
 		int limit_quake_barrier;			//バリアの画面揺れ時間
 		int choice_state;					//外部から状態を指定する際、使用

@@ -5,6 +5,7 @@
 #include  "Task_Boss_Head.h"
 #include  "Task_Player.h"
 #include  "Task_Boss_Lower.h"
+#include  "Task_UI.h"
 
 namespace  Boss_Head
 {
@@ -55,42 +56,43 @@ namespace  Boss_Head
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->state = Hiding_Under;									//状態管理
-		this->render2D_Priority[1] = 0.85f;							//描画順
-		this->hitBase = ML::Box2D(-92, -145, 184, 290);				//表示矩形
-		this->recieveBase = ML::Box2D(-92, -46, 184, 92);			//キャラクタとの判定矩形
-		this->correction_pos_weak_point = -75;						//弱点矩形の本体からの座標補正
-		this->std_pos_x = 8382.0f;									//横揺れ基準値
-		this->speed_shake_def = 64.0f;								//通常時の横揺れ速度
-		this->speed_shake_ref = 128.0f;								//反射被弾時の横揺れ速度
-		this->speed_shake_stn = 32.0f;								//気絶時の横揺れ速度
-		this->speed_shake = this->speed_shake_def;					//実処理を行う追従速度
-		this->cnt_shake = 0.0f;										//カウンタ横揺れ
-		this->interval_shake = 12.0f;								//間隔横揺れ
-		this->interval_shake_stan = 24.0f;							//気絶時の横揺れ速度
-		this->shot = new Shot01::Object();							//ショットオブジェクトインスタンス
-		this->boss = new Boss();									//ボスクラスインスタンス
-		this->eff = new Task_Effect::Object();						//エフェクトオブジェクトインスタンス
-		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);				//移動量ショット
-		this->hit_shot = ML::Box2D(-16, -16, 32, 32);				//矩形ショット
-		this->interval_shot = 360;									//生成時間ショット
-		this->hp = 40;												//HPボス
-		this->add_un_hit = 60;										//プレイヤに与える無敵時間
-		this->num_shot = 5;											//弾の生成数
-		this->angle_create_shot = 18.0f;							//弾を生成する間隔
-		this->flag_alive_base = true;								//土台の生死
-		this->interval_to_appear = 240;								//登場するまでの時間
-		this->interval_create_effect = 30;							//エフェクトの生成間隔
-		this->interval_return = 180;								//ショットから戻るまでの時間
-		this->limit_move_vertically = 57;							//縦向き時の登場移動時間
-		this->speed_move_under = 10.0f;								//縦向き時の登場、退場速度
-		this->speed_chase_hiding = 0.025f;							//潜行中プレイヤに接近する割合
-		this->hit_vertically_long = ML::Box2D(-92, -46, 184, 92);	//縦長の時の矩形（hitBaseに代入して使用）
-		this->hit_horizontally_long = ML::Box2D(-46, -92, 92, 184);	//横長の時の矩形（hitBaseに代入して使用）
-		this->dist_quake_boss_return_appear = ML::Vec2(0,5);		//ボス用登場退場画面揺れ幅
-		this->limit_quake_boss_return_appear = 90;					//ボス用登場退場画面揺れ時間
-		this->cnt_defeat_parts = 0;									//胴体パーツを破壊すると加算し、上限に達すると気絶する
-		this->limit_stan = 360;										//気絶時間
+		this->state = Hiding_Under;												//状態管理
+		this->render2D_Priority[1] = 0.85f;										//描画順
+		this->hitBase = ML::Box2D(-92, -145, 184, 290);							//表示矩形
+		this->recieveBase = ML::Box2D(-92, -46, 184, 92);						//キャラクタとの判定矩形
+		this->correction_pos_weak_point = -75;									//弱点矩形の本体からの座標補正
+		this->std_pos_x = 8382.0f;												//横揺れ基準値
+		this->speed_shake_def = 64.0f;											//通常時の横揺れ速度
+		this->speed_shake_ref = 128.0f;											//反射被弾時の横揺れ速度
+		this->speed_shake_stn = 32.0f;											//気絶時の横揺れ速度
+		this->speed_shake = this->speed_shake_def;								//実処理を行う追従速度
+		this->cnt_shake = 0.0f;													//カウンタ横揺れ
+		this->interval_shake = 12.0f;											//間隔横揺れ
+		this->interval_shake_stan = 24.0f;										//気絶時の横揺れ速度
+		this->shot = new Shot01::Object();										//ショットオブジェクトインスタンス
+		this->boss = new Boss();												//ボスクラスインスタンス
+		this->eff = new Task_Effect::Object();									//エフェクトオブジェクトインスタンス
+		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);							//移動量ショット
+		this->hit_shot = ML::Box2D(-16, -16, 32, 32);							//矩形ショット
+		this->interval_shot = 360;												//生成時間ショット
+		this->hp = HP_BOSS_HEAD;												//HPボス
+		this->add_un_hit = 60;													//プレイヤに与える無敵時間
+		this->num_shot = 5;														//弾の生成数
+		this->angle_create_shot = 18.0f;										//弾を生成する間隔
+		this->flag_alive_base = true;											//土台の生死
+		this->interval_to_appear = 240;											//登場するまでの時間
+		this->interval_create_effect = 30;										//エフェクトの生成間隔
+		this->interval_return = 180;											//ショットから戻るまでの時間
+		this->limit_move_vertically = 57;										//縦向き時の登場移動時間
+		this->speed_move_under = 10.0f;											//縦向き時の登場、退場速度
+		this->speed_chase_hiding = 0.025f;										//潜行中プレイヤに接近する割合
+		this->hit_vertically_long = ML::Box2D(-92, -46, 184, 92);				//縦長の時の矩形（hitBaseに代入して使用）
+		this->hit_horizontally_long = ML::Box2D(-46, -92, 92, 184);				//横長の時の矩形（hitBaseに代入して使用）
+		this->dist_quake_boss_return_appear = ML::Vec2(0, 5);					//ボス用登場退場画面揺れ幅
+		this->limit_quake_boss_return_appear = 90;								//ボス用登場退場画面揺れ時間
+		this->cnt_defeat_parts = 0;												//胴体パーツを破壊すると加算し、上限に達すると気絶する
+		this->limit_stan = 360;													//気絶時間
+		this->rect_create_effect_end = ML::Box2D(-640, -360, 1280, 720);		//エンドパターン中のエフェクト生成範囲
 
 		//★タスクの生成
 
@@ -379,10 +381,14 @@ namespace  Boss_Head
 			}
 			break;
 		case Stan:
-			//一度だけ、弱点を示すハイライトエフェクトを生成する
+			//一度だけ弱点表示を生成する
 			if (this->moveCnt == 0)
 			{
-				this->eff->Create_Effect(13, this->pos);
+				//生成位置
+				ML::Vec2 init_pos =
+					this->pos + ML::Vec2(0.0f, float(this->correction_pos_weak_point));
+				this->eff->Create_Effect(14, init_pos);
+				this->eff->Create_Effect(15, init_pos);
 			}
 			//気絶中はゆっくり横揺れする
 			this->pos.x = this->std_pos_x + sinf(this->cnt_shake / this->interval_shake_stan)*this->speed_shake_stn;
@@ -399,8 +405,8 @@ namespace  Boss_Head
 				//ランダムな生成位置を角度から指定
 				float ang = float(rand() % 360);
 				//自身の矩形の範囲内にランダムに生成
-				float x = float(cos(ang)*float(rand() % this->hitBase.w / 2));
-				float y = float(sin(ang)*float(rand() % this->hitBase.h / 2));
+				float x = float(cos(ang)*float(rand() % this->rect_create_effect_end.w / 2));
+				float y = float(sin(ang)*float(rand() % this->rect_create_effect_end.h / 2));
 				this->eff->Create_Effect(3, this->pos + ML::Vec2(x, y));
 			}
 			break;
@@ -411,7 +417,17 @@ namespace  Boss_Head
 	void Object::Recieved(BChara* from_, AttackInfo at_, const int& un_hit_)
 	{
 		//気絶時以外はダメージを受けない
-		if (this->state != Stan) { return; }
+		if (this->state != Stan) 
+		{ 
+			//ボスヘッドに反射に対応したエフェクトを生成する
+			this->eff->Create_Effect(13, this->pos);
+			//UIに反射に対応した表示を行わせる
+			auto ui =
+				ge->GetTask_One_G<UI::Object>(UI::defGroupName);
+			ui->Set_Highlight_Bar();
+			//ダメージを受けず関数を抜ける
+			return;
+		}
 		//無敵時間中はダメージを受けない
 		if (this->time_un_hit > 0)
 		{
@@ -490,6 +506,11 @@ namespace  Boss_Head
 	int Object::Get_Defeat_Parts()
 	{
 		return this->cnt_defeat_parts;
+	}
+	//自身の座標から弱点座標への補正量を取得する
+	int Object::Get_Correction_Pos_Weak_Point()
+	{
+		return this->correction_pos_weak_point;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

@@ -15,8 +15,11 @@ namespace  Item00
 		this->imageName = "Item00Img";
 		DG::Image_Create(this->imageName, "./data/image/Item00.png");
 
-		this->name_se_pick_up_item = "se_pick_up_item";
-		DM::Sound_CreateSE(this->name_se_pick_up_item, "./data/sound/wav/pick_up_life_item.wav");
+		this->name_se_pick_up_ability_00 = "se_pick_up_ability00";
+		DM::Sound_CreateSE(this->name_se_pick_up_ability_00, "./data/sound/wav/jingle_pick_up_ability_00.wav");
+		this->name_se_pick_up_ability_01 = "se_pick_up_ability01";
+		DM::Sound_CreateSE(this->name_se_pick_up_ability_01, "./data/sound/wav/jingle_pick_up_ability_01.wav");
+
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -24,7 +27,8 @@ namespace  Item00
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
-		DM::Sound_Erase(this->name_se_pick_up_item);
+		DM::Sound_Erase(this->name_se_pick_up_ability_00);
+		DM::Sound_Erase(this->name_se_pick_up_ability_01);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -42,6 +46,8 @@ namespace  Item00
 		this->recieveBase = this->hitBase;													//キャラクタとの判定矩形
 		this->add_Hp = 1;																	//プレイヤのHP増加量
 		this->limit_message = 180;															//時間制限メッセージ
+		this->time_play_second_se = 75;									//消滅までの時間
+		this->time_erase = 180;											//自身の消滅タイミング
 		this->center = ML::Vec2(float(ge->screenWidth / 2), float(ge->screenHeight / 2));	//画面中央
 		this->tutorials = new Tutorials::Object();											//ポインタチュートリアル
 		//★タスクの生成
@@ -51,8 +57,7 @@ namespace  Item00
 	//「終了」タスク消滅時に１回だけ行う処理
 	bool  Object::Finalize()
 	{
-		//SE再生
-		DM::Sound_Play_Volume(this->res->name_se_pick_up_item, false, VOLUME_ALL_GAME);
+		
 		delete this->tutorials;
 		//★データ＆タスク解放
 		if (!ge->QuitFlag() && this->nextTaskCreate) 
@@ -65,8 +70,6 @@ namespace  Item00
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		this->moveCnt++;
-		this->animCnt++;
 		if (this->time_un_hit > 0) { this->time_un_hit--; }
 
 		switch (this->state) {
@@ -74,9 +77,25 @@ namespace  Item00
 			this->pos.y += float(sin(this->moveCnt/12));
 			break;
 		case Lose:
-			this->Kill();
+			//1つ目のSEを再生
+			if (this->moveCnt == 0)
+			{
+				DM::Sound_Play_Volume(this->res->name_se_pick_up_ability_00, false, VOLUME_ALL_GAME);
+			}
+			//2つ目のSEを再生し消滅
+			if (this->moveCnt == this->time_play_second_se)
+			{
+				DM::Sound_Play_Volume(this->res->name_se_pick_up_ability_01, false, VOLUME_ALL_GAME);
+			}
+			//SW再生後、消滅
+			if (this->moveCnt >= this->time_erase)
+			{
+				this->Kill();
+			}
 			break;
 		}
+		this->moveCnt++;
+		this->animCnt++;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理

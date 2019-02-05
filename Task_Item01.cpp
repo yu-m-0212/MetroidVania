@@ -14,6 +14,10 @@ namespace  Item01
 	{
 		this->name_image = "image_item01";
 		DG::Image_Create(this->name_image, "./data/image/Item01.png");
+
+		this->name_se_pick_up_item = "se_pick_up_item";
+		DM::Sound_CreateSE(this->name_se_pick_up_item, "./data/sound/wav/pick_up_life_item.wav");
+
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -21,6 +25,7 @@ namespace  Item01
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->name_image);
+		DM::Sound_Erase(this->name_se_pick_up_item);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -35,6 +40,7 @@ namespace  Item01
 		//★データ初期化
 		this->render2D_Priority[1] = 0.7f;								//描画順
 		this->limit_message = 180;										//メッセージの時間制限
+		this->time_erase = 120;											//自身の消滅タイミング
 		this->hitBase = ML::Box2D(-16, -16, 32, 32);					//マップとの判定矩形
 		this->recieveBase = this->hitBase;								//キャラクタとの判定矩形
 		this->center = ML::Vec2(float(ge->screenWidth / 2.0f),
@@ -49,8 +55,6 @@ namespace  Item01
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-		//反射チュートリアルの生成
-		this->tutorials->Create_Message("バリアは敵の攻撃を跳ね返すことができる", this->init_pos_create_tutorial, -1);
 		delete this->tutorials;
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
@@ -62,18 +66,31 @@ namespace  Item01
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
-		this->moveCnt++;
-		this->animCnt++;
+		//無敵時間の減少
 		if (this->time_un_hit > 0) { this->time_un_hit--; }
-
-		switch (this->state) {
+		switch (this->state)
+		{
 		case Stand:
 			this->pos.y += float(sin(this->moveCnt / 12));
 			break;
 		case Lose:
-			this->Kill();
+			//SE再生
+			if (this->moveCnt == 0)
+			{
+				DM::Sound_Play_Volume(this->res->name_se_pick_up_item, false, VOLUME_ALL_GAME);
+				//反射チュートリアルの生成
+				this->tutorials->Create_Message("バリアは敵の攻撃を跳ね返すことができる", this->init_pos_create_tutorial, -1);
+			}
+			//消滅
+			if (this->moveCnt > this->time_erase)
+			{
+				this->Kill();
+			}
 			break;
 		}
+		//カウンタインクリメント
+		this->moveCnt++;
+		this->animCnt++;
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理

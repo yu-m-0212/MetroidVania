@@ -69,9 +69,9 @@ namespace  Game
 		ge->failure = false;								//ミスフラグ初期化
 		ge->pause = false;									//ポーズフラグの初期化
 		this->cnt_transition = 0;							//カウンタ遷移用
-		this->time_create_fade = 60;						//画面効果生成タイミング
+		this->time_create_fade = 240;						//画面効果生成タイミング
 		this->time_create_next_task = 180;					//引継ぎタスクの生成タイミング
-		this->time_kill_game = 150;							//自身を消滅させるタイミング
+		this->time_kill_game = 390;							//自身を消滅させるタイミング
 		this->tutorials = new Tutorials::Object();			//ポインタメッセージ
 		this->eff = new Task_Effect::Object();				//ポインタエフェクト
 		this->pos_spawer = ML::Vec2(7876.0f, 7648.0f);		//スポナー座標
@@ -103,7 +103,8 @@ namespace  Game
 		tutorials->Create_Message("左スティックを横に倒すと移動", ML::Vec2(224, 4482), -1);
 		tutorials->Create_Message("Aボタンでジャンプ", ML::Vec2(1180, 4482), -1);
 		tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1);
-		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6792, 3650), -1);
+		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6350, 3650), -1);
+		this->tutorials->Create_Message("銃口に合わせて視点も移動する", ML::Vec2(6813.0f, 3650),-1);
 		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
 		//背景の生成
 		Back::Object::Create(true);
@@ -223,6 +224,13 @@ namespace  Game
 		//ゲームクリア
 		if (ge->clear)
 		{
+			if (this->cnt_transition == 0)
+			{
+				//クリア時点でレターボックスの生成
+				auto display_effect =
+					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				display_effect->Create_Display_Effect(1);
+			}
 			//画面遷移カウンタ
 			this->cnt_transition++;
 			//フェードイン

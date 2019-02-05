@@ -20,3 +20,17 @@ ML::Vec2 Effect::Move_Parabola(const float& speed_, const float& moveY_, const f
 	//Y軸は与えられた初速に重力加速度を加算していく
 	return ML::Vec2(cos(angle_)*speed_, moveY_+gravity_);
 }
+//ランダムに2軸の反復する移動量（振動）を返す
+//引数	：	（カウンタ,X軸揺れ最大値,Y軸揺れ最大値,揺れ間隔）
+ML::Vec2 Effect::Quake(const int& cnt_, const int& dist_x_, const int& dist_y_, const int& interval_)
+{
+	int x =
+		rand() % dist_x_;
+	float quake_x =
+		sinf(cnt_ / interval_)*x;
+	int y =
+		rand() % dist_y_;
+	float quake_y =
+		sinf(cnt_ / interval_)*y;
+	return ML::Vec2(quake_x, quake_y);
+}

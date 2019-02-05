@@ -150,6 +150,9 @@ namespace  Shot00
 						//相手に接触の有無を確認させる
 						if (boss_head->CheckHit(me))
 						{
+							//Recieveを呼び出し、反射時の処理はボスが行う
+							BChara::AttackInfo at = { this->power,0,0 };
+							boss_head->Recieved(this, at, this->un_hit);
 							//SEの再生
 							DM::Sound_Play_Volume(this->res->name_se_reflect, false, VOLUME_SE_REFLECT_SHOT);
 							//X方向のみの反転

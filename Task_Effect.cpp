@@ -72,9 +72,10 @@ namespace  Task_Effect
 		this->limit_erase_appear = 180;				//時間消滅まで登場
 		this->limit_erase_debris = 120;				//消滅までの時間破片
 		this->limit_erase_spark = 180;				//消滅までの時間火花
-		this->limit_erase_highlight_head = 360;		//消滅までの時間ハイライト
+		this->limit_erase_highlight_head = 30;		//消滅までの時間ハイライト
 		this->limit_effect_target_boss = 240;		//ボス警告エフェクトの消滅時間
-		this->limit_effect_barrier = 15;			//消滅までの時間バリア
+		this->limit_effect_barrier = 30;			//消滅までの時間バリア
+		this->limit_effect_boss_chance_mark = 360;	//消滅までの時間ボス弱点
 		this->limit_quake_defeat = 30;				//撃破エフェクトの画面揺れ時間
 		this->limit_quake_barrier = 15;				//バリアの画面揺れ時間
 		this->dist_quake_defeat = ML::Vec2(2, 2);	//撃破エフェクトの画面揺れ幅
@@ -203,6 +204,14 @@ namespace  Task_Effect
 				this->state_effect = Highlight_Head;
 				this->limit_erase = this->limit_erase_highlight_head;
 				break;
+			case 14:	//ボス弱点表示内側
+				this->state_effect = Boss_Chance_Mark_In_Line;
+				this->limit_erase = this->limit_effect_boss_chance_mark;
+				break;
+			case 15:	//ボス弱点表示外側
+				this->state_effect = Boss_Chance_Mark_Out_Line;
+				this->limit_erase = this->limit_effect_boss_chance_mark;
+				break;
 			}
 		}
 		//ポーズ
@@ -281,7 +290,10 @@ namespace  Task_Effect
 			{ Box2D(-192,-192, 384, 384),Box2D(2304,   0, 384, 384),dc },//ターゲットバー00									[38]
 			{ Box2D(-192,-192, 384, 384),Box2D(2304, 384, 384, 384),dc },//ターゲットバー01									[39]
 			{ Box2D( -96, -96, 192, 192),Box2D(2688,   0, 192, 192),ML::Color(0.5f,1.0f,1.0f,1.0f) },//バリア				[40]
-			{ Box2D( -96,-148, 192, 296),Box2D(2880,   0, 192, 296),ML::Color(1.0f,1.0f,1.0f,1.0f) },//ボススタンハイライト	[41]
+			{ Box2D( -96,-148, 192, 296),Box2D(2880,   0, 192, 296),dc },//ボススタンハイライト								[41]
+			{ Box2D(-128,-128, 256, 256),Box2D(3086,   0, 256, 256),dc },//ウィークポイントサークル1							[42]
+			{ Box2D(-128,-128, 256, 256),Box2D(3342,   0, 256, 256),dc },//ウィークポイントサークル2							[43]
+			{ Box2D(-960,-540,1920,1080),Box2D(3600,   0,1920,1080),dc } //HPバーハイライト									[44]
 		};
 		//返す変数を用意
 		BChara::DrawInfo  rtv;
@@ -368,6 +380,7 @@ namespace  Task_Effect
 			rtv = imageTable[40];
 			break;
 		case Highlight_Head:
+		{
 			rtv = imageTable[41];
 			this->cnt_anim_highlight += 0.1f;
 			float highlight_red_green =
@@ -377,6 +390,13 @@ namespace  Task_Effect
 				highlight_red_green = 0.0f;
 			}
 			rtv.color.Set(1.0f, highlight_red_green, highlight_red_green, 1.0f);
+		}
+			break;
+		case Boss_Chance_Mark_In_Line:
+			rtv = imageTable[42];
+			break;
+		case Boss_Chance_Mark_Out_Line:
+			rtv = imageTable[43];
 			break;
 		}
 		//	向きに応じて画像を左右反転する
@@ -440,6 +460,7 @@ namespace  Task_Effect
 			//ボスヘッドの頭上に常に移動する
 			auto boss_head =
 				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
+			if (nullptr == boss_head) { break; }
 			ML::Vec2 pos_boss_head_top =
 				boss_head->pos - ML::Vec2(0.0f, float(boss_head->hitBase.h / 2));
 			this->pos = pos_boss_head_top;
@@ -479,15 +500,31 @@ namespace  Task_Effect
 		{
 			auto head =
 				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
-			//ボスヘッドを追従する
+			//ボスヘッドの弱点を追従する
 			this->pos = head->pos;
-			//気絶状態でなくなったとき、消滅
-			if (head->state != Stan)
-			{
-				this->Kill();
-			}
 			break;
 		}
+		case Boss_Chance_Mark_In_Line:
+		case Boss_Chance_Mark_Out_Line:
+			auto head =
+				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
+			if (nullptr == head) { break; }
+			//ボスヘッドの弱点を追従する
+			int correction_pos = head->Get_Correction_Pos_Weak_Point();
+			ML::Vec2 chase_head =
+				head->pos + ML::Vec2(0.0f, float(correction_pos));
+			this->pos = chase_head;
+			//外側のサークルは反時計周り
+			if (this->state_effect == Boss_Chance_Mark_In_Line)
+			{
+				this->angle -= this->add_angle_target_circle;
+			}
+			//内側のサークルは時計回り
+			else if (this->state_effect == Boss_Chance_Mark_Out_Line)
+			{
+				this->angle += this->add_angle_target_circle;
+			}
+			break;
 		}
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★

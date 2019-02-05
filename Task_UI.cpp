@@ -6,6 +6,7 @@
 #include	"Task_Player.h"
 #include	"Task_Enemy01.h"
 #include	"Task_Display_Effect.h"
+#include	"Task_Boss_Head.h"
 
 namespace  UI
 {
@@ -37,9 +38,18 @@ namespace  UI
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.2f;	//描画順
-		this->controllerName = "P1";		//コントローラー宣言
-		this->cnt = 0;						//アニメーションカウンタ
+		this->render2D_Priority[1] = 0.2f;						//描画順
+		this->controllerName = "P1";							//コントローラー宣言
+		this->cnt = 0;											//アニメーションカウンタ
+		this->cnt_highllight_bar = 0;							//ボスHPバー表示時間カウンタ
+		this->limit_highlight_bar = 30;							//ボスHPバー強調表示時間
+		this->pos_hp_boss = ML::Vec2(64.0f, 1002.0f);			//ボスHPバー座標
+		this->max_range_hp_bar = 1792;							//ボスHpの最大表示幅
+		this->flag_highlight_bar = false;						//ボスHPバー強調表示フラグ
+		this->eff = new Effect();								//エフェクトクラスインスタンス
+		this->max_dist_quake_x_bar = 15;						//HPバーX軸揺れ最大値
+		this->max_dist_quake_y_bar = 15;						//HPバーy軸揺れ最大値
+		this->interval_quake_bar = 5;							//HPバー揺れ間隔
 		
 		//★タスクの生成
 
@@ -50,7 +60,7 @@ namespace  UI
 	bool  Object::Finalize()
 	{
 		//★データ＆タスク解放
-
+		delete this->eff;
 
 		if (!ge->QuitFlag() && this->nextTaskCreate) {
 			//★引き継ぎタスクの生成
@@ -63,6 +73,12 @@ namespace  UI
 	void  Object::UpDate()
 	{
 		this->cnt++;
+		//HPバーハイライト
+		if (this->flag_highlight_bar)
+		{
+			this->cnt_highllight_bar = this->limit_highlight_bar;
+			this->flag_highlight_bar = false;
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
@@ -138,6 +154,67 @@ namespace  UI
 				DG::Image_Draw(this->res->hpImageName, draw, src);
 			}
 		}
+		//ボスHP表示
+		{
+			auto boss_head =
+				ge->GetTask_One_GN<Boss_Head::Object>(Boss_Head::defGroupName, Boss_Head::defName);
+			if (nullptr != boss_head)
+			{
+				//フレーム表示
+				ML::Box2D draw(0, 0, 1920, 1080);
+				ML::Box2D  src(0, 1377, 1920, 1080);
+				//揺れ効果
+				if (boss_head->time_un_hit)
+				{
+					ML::Vec2 quake_bar = 
+						this->eff->Quake
+						(
+							this->cnt,
+							this->max_dist_quake_x_bar,
+							this->max_dist_quake_y_bar, 
+							this->interval_quake_bar
+						);
+					draw.x = int(0 + quake_bar.x);
+					draw.y = int(0 + quake_bar.y);
+				}
+				DG::Image_Draw(this->res->hpImageName, draw, src);
+				//反射に対応したフレーム効果の表示
+				if (this->cnt_highllight_bar)
+				{
+					//表示用カウンタデクリメント
+					this->cnt_highllight_bar--;
+					ML::Box2D  src(0, 2457, 1920, 1080);
+					//グラデーション
+					this->cnt_gradation_bar += 0.1f;
+					float highlight_red_green =
+						sinf(this->cnt_gradation_bar);
+					if (highlight_red_green < 0.0f)
+					{
+						highlight_red_green = 0.0f;
+					}
+					ML::Color gradation(1.0f, highlight_red_green, highlight_red_green, 1.0f);
+					DG::Image_Draw(this->res->hpImageName, draw, src, gradation);
+				}
+				//HPバー本体表示
+				{
+					ML::Box2D draw
+					(
+						+ 0,
+						-16,
+						//表示幅上限とHP上限がかみ合ってないのでフレームが余る
+						//要修正
+						+(boss_head->hp+1)*(this->max_range_hp_bar / HP_BOSS_HEAD),//現在のHP*(最大表示幅/ボスHP最大値)
+						+32
+					);
+					draw.Offset(this->pos_hp_boss);
+					ML::Box2D  src(64, 0, 64, 64);
+					//色は仮処理
+					//長さ全体のリソースを用意しそこでアニメーション
+					//表示幅のみをプログラム側から調整すること
+					DG::Image_Draw(this->res->hpImageName, draw, src,ML::Color(1,1,0,0));
+				}
+			}
+		}
 		//以下デバッグ----------------------------------------------------
 		if (ge->debugMode)
 		{
@@ -167,6 +244,11 @@ namespace  UI
 			DG::Image_Draw(this->res->hpImageName, debugBox02, ML::Box2D(32, 0, 32, 32), ML::Color(0.7f, 0, 0, 0));
 			DG::Font_Draw("fontUI", debugBox02, debugText02, ML::Color(1, 1, 1, 1));
 		}
+	}
+	//HPバーの強調表示を外部から指定する
+	void Object::Set_Highlight_Bar()
+	{
+		this->flag_highlight_bar = true;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

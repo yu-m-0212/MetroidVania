@@ -93,6 +93,8 @@ namespace  Boss_Head
 		Boss* boss;									//ボスクラスポインタ
 		Shot01::Object* shot;						//ショットオブジェクトポインタ
 		Task_Effect::Object* eff;					//エフェクトオブジェクトポインタ
+		//エフェクト生成関連
+		ML::Box2D rect_create_effect_end;			//エンドパターン中のエフェクト生成範囲
 	public:
 		//コンストラクタ
 		Object();
@@ -118,5 +120,7 @@ namespace  Boss_Head
 		void Add_Defeat_Parts();
 		//胴体パーツの破壊数を取得する
 		int Get_Defeat_Parts();
+		//自身の座標から弱点座標への補正量を取得する
+		int Get_Correction_Pos_Weak_Point();
 	};
 }

@@ -89,7 +89,7 @@ namespace  Player
 		this->init_shot = 48.0f;							//生成位置ショット
 		this->speed_shot = 10;								//ショット速度
 		this->limit_stompHoldTime = 30;						//ストンプ着地時の硬直時間
-		this->limit_stomp = 15;								//ストンプ継続時間
+		this->limit_stomp = 30;								//ストンプ継続時間
 		this->limit_shot = 60;								//継続時間ショット
 		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
 		this->limit_quake_damage = 15;						//画面揺れ時間ダメージ
@@ -301,12 +301,14 @@ namespace  Player
 			if (in.LStick.L.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.LStick.R.on && this->moveCnt >= 6) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
+			if (in.B3.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }//足元 障害　無し
 			break;
 		case  Walk:		//歩いている
 			if (in.LStick.L.off&&in.LStick.R.off) { nm = SlowDown; }
 			if (in.B2.down) { nm = TakeOff; }
+			if (in.B3.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			break;
@@ -314,6 +316,7 @@ namespace  Player
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
+			if (in.B3.down) { nm = TakeOff; }
 			if (in.R1.on) { nm = Shoot; }
 			if (!this->CheckFoot()) { nm = Fall; }
 			if (this->moveCnt >= 12) { nm = Stand; }
@@ -333,12 +336,14 @@ namespace  Player
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.down) { nm = TakeOff; }
+			if (in.B3.down) { nm = TakeOff; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 6) { nm = Stand; }
 			break;
 		case  Shoot:	//射撃
 			if (in.R1.off) {nm = Stand;}
 			if (in.B2.down) { nm = TakeOff; }
+			if (in.B3.down) { nm = TakeOff; }
 			if (!this->CheckFoot()) { nm = Fallshoot; }
 			break;
 		case Jumpshoot:	//空中射撃
@@ -364,17 +369,20 @@ namespace  Player
 			break;
 		}
 		//バリアの発生を割り込ませる
-		if (this->barrier &&
-			in.B1.down)
+		if (this->barrier)
 		{
-			//接地
-			if (this->CheckFoot())
+			if (in.B1.down ||
+				in.B4.down)
 			{
-				nm = LandStomp;
-			}
-			else
-			{
-				nm = AirStomp;
+				//接地
+				if (this->CheckFoot())
+				{
+					nm = LandStomp;
+				}
+				else
+				{
+					nm = AirStomp;
+				}
 			}
 		}
 		//モーション更新
