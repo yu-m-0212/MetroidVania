@@ -299,8 +299,8 @@ namespace  Map2D
 	//‰æ–Ê‚Ì—h‚ê•‚ğw’è‚·‚é
 	void Object::Set_Dist_Quake(const ML::Vec2& dist_)
 	{
-		this->dist_Quake_x = dist_.x;
-		this->dist_Quake_y = dist_.y;
+		this->dist_Quake_x = int(dist_.x);
+		this->dist_Quake_y = int(dist_.y);
 	}
 	//‰æ–Ê‚ğ—h‚ç‚·ŠÔ‚ğw’è‚·‚é
 	void Object::Set_Limit_Quake(const int& limit_)

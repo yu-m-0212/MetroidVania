@@ -34,7 +34,7 @@ namespace  Ending
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.1f;												//描画順
+		this->render2D_Priority[1] = 0.2f;												//描画順
 		this->transition = false;														//フラグ画面遷移
 		this->cnt_transition = 0;														//カウンタ画面遷移
 		this->time_kill_this = 150;														//時間自身を消滅させる

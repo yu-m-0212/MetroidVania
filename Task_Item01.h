@@ -49,11 +49,12 @@ namespace  Item01
 		Object();
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
 	private:
-		int limit_message;					//メッセージの時間制限
-		int time_erase;						//自身の消滅タイミング
-		ML::Vec2 center;					//画面中央座標
-		ML::Vec2 init_pos_create_tutorial;	//反射チュートリアルの生成座標
-		Tutorials::Object* tutorials;		//メソッド呼び出し
+		int limit_message;							//メッセージの時間制限
+		int time_erase;								//自身の消滅タイミング
+		ML::Vec2 center;							//画面中央座標
+		ML::Vec2 init_pos_create_tutorial_reflect;	//反射チュートリアルの生成座標
+		ML::Vec2 init_pos_create_tutorial_ref_buf;	//反射時強化のチュートリアル座標
+		Tutorials::Object* tutorials;				//メソッド呼び出し
 	public:
 		//アニメーション制御
 		BChara::DrawInfo Anim();

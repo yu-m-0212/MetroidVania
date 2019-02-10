@@ -5,6 +5,7 @@
 //-------------------------------------------------------------------
 #include "BChara.h"
 #include "Task_Effect.h"
+#include "Task_Tutorials.h"
 
 namespace  Player
 {
@@ -31,6 +32,7 @@ namespace  Player
 		string		name_sound_shot;		//効果音ショット
 		string		name_not_recharge;		//効果音未リチャージバリア
 		string		name_damage_player;		//効果音被弾
+		string		name_sound_heal;		//効果音回復
 	};
 	//-------------------------------------------------------------------
 	class  Object : public  BChara
@@ -51,32 +53,35 @@ namespace  Player
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		bool barrier;				//バリアの使用制限
-		bool active_barrier;		//バリアのリチャージフラグ
-		string controllerName;		//コントローラ宣言
-		float decSpeed;				//速度減衰量
-		float max_StompFallSpeed;	//ストンプ時の最大降下速度
-		float max_speed_fall;		//最大速度降下
-		float speed_shot;			//ショット速度
-		float init_shot;			//生成位置ショット
-		float height_jump;			//ジャンプ初速
-		int interval_shot;			//射撃の発射間隔（フレーム）
-		int limit_JumpAngleChange;	//ジャンプから一定時間内なら向きを変えられる
-		int limit_stomp;			//継続時間ストンプ
-		int limit_stompHoldTime;	//硬直時間ストンプ
-		int limit_shot;				//継続時間ショット
-		int limit_quake_damage;		//画面揺れ時間ダメージ
-		int lv_stomp;				//ストンプアップグレードレベル
-		int power_stomp;			//攻撃力ストンプ
-		int power_shot;				//攻撃力ショット
-		int gauge_melee;			//近接攻撃のリチャージ
-		int gauge_melee_max;		//近接攻撃リチャージ上限
-		int max_hp;					//上限HP
-		ML::Box2D range_stomp;		//範囲ストンプ
-		ML::Box2D range_shot;		//範囲ショット
-		ML::Vec2 moveBack_stomp;	//ふっとび量ストンプ
-		ML::Vec2 dist_quake_damage;	//画面揺れ幅ダメージ
-		Task_Effect::Object* eff;	//メソッド呼び出し
+		bool barrier;					//バリアの使用制限
+		bool active_barrier;			//バリアのリチャージフラグ
+		string controllerName;			//コントローラ宣言
+		string message_dead;			//死亡時のメッセージ
+		float decSpeed;					//速度減衰量
+		float max_StompFallSpeed;		//ストンプ時の最大降下速度
+		float max_speed_fall;			//最大速度降下
+		float speed_shot;				//ショット速度
+		float init_shot;				//生成位置ショット
+		float height_jump;				//ジャンプ初速
+		int interval_shot;				//射撃の発射間隔（フレーム）
+		int limit_JumpAngleChange;		//ジャンプから一定時間内なら向きを変えられる
+		int limit_stomp;				//継続時間ストンプ
+		int limit_stompHoldTime;		//硬直時間ストンプ
+		int limit_shot;					//継続時間ショット
+		int limit_quake_damage;			//画面揺れ時間ダメージ
+		int limit_message_dead;			//死亡時のメッセージの消滅時間
+		int lv_stomp;					//ストンプアップグレードレベル
+		int power_stomp;				//攻撃力ストンプ
+		int power_shot;					//攻撃力ショット
+		int gauge_melee;				//近接攻撃のリチャージ
+		int gauge_melee_max;			//近接攻撃リチャージ上限
+		int max_hp;						//上限HP
+		ML::Box2D range_stomp;			//範囲ストンプ
+		ML::Box2D range_shot;			//範囲ショット
+		ML::Vec2 moveBack_stomp;		//ふっとび量ストンプ
+		ML::Vec2 dist_quake_damage;		//画面揺れ幅ダメージ
+		Task_Effect::Object* eff;		//メソッド呼び出し
+		Tutorials::Object* tutorials;	//チュートリアルインスタンス
 	public:
 		Object();
 		//思考＆状況判断(ステータス決定）

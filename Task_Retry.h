@@ -58,7 +58,7 @@ namespace  Retry
 		int cnt_create_bubble;			//エフェクトの生成カウンタ
 		int cnt_available_controll;		//生成後、操作を受け付けるまでのカウンタ
 		int time_create_next_task;		//引継ぎタスクの生成タイミング
-		int time_kill_game;				//自身を消滅させるタイミング
+		int time_create_fade_after_clear;				//自身を消滅させるタイミング
 		int time_available_controll;	//生成後、操作を受け付けるまでの時間
 		float interval_anim_back;		//背景アニメ周期
 		float cnt_anim_back;			//背景アニメカウンタ

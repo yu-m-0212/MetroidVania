@@ -53,7 +53,7 @@ namespace  Retry
 		this->cnt_transition = 0;									//カウンタ遷移用
 		this->title_or_game = 0;									//引継ぎタスクの選択フラグ(0=Game,1=Title)
 		this->time_create_next_task = 100;							//引継ぎタスクの生成タイミング
-		this->time_kill_game = 100;									//自身を消滅させるタイミング
+		this->time_create_fade_after_clear = 100;									//自身を消滅させるタイミング
 		this->cnt_create_bubble = 0;								//エフェクトの生成カウンタ
 		this->cnt_available_controll = 0;							//生成後、操作を受け付けるまでのカウンタ
 		this->time_available_controll = 150;						//生成後、操作を受け付けるまでの時間
@@ -165,7 +165,7 @@ namespace  Retry
 			}
 		}
 		//一定時間で消滅する
-		if (this->cnt_transition > this->time_kill_game)
+		if (this->cnt_transition > this->time_create_fade_after_clear)
 		{
 			this->Kill();
 		}

@@ -33,7 +33,9 @@ namespace  Back
 
 		//★データ初期化
 		this->render2D_Priority[1] = 1.0f;
-		this->pos = Vec2(0, 0);
+		this->pos = Vec2(0, 0);		//座標
+		this->cnt_anim_back = 0;	//背景アニメ用カウンタ
+		this->speed_move_back = 1;	//背景アニメスピード
 		
 		//★タスクの生成
 
@@ -56,13 +58,29 @@ namespace  Back
 	//「更新」１フレーム毎に行う処理
 	void  Object::UpDate()
 	{
+		//背景カウンタインクリメント
+		this->cnt_anim_back+=this->speed_move_back;
+		//リソース幅に達したらリセットする
+		POINT size =
+			DG::Image_Size(this->res->image01);
+		if (this->cnt_anim_back == size.x)
+		{
+			this->cnt_anim_back = 0;
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
 	void  Object::Render2D_AF()
 	{
+		//一枚目の描画
 		Box2D draw(0, 0, 1920, 1080);
+		draw.x = pos.x - this->cnt_anim_back;
 		Box2D  src(0, 0, 1920, 1080);
+		DG::Image_Draw(this->res->image01, draw, src);
+		//二枚目の描画
+		POINT size =
+			DG::Image_Size(this->res->image01);
+		draw.x = pos.x + size.x - this->cnt_anim_back;
 		DG::Image_Draw(this->res->image01, draw, src);
 	}
 

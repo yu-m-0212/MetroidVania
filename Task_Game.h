@@ -59,9 +59,11 @@ namespace  Game
 		int cnt_transition;				//カウンタ遷移用
 		int time_create_fade;			//画面効果生成タイミング
 		int time_create_next_task;		//引継ぎタスクの生成タイミング
-		int time_kill_game;				//自身を消滅させるタイミング
+		int time_create_fade_after_clear;				//自身を消滅させるタイミング
+		int limit_message_task;			//目的メッセージの表示時間
 		Tutorials::Object* tutorials;	//ポインタメッセージ
 		Task_Effect::Object* eff;		//ポインタエフェクト
+		string message_clear;			//ボス撃破時のメッセージ
 	public:
 		//リソースを常駐させる
 		Shot00::Resource::SP		shot00_Resource;

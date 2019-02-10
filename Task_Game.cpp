@@ -11,12 +11,9 @@
 #include  "Task_Map2D.h"
 #include  "Task_Player.h"
 #include  "Task_Sprite.h"
-#include  "Task_Enemy00.h"
 #include  "Task_Enemy01.h"
 #include  "Task_Item00.h"
 #include  "Task_Item01.h"
-#include  "Task_Item02.h"
-#include  "Task_Goal.h"
 #include  "Task_EnemySearch.h"
 #include  "Task_Pause.h"
 #include  "Task_Tutorials.h"
@@ -64,17 +61,20 @@ namespace  Game
 		this->res = Resource::Create();
 
 		//★データ初期化
-		ge->camera2D = ML::Box2D(-960, -540, 1920, 1080);	//カメラ初期化
-		ge->clear = false;									//クリアフラグ初期化
-		ge->failure = false;								//ミスフラグ初期化
-		ge->pause = false;									//ポーズフラグの初期化
-		this->cnt_transition = 0;							//カウンタ遷移用
-		this->time_create_fade = 240;						//画面効果生成タイミング
-		this->time_create_next_task = 180;					//引継ぎタスクの生成タイミング
-		this->time_kill_game = 390;							//自身を消滅させるタイミング
-		this->tutorials = new Tutorials::Object();			//ポインタメッセージ
-		this->eff = new Task_Effect::Object();				//ポインタエフェクト
-		this->pos_spawer = ML::Vec2(7876.0f, 7648.0f);		//スポナー座標
+		ge->camera2D = ML::Box2D(-960, -540, 1920, 1080);			//カメラ初期化
+		ge->clear = false;											//クリアフラグ初期化
+		ge->failure = false;										//ミスフラグ初期化
+		ge->pause = false;											//ポーズフラグの初期化
+		ge-> center = ML::Vec2(float(1920 / 2), float(1080 / 2));	//画面中心
+		this->cnt_transition = 0;									//カウンタ遷移用
+		this->time_create_fade = 240;								//画面効果生成タイミング
+		this->time_create_next_task = 180;							//引継ぎタスクの生成タイミング
+		this->time_create_fade_after_clear = 390;									//自身を消滅させるタイミング
+		this->tutorials = new Tutorials::Object();					//ポインタメッセージ
+		this->eff = new Task_Effect::Object();						//ポインタエフェクト
+		this->pos_spawer = ML::Vec2(7876.0f, 7648.0f);				//スポナー座標
+		this->limit_message_task = 240;								//目的メッセージの表示時間
+		this->message_clear = "MISSION COMPLETE !";					//クリア時のメッセージ
 		
 		//★タスクを常駐させる
 		this->shot00_Resource = Shot00::Resource::Create();
@@ -100,16 +100,17 @@ namespace  Game
 		//UIの生成
 		UI::Object::Create(true);
 		//チュートリアルの生成
-		tutorials->Create_Message("左スティックを横に倒すと移動", ML::Vec2(224, 4482), -1);
-		tutorials->Create_Message("Aボタンでジャンプ", ML::Vec2(1180, 4482), -1);
-		tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1);
-		tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6350, 3650), -1);
-		this->tutorials->Create_Message("銃口に合わせて視点も移動する", ML::Vec2(6813.0f, 3650),-1);
-		tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1);
+		this->tutorials->Create_Message("左スティックを横に倒すと移動", ML::Vec2(224, 4482), -1,false);
+		this->tutorials->Create_Message("Aボタンでジャンプ", ML::Vec2(1180, 4482), -1, false);
+		this->tutorials->Create_Message("R1ボタンでショット", ML::Vec2(2130, 3970), -1, false);
+		this->tutorials->Create_Message("右スティックで銃口を傾ける", ML::Vec2(6350, 3650), -1, false);
+		this->tutorials->Create_Message("銃口に合わせて視点も移動する", ML::Vec2(6813.0f, 3650),-1, false);
+		this->tutorials->Create_Message("力尽きた場所には自分の遺体が置かれる", ML::Vec2(5207, 5442), -1, false);
+		this->tutorials->Create_Message("遺体に触れると回復する", ML::Vec2(4823, 5378), -1, false);
+		//ゲームの目的
+		this->tutorials->Create_Message("MISSION：ボスを撃破しろ", ge->center,this->limit_message_task, false);
 		//背景の生成
 		Back::Object::Create(true);
-		//プレイヤの目の前に生成する場合
-		/*goal->pos = ML::Vec2(300.0f, 4460.0f);*/
 		//ボススポナーの生成
 		auto spawner = Spawner::Object::Create(true);
 		spawner->pos = this->pos_spawer;
@@ -230,19 +231,28 @@ namespace  Game
 				auto display_effect =
 					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
 				display_effect->Create_Display_Effect(1);
+				//メッセージの生成
+				this->tutorials->Create_Message(this->message_clear, ge->center, this->limit_message_task, false);
 			}
 			//画面遷移カウンタ
 			this->cnt_transition++;
-			//フェードイン
+			//ホワイトアウト
 			if (this->cnt_transition == this->time_create_fade)
 			{
 				auto display_effect =
 					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
-				display_effect->Create_Display_Effect(0);
+				display_effect->Create_Display_Effect(2);
 				DM::Sound_FadeOut(this->res->name_bgm_main_game);
 			}
-			//一定時間で自身を消滅させる
-			if (this->cnt_transition > this->time_kill_game)
+			//一定時間でホワイトアウトからフェードイン
+			if (this->cnt_transition == this->time_create_fade_after_clear)
+			{
+				auto display_effect =
+					ge->GetTask_One_G<Display_Effect::Object>(Display_Effect::defGroupName);
+				display_effect->Create_Display_Effect(0);
+			}
+			//自身をキル
+			if (this->cnt_transition > this->time_create_fade_after_clear)
 			{
 				this->Kill();
 			}

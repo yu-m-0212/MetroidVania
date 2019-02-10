@@ -8,7 +8,6 @@
 #include	"Task_Barrier.h"
 #include	"Task_Map2D.h"
 #include	"Task_Effect.h"
-#include	"Task_Goal.h"
 #include	"Task_Retry.h"
 #include	"Task_Corpse.h"
 #include	"Task_Gun.h"
@@ -45,6 +44,9 @@ namespace  Player
 
 		this->name_damage_player = "damage_player";
 		DM::Sound_CreateSE(this->name_damage_player, this->base_file_path_sound + "damage_player.wav");
+
+		this->name_sound_heal = "heal_player";
+		DM::Sound_CreateSE(this->name_sound_heal, this->base_file_path_sound + "heal_player.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -57,6 +59,7 @@ namespace  Player
 		DM::Sound_Erase(this->name_sound_shot);
 		DM::Sound_Erase(this->name_not_recharge);
 		DM::Sound_Erase(this->name_damage_player);
+		DM::Sound_Erase(this->name_sound_heal);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -74,36 +77,39 @@ namespace  Player
 		this->recieveBase = this->hitBase;
 		this->angle_LR = Right;
 		this->controllerName = "P1";
-		this->barrier = true;								//バリアの使用制限
-		this->active_barrier = true;						//バリアのリチャージフラグ
-		this->state = Stand;								//キャラ初期状態
-		this->max_hp = 5;									//HP最大値
-		this->hp = this->max_hp;							//HP初期値
-		this->maxSpeed = 7.5f;								//最大移動速度（横）
-		this->addSpeed = 0.75f;								//歩行加速度（地面の影響である程度打ち消される
-		this->decSpeed = 0.5f;								//接地状態の時の速度減衰量（摩擦
-		this->max_speed_fall = 15.0f;						//最大落下速度
-		this->max_StompFallSpeed = 17.5f;					//ストンプの最大降下速度
-		this->height_jump = -10.0f;							//ジャンプ力（初速）
-		this->gravity = ML::Gravity(SIZE_CHIP);				//重力加速度＆時間速度による加算量
-		this->init_shot = 48.0f;							//生成位置ショット
-		this->speed_shot = 10;								//ショット速度
-		this->limit_stompHoldTime = 30;						//ストンプ着地時の硬直時間
-		this->limit_stomp = 30;								//ストンプ継続時間
-		this->limit_shot = 60;								//継続時間ショット
-		this->limit_JumpAngleChange = 16;					//ジャンプから一定時間内なら向きを変えられる
-		this->limit_quake_damage = 15;						//画面揺れ時間ダメージ
-		this->dist_quake_damage = ML::Vec2(0, 5);			//画面揺れ幅ダメージ
-		this->lv_stomp = 1;									//ストンプアップグレードレベル
-		this->interval_shot = 12;							//射撃の発射間隔（フレーム）
-		this->range_stomp = ML::Box2D(-112, -112, 224, 224);//範囲ストンプ
-		this->range_shot = ML::Box2D(-8, -8, 16, 16);		//範囲ショット
-		this->power_stomp = 1;								//攻撃力ストンプ
-		this->power_shot = 1;								//攻撃力ショット
-		this->gauge_melee_max = 100;						//近接攻撃リチャージ上限
-		this->gauge_melee = this->gauge_melee_max;			//近接攻撃のリチャージ
-		this->moveBack_stomp = ML::Vec2(16, -6);			//ストンプふっとび量
-		this->eff = new Task_Effect::Object();				//メソッド呼び出し
+		this->barrier = false;											//バリアの使用制限
+		this->active_barrier = false;									//バリアのリチャージフラグ
+		this->state = Stand;											//キャラ初期状態
+		this->max_hp = 5;												//HP最大値
+		this->hp = this->max_hp;										//HP初期値
+		this->maxSpeed = 7.5f;											//最大移動速度（横）
+		this->addSpeed = 0.75f;											//歩行加速度（地面の影響である程度打ち消される
+		this->decSpeed = 0.5f;											//接地状態の時の速度減衰量（摩擦
+		this->max_speed_fall = 15.0f;									//最大落下速度
+		this->max_StompFallSpeed = 17.5f;								//ストンプの最大降下速度
+		this->height_jump = -10.0f;										//ジャンプ力（初速）
+		this->gravity = ML::Gravity(SIZE_CHIP);							//重力加速度＆時間速度による加算量
+		this->init_shot = 48.0f;										//生成位置ショット
+		this->speed_shot = 10;											//ショット速度
+		this->limit_stompHoldTime = 30;									//ストンプ着地時の硬直時間
+		this->limit_stomp = 30;											//ストンプ継続時間
+		this->limit_shot = 60;											//継続時間ショット
+		this->limit_JumpAngleChange = 16;								//ジャンプから一定時間内なら向きを変えられる
+		this->limit_quake_damage = 15;									//画面揺れ時間ダメージ
+		this->limit_message_dead = 120;									//死亡時のメッセージの消滅時間
+		this->dist_quake_damage = ML::Vec2(0, 5);						//画面揺れ幅ダメージ
+		this->lv_stomp = 1;												//ストンプアップグレードレベル
+		this->interval_shot = 12;										//射撃の発射間隔（フレーム）
+		this->range_stomp = ML::Box2D(-112, -112, 224, 224);			//範囲ストンプ
+		this->range_shot = ML::Box2D(-8, -8, 16, 16);					//範囲ショット
+		this->power_stomp = 1;											//攻撃力ストンプ
+		this->power_shot = 1;											//攻撃力ショット
+		this->gauge_melee_max = 100;									//近接攻撃リチャージ上限
+		this->gauge_melee = this->gauge_melee_max;						//近接攻撃のリチャージ
+		this->moveBack_stomp = ML::Vec2(16, -6);						//ストンプふっとび量
+		this->eff = new Task_Effect::Object();							//メソッド呼び出し
+		this->tutorials = new Tutorials::Object();						//チュートリアルインスタンス
+		this->message_dead = "力尽きました";								//死亡時のメッセージ
 
 		//★タスクの生成
 		auto gun = Gun::Object::Create(true);
@@ -118,8 +124,10 @@ namespace  Player
 	bool  Object::Finalize()
 	{
 		delete this->eff;
+		delete this->tutorials;
 		//★データ＆タスク解放
-		if (!ge->QuitFlag() && this->nextTaskCreate) {
+		if (!ge->QuitFlag() && this->nextTaskCreate) 
+		{
 			//★引き継ぎタスクの生成
 		}
 		return  true;
@@ -200,6 +208,8 @@ namespace  Player
 						{
 							//回復エフェクトを生成
 							eff->Create_Effect(4, this->pos);
+							//SEの再生
+							DM::Sound_Play_Volume(this->res->name_sound_heal, false, VOLUME_ALL_GAME);
 							//フラグ反転
 							(*it)->Set_Flag_Erase(1);
 						}
@@ -228,19 +238,10 @@ namespace  Player
 		//hp0でゲームオーバー
 		if (this->hp <= 0)
 		{
+			//死亡時のメッセージを生成
+			this->tutorials->Create_Message(this->message_dead, ge->center, this->limit_message_dead, false);
 			//ゲームオーバーフラグ成立
 			ge->failure = true;
-		}
-		//仮ゴールとの接触判定
-		auto goal = ge->GetTask_One_G<Goal::Object>(Goal::defGroupName);
-		if (nullptr != goal)
-		{
-			ML::Box2D me = this->hitBase.OffsetCopy(this->pos);
-			ML::Box2D you = goal->hitBase.OffsetCopy(goal->pos);
-			if (you.Hit(me))
-			{
-				ge->clear = true;
-			}
 		}
 	}
 	//-------------------------------------------------------------------
@@ -335,8 +336,8 @@ namespace  Player
 		case  Landing:	//着地
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
-			if (in.B2.down) { nm = TakeOff; }
-			if (in.B3.down) { nm = TakeOff; }
+			if (in.B2.on) { nm = TakeOff; }
+			if (in.B3.on) { nm = TakeOff; }
 			if (this->CheckFoot() == false) { nm = Fall; }//足元 障害　無し
 			if (this->moveCnt >= 6) { nm = Stand; }
 			break;
@@ -402,7 +403,8 @@ namespace  Player
 			if ((this->state == Jump ||
 				this->state == Jumpshoot ||
 				this->state == AirStomp)
-				&& in.B2.on)
+				&& (in.B2.on ||
+					in.B3.on))
 			{
 				this->gravity = ML::Gravity(32) * 2;
 			}

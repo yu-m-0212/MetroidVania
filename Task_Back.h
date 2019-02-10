@@ -46,10 +46,9 @@ namespace  Back
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-	
-	//追加変数
-		//表示座標
-		Vec2 pos;
+		Vec2 pos;				//表示座標
+		int cnt_anim_back;		//背景アニメ用カウンタ
+		int speed_move_back;	//背景アニメスピード
 	public:
 		//追加したい変数・メソッドはここに追加する
 		

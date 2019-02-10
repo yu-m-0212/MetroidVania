@@ -91,8 +91,9 @@ namespace  Boss_Head
 		this->dist_quake_boss_return_appear = ML::Vec2(0, 5);					//ボス用登場退場画面揺れ幅
 		this->limit_quake_boss_return_appear = 90;								//ボス用登場退場画面揺れ時間
 		this->cnt_defeat_parts = 0;												//胴体パーツを破壊すると加算し、上限に達すると気絶する
-		this->limit_stan = 360;													//気絶時間
+		this->limit_stan = 420;													//気絶時間
 		this->rect_create_effect_end = ML::Box2D(-640, -360, 1280, 720);		//エンドパターン中のエフェクト生成範囲
+		this->dist_shake_end_pattern = 15.0f;									//エンドパターン時の横揺れ幅
 
 		//★タスクの生成
 
@@ -399,6 +400,8 @@ namespace  Boss_Head
 				//移動をやめる
 				this->moveVec=ML::Vec2(0.0f,0.0f);
 			}
+			//爆発中は振動する
+			this->pos.x += sinf(float(this->moveCnt))*this->dist_shake_end_pattern;
 			//一定間隔で爆発エフェクトを生成
 			if (this->moveCnt % INTERVAL_CREATE_END_EFFECT_HEAD == 0)
 			{

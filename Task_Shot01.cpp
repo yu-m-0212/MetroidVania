@@ -19,6 +19,9 @@ namespace  Shot01
 	{
 		this->imageName = "Shot01Img";
 		DG::Image_Create(this->imageName, "./data/image/Shot00.png");
+
+		this->name_sound_reflect = "sound_reflect";
+		DM::Sound_CreateSE(this->name_sound_reflect, "./data/sound/wav/refllect_shot.wav");
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -26,6 +29,7 @@ namespace  Shot01
 	bool  Resource::Finalize()
 	{
 		DG::Image_Erase(this->imageName);
+		DM::Sound_Erase(this->name_sound_reflect);
 		return true;
 	}
 	//-------------------------------------------------------------------
@@ -136,6 +140,8 @@ namespace  Shot01
 					this->power *= this->rate_reflect_power;
 					//”½ŽË‚µ‚½’e‚Ì‘¬“x‚ðã‚°‚é
 					this->moveVec *= this->rate_speed_reflect;
+					//SE‚ÌÄ¶
+					DM::Sound_Play_Volume(this->res->name_sound_reflect, false, VOLUME_ALL_GAME);
 				}
 			}
 		}

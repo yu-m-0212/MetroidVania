@@ -48,8 +48,9 @@ namespace  Tutorials
 		void  Render2D_AF();	//「2D描画」１フレーム毎に行う処理
 		bool  Finalize();		//「終了」タスク消滅時に１回だけ行う処理
 	//変更可◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇
-		string message;	//表示するメッセージを格納する
-		int limit;		//消滅までの時間
+		bool flag_pause_at_create;	//メッセージ生成時にポーズをかけるか
+		string message;				//表示するメッセージを格納する
+		int limit;					//消滅までの時間
 	public:
 		//コンストラクタ
 		Object();
@@ -60,7 +61,7 @@ namespace  Tutorials
 		//引数	：	（消滅までの時間）
 		void Set_Limit(const int&);
 		//メッセージを生成する
-		//引数	：	（メッセージ,座標,消滅時間）
-		void Create_Message(const string&, const ML::Vec2&,const int&);
+		//引数	：	（メッセージ,座標,消滅時間,ポーズの有無）
+		void Create_Message(const string&, const ML::Vec2&,const int&,const bool&);
 	};
 }

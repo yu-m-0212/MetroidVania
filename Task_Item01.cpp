@@ -38,15 +38,16 @@ namespace  Item01
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.7f;								//描画順
-		this->limit_message = 180;										//メッセージの時間制限
-		this->time_erase = 120;											//自身の消滅タイミング
-		this->hitBase = ML::Box2D(-16, -16, 32, 32);					//マップとの判定矩形
-		this->recieveBase = this->hitBase;								//キャラクタとの判定矩形
+		this->render2D_Priority[1] = 0.7f;										//描画順
+		this->limit_message = 180;												//メッセージの時間制限
+		this->time_erase = 120;													//自身の消滅タイミング
+		this->hitBase = ML::Box2D(-32, -32, 64, 64);							//マップとの判定矩形
+		this->recieveBase = this->hitBase;										//キャラクタとの判定矩形
 		this->center = ML::Vec2(float(ge->screenWidth / 2.0f),
-			float(ge->screenHeight / 2.0f));							//画面の中心座標
-		this->init_pos_create_tutorial = ML::Vec2(7228.0f, 5120.0f);	//反射チュートリアルの生成座標
-		this->tutorials = new Tutorials::Object();						//メソッド呼び出し
+			float(ge->screenHeight / 2.0f));									//画面の中心座標
+		this->init_pos_create_tutorial_reflect = ML::Vec2(7228.0f, 5120.0f);	//反射チュートリアルの生成座標
+		this->init_pos_create_tutorial_ref_buf = ML::Vec2(6908.0f, 5120.0f);	//反射強化のチュートリアル座標
+		this->tutorials = new Tutorials::Object();								//メソッド呼び出し
 		//★タスクの生成
 		return  true;
 	}
@@ -79,7 +80,9 @@ namespace  Item01
 			{
 				DM::Sound_Play_Volume(this->res->name_se_pick_up_item, false, VOLUME_ALL_GAME);
 				//反射チュートリアルの生成
-				this->tutorials->Create_Message("バリアは敵の攻撃を跳ね返すことができる", this->init_pos_create_tutorial, -1);
+				this->tutorials->Create_Message("バリアは敵の攻撃を跳ね返すことができる", this->init_pos_create_tutorial_reflect, -1,false);
+				//反射時強化されるチュートリアルの生成
+				this->tutorials->Create_Message("反射した弾は威力と速度が強化される", this->init_pos_create_tutorial_ref_buf, -1, false);
 			}
 			//消滅
 			if (this->moveCnt > this->time_erase)
@@ -113,7 +116,7 @@ namespace  Item01
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		//メッセージ生成
-		this->tutorials->Create_Message("バリアを取得した[□を押す]", this->center, this->limit_message);
+		this->tutorials->Create_Message("バリアを取得した[□を押す]", this->center, this->limit_message,true);
 		this->UpdateMotion(Lose);
 		//バリアを有効にする
 		pl->Set_Barrier(true);
@@ -125,7 +128,7 @@ namespace  Item01
 	{
 		BChara::DrawInfo imageTable[] = {
 			//draw					src						color
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,64,64),ML::Color(1,1,1,1) },	//Stand[0]
+			{ this->hitBase,ML::Box2D(0,0,64,64),ML::Color(1,1,1,1) },	//Stand[0]
 		};
 		BChara::DrawInfo  rtv;
 		switch (this->state) 

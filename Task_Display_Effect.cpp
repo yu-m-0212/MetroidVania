@@ -86,6 +86,10 @@ namespace  Display_Effect
 			case 1:
 				this->state_display = Letter_Box;
 				break;
+				//ホワイトアウト
+			case 2:
+				this->state_display = White_Out;
+				break;
 			}
 		}
 		//汎用カウンタ
@@ -107,7 +111,8 @@ namespace  Display_Effect
 				this->flag_in_out = !this->flag_in_out;
 			}
 			//一定時間でフェードアウトを始める
-			if (this->flag_in_out && this->cnt_transition>this->time_start_fade_out)
+			if (this->flag_in_out &&
+				this->cnt_transition > this->time_start_fade_out)
 			{
 				this->transparency -= 0.01f;
 			}
@@ -144,6 +149,29 @@ namespace  Display_Effect
 				}
 			}
 			break;
+		case White_Out:
+			//フェードイン
+			if (!this->flag_in_out)
+			{
+				this->transparency += 0.01f;
+			}
+			//一定時間でフラグを反転
+			if (this->cnt_transition == this->time_create_next_task)
+			{
+				this->flag_in_out = !this->flag_in_out;
+			}
+			//一定時間でフェードアウトを始める
+			if (this->flag_in_out &&
+				this->cnt_transition > this->time_start_fade_out)
+			{
+				this->transparency -= 0.01f;
+			}
+			//透明になったら自身を消滅させる
+			if (this->transparency < 0.0f)
+			{
+				this->Kill();
+			}
+			break;
 		}	
 	}
 	//-------------------------------------------------------------------
@@ -158,6 +186,13 @@ namespace  Display_Effect
 		{
 			ML::Box2D draw(0, 0, 1920, 1080);
 			ML::Box2D src(0, 0, 1920, 1080);
+			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(this->transparency, 1, 1, 1));
+			break;
+		}
+		case White_Out:
+		{
+			ML::Box2D draw(0, 0, 1920, 1080);
+			ML::Box2D src(0, 1700, 1920, 1080);
 			DG::Image_Draw(this->res->imageName, draw, src, ML::Color(this->transparency, 1, 1, 1));
 			break;
 		}
@@ -193,6 +228,7 @@ namespace  Display_Effect
 	//引数	：	（状態番号）
 	//0：フェードイン/アウト
 	//1：レターボックス
+	//2: ホワイトアウト
 	void Object::Create_Display_Effect(const int& num_)
 	{
 		auto display_effect =

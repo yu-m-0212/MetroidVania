@@ -42,7 +42,7 @@ namespace  Item00
 
 		//★データ初期化
 		this->render2D_Priority[1] = 0.7f;													//描画順
-		this->hitBase = ML::Box2D(-16, -16, 32, 32);										//マップとの判定矩形
+		this->hitBase = ML::Box2D(-32,-32,64,64);										//マップとの判定矩形
 		this->recieveBase = this->hitBase;													//キャラクタとの判定矩形
 		this->add_Hp = 1;																	//プレイヤのHP増加量
 		this->limit_message = 180;															//時間制限メッセージ
@@ -119,7 +119,7 @@ namespace  Item00
 		auto pl = ge->GetTask_One_G<Player::Object>(Player::defGroupName);
 		if (nullptr == pl) { return; }
 		//メッセージ生成
-		this->tutorials->Create_Message("HPの上限が増加した", this->center, this->limit_message);
+		this->tutorials->Create_Message("HPの上限が増加した", this->center, this->limit_message,true);
 		this->UpdateMotion(Lose);
 		//体力上限を増加し、回復する
 		int max = pl->Get_Max_HP();
@@ -133,7 +133,7 @@ namespace  Item00
 	{
 		BChara::DrawInfo imageTable[] = {
 			//draw					src						color
-			{ ML::Box2D(-16,-16,32,32),ML::Box2D(0,0,64,64),ML::Color(1,1,1,1)},	//Stand[0]
+			{ this->hitBase,ML::Box2D(0,0,64,64),ML::Color(1,1,1,1)},	//Stand[0]
 		};
 		BChara::DrawInfo  rtv;
 		switch (this->state) {

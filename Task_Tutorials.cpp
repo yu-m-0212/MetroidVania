@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------
-//
+//メッセージ表示タスク
 //-------------------------------------------------------------------
 #include  "MyPG.h"
 #include  "Task_Tutorials.h"
@@ -40,6 +40,7 @@ namespace  Tutorials
 		this->message = "このメッセージが見れるのはおかしいよ";		//メッセージ
 		this->recieveBase = ML::Box2D(-128, -64, 256, 128);		//矩形
 		this->limit = -1;										//消滅までの時間
+		this->flag_pause_at_create = false;						//ポーズをかけるか
 		
 		//★タスクの生成
 		
@@ -63,7 +64,7 @@ namespace  Tutorials
 	void  Object::UpDate()
 	{
 		//時間制限付きで呼ばれた場合、一度だけポーズをかける
-		if (this->limit != -1)
+		if (this->flag_pause_at_create)
 		{
 			if (!ge->pause)
 			{
@@ -150,13 +151,14 @@ namespace  Tutorials
 		this->limit = limit_;
 	}
 	//メッセージを生成する
-	//引数	：	（メッセージ,座標,消滅時間）
-	void Object::Create_Message(const string& message_,const ML::Vec2& pos_, const int& limit_)
+	//引数	：	（メッセージ,座標,消滅時間,ポーズの有無）
+	void Object::Create_Message(const string& message_,const ML::Vec2& pos_, const int& limit_, const bool& pause_)
 	{
 		auto message = Tutorials::Object::Create(true);
 		message->Set_Message(message_);
 		message->pos = pos_;
 		message->Set_Limit(limit_);
+		message->flag_pause_at_create = pause_;
 	}
 	//★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 	//以下は基本的に変更不要なメソッド

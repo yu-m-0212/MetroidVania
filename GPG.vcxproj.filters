@@ -58,14 +58,14 @@
     <Filter Include="MyPG\Enemy01">
       <UniqueIdentifier>{6d08d147-2bfd-41ef-a8ba-4154761d5fb7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MyPG\Enemy00">
-      <UniqueIdentifier>{e9f26407-a735-4e9c-be34-00d71f5f57ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="MyPG\Effect">
       <UniqueIdentifier>{18d8a613-69b7-4355-8866-0313d7d53ad8}</UniqueIdentifier>
     </Filter>
     <Filter Include="MyPG\Boss">
       <UniqueIdentifier>{d8fa7d89-8382-4d88-9b64-289080956d57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース">
+      <UniqueIdentifier>{a7aef5af-a430-4d9a-9cb2-20ff8e031c19}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,25 +138,16 @@
     <ClCompile Include="Task_Player.cpp">
       <Filter>MyPG\Player</Filter>
     </ClCompile>
-    <ClCompile Include="Task_Enemy00.cpp">
-      <Filter>MyPG\Enemy00</Filter>
-    </ClCompile>
     <ClCompile Include="Task_Shot00.cpp">
       <Filter>MyPG\Player</Filter>
     </ClCompile>
     <ClCompile Include="Task_Corpse.cpp">
       <Filter>MyPG</Filter>
     </ClCompile>
-    <ClCompile Include="Task_Goal.cpp">
-      <Filter>MyPG</Filter>
-    </ClCompile>
     <ClCompile Include="Task_Item00.cpp">
       <Filter>MyPG\Item</Filter>
     </ClCompile>
     <ClCompile Include="Task_Item01.cpp">
-      <Filter>MyPG\Item</Filter>
-    </ClCompile>
-    <ClCompile Include="Task_Item02.cpp">
       <Filter>MyPG\Item</Filter>
     </ClCompile>
     <ClCompile Include="Task_Map2D.cpp">
@@ -299,25 +290,16 @@
     <ClInclude Include="Task_Player.h">
       <Filter>MyPG\Player</Filter>
     </ClInclude>
-    <ClInclude Include="Task_Enemy00.h">
-      <Filter>MyPG\Enemy00</Filter>
-    </ClInclude>
     <ClInclude Include="Task_Shot00.h">
       <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="Task_Corpse.h">
       <Filter>MyPG</Filter>
     </ClInclude>
-    <ClInclude Include="Task_Goal.h">
-      <Filter>MyPG</Filter>
-    </ClInclude>
     <ClInclude Include="Task_Item00.h">
       <Filter>MyPG\Item</Filter>
     </ClInclude>
     <ClInclude Include="Task_Item01.h">
-      <Filter>MyPG\Item</Filter>
-    </ClInclude>
-    <ClInclude Include="Task_Item02.h">
       <Filter>MyPG\Item</Filter>
     </ClInclude>
     <ClInclude Include="Task_Map2D.h">
@@ -392,8 +374,15 @@
     <ClInclude Include="Task_Barrier.h">
       <Filter>MyPG\Player</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\Shader\MyStdShader.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GPG.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
   </ItemGroup>
 </Project>

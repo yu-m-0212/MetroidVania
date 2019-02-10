@@ -9,7 +9,7 @@
 namespace  Shot01
 {
 	//タスクに割り当てるグループ名と固有名
-	const  string  defGroupName("弾(エネミー)");	//グループ名
+	const  string  defGroupName("弾(エネミー)");		//グループ名
 	const  string  defName("NoName");				//タスク名
 	//-------------------------------------------------------------------//リソース
 	class  Resource
@@ -23,7 +23,9 @@ namespace  Shot01
 		typedef  weak_ptr<Resource>		WP;
 		static   WP  instance;
 		static  Resource::SP  Create();
+
 		string imageName;
+		string name_sound_reflect;	//反射効果音
 	};
 	//-------------------------------------------------------------------//オブジェクト
 	class  Object : public  BChara

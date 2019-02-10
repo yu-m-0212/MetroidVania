@@ -115,15 +115,12 @@
     <ClCompile Include="Task_Display_Effect.cpp" />
     <ClCompile Include="Task_Effect.cpp" />
     <ClCompile Include="Task_Ending.cpp" />
-    <ClCompile Include="Task_Enemy00.cpp" />
     <ClCompile Include="Task_Enemy01.cpp" />
     <ClCompile Include="Task_EnemySearch.cpp" />
     <ClCompile Include="Task_Game.cpp" />
-    <ClCompile Include="Task_Goal.cpp" />
     <ClCompile Include="Task_Gun.cpp" />
     <ClCompile Include="Task_Item00.cpp" />
     <ClCompile Include="Task_Item01.cpp" />
-    <ClCompile Include="Task_Item02.cpp" />
     <ClCompile Include="Task_Map2D.cpp" />
     <ClCompile Include="Task_Pause.cpp" />
     <ClCompile Include="Task_Player.cpp" />
@@ -160,6 +157,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="myLib.h" />
     <ClInclude Include="MyPG.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="Task_Back.h" />
     <ClInclude Include="Task_Barrier.h" />
     <ClInclude Include="Task_Boss_Center.h" />
@@ -171,15 +169,12 @@
     <ClInclude Include="Task_Display_Effect.h" />
     <ClInclude Include="Task_Effect.h" />
     <ClInclude Include="Task_Ending.h" />
-    <ClInclude Include="Task_Enemy00.h" />
     <ClInclude Include="Task_Enemy01.h" />
     <ClInclude Include="Task_EnemySearch.h" />
     <ClInclude Include="Task_Game.h" />
-    <ClInclude Include="Task_Goal.h" />
     <ClInclude Include="Task_Gun.h" />
     <ClInclude Include="Task_Item00.h" />
     <ClInclude Include="Task_Item01.h" />
-    <ClInclude Include="Task_Item02.h" />
     <ClInclude Include="Task_Map2D.h" />
     <ClInclude Include="Task_Pause.h" />
     <ClInclude Include="Task_Player.h" />
@@ -196,6 +191,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="data\Shader\MyStdShader.fx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="GPG.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -49,7 +49,8 @@ namespace  Display_Effect
 		{
 			Non,							//未指定
 			Fade,							//フェードイン、アウト
-			Letter_Box						//レターボックス
+			Letter_Box,						//レターボックス
+			White_Out						//ホワイトアウト
 		};
 		State_Display_Effect state_display;	//状態管理
 		int	num_state;						//外部から指定する際の状態番号

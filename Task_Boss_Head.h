@@ -95,6 +95,7 @@ namespace  Boss_Head
 		Task_Effect::Object* eff;					//エフェクトオブジェクトポインタ
 		//エフェクト生成関連
 		ML::Box2D rect_create_effect_end;			//エンドパターン中のエフェクト生成範囲
+		float dist_shake_end_pattern;					//エンドパターン時の横揺れ幅
 	public:
 		//コンストラクタ
 		Object();

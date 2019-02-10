@@ -524,6 +524,11 @@ namespace  Task_Effect
 			{
 				this->angle += this->add_angle_target_circle;
 			}
+			//ƒ{ƒX‚Ìó‘Ô‚É‰‚¶‚ÄÁ–Å
+			if (head->state != Stan)
+			{
+				this->Kill();
+			}
 			break;
 		}
 	}
