@@ -323,7 +323,7 @@ namespace  Player
 			if (this->moveCnt >= 12) { nm = Stand; }
 			break;
 		case  TakeOff:	//”ò‚Ñ—§‚¿
-			if (this->moveCnt >= 3) { nm = Jump; }
+			if (this->moveCnt >= 0) { nm = Jump; }
 			break;
 		case  Jump:		//ã¸’†
 			if (this->moveVec.y >= 0) { nm = Fall; }
@@ -334,12 +334,12 @@ namespace  Player
 			if (in.R1.on) { nm = Fallshoot; }
 			break;
 		case  Landing:	//’…’n
+			if (this->moveCnt > 0) { nm = Stand; }
 			if (in.LStick.L.on) { nm = Walk; }
 			if (in.LStick.R.on) { nm = Walk; }
 			if (in.B2.on) { nm = TakeOff; }
 			if (in.B3.on) { nm = TakeOff; }
 			if (this->CheckFoot() == false) { nm = Fall; }//‘«Œ³ áŠQ@–³‚µ
-			if (this->moveCnt >= 6) { nm = Stand; }
 			break;
 		case  Shoot:	//ŽËŒ‚
 			if (in.R1.off) {nm = Stand;}

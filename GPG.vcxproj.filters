@@ -222,6 +222,9 @@
     <ClCompile Include="Task_Barrier.cpp">
       <Filter>MyPG\Player</Filter>
     </ClCompile>
+    <ClCompile Include="Task_Caution_GamePad.cpp">
+      <Filter>MyPG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="myLib.h">
@@ -375,6 +378,9 @@
       <Filter>MyPG\Player</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Task_Caution_GamePad.h">
+      <Filter>MyPG</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="data\Shader\MyStdShader.fx" />

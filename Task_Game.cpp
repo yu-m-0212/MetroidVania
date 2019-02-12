@@ -65,11 +65,10 @@ namespace  Game
 		ge->clear = false;											//クリアフラグ初期化
 		ge->failure = false;										//ミスフラグ初期化
 		ge->pause = false;											//ポーズフラグの初期化
-		ge-> center = ML::Vec2(float(1920 / 2), float(1080 / 2));	//画面中心
 		this->cnt_transition = 0;									//カウンタ遷移用
 		this->time_create_fade = 240;								//画面効果生成タイミング
 		this->time_create_next_task = 180;							//引継ぎタスクの生成タイミング
-		this->time_create_fade_after_clear = 390;									//自身を消滅させるタイミング
+		this->time_create_fade_after_clear = 390;					//自身を消滅させるタイミング
 		this->tutorials = new Tutorials::Object();					//ポインタメッセージ
 		this->eff = new Task_Effect::Object();						//ポインタエフェクト
 		this->pos_spawer = ML::Vec2(7876.0f, 7648.0f);				//スポナー座標
@@ -89,8 +88,9 @@ namespace  Game
 		m->Load("./data/Map/map0.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
-		//pl->pos = ML::Vec2(224.0f,4400.0f);
-		pl->pos=ML::Vec2(7643.0f,5835.0f);
+		pl->pos = ML::Vec2(224.0f,4400.0f);
+		//ボス前
+		//pl->pos=ML::Vec2(7643.0f,5835.0f);
 		//pl->pos = ML::Vec2(8382.0f,7200.0f);
 		this->eff->Create_Effect(6, pl->pos);
 		//カメラマンの生成
@@ -176,7 +176,8 @@ namespace  Game
 	void  Object::UpDate()
 	{
 		auto in = DI::GPad_GetState("P1");
-		if (!ge->pause&&in.ST.down)
+		if (!ge->pause &&
+			in.ST.down)
 		{
 			//スタートでポーズ
 			ge->pause = true;

@@ -201,8 +201,6 @@ namespace  UI
 					(
 						+ 0,
 						-16,
-						//表示幅上限とHP上限がかみ合ってないのでフレームが余る
-						//要修正
 						+(boss_head->hp+1)*(this->max_range_hp_bar / HP_BOSS_HEAD),//現在のHP*(最大表示幅/ボスHP最大値)
 						+32
 					);

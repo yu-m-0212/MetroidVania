@@ -21,7 +21,7 @@ namespace  Retry
 		DG::Image_Create(this->back_retry, "./data/image/Retry.png");
 		this->button_retry = "button_retry";
 		DG::Image_Create(this->button_retry, "./data/image/ui.png");
-		DG::Font_Create("fontRetry", "HG丸ｺﾞｼｯｸM-PRO", 8, 16);
+		DG::Font_Create("fontRetry", "HG丸ｺﾞｼｯｸM-PRO", 16, 32);
 
 		this->name_se_retry = "se_retry";
 		DM::Sound_CreateSE(this->name_se_retry, "./data/sound/wav/title_push.wav");
@@ -47,13 +47,13 @@ namespace  Retry
 		this->res = Resource::Create();
 
 		//★データ初期化
-		this->render2D_Priority[1] = 0.4f;							//描画順
+		this->render2D_Priority[1] = 0.2f;							//描画順
 		this->controllerName = "P1";								//コントローラ宣言
 		this->flag_transition = false;								//画面遷移用フラグ
 		this->cnt_transition = 0;									//カウンタ遷移用
 		this->title_or_game = 0;									//引継ぎタスクの選択フラグ(0=Game,1=Title)
 		this->time_create_next_task = 100;							//引継ぎタスクの生成タイミング
-		this->time_create_fade_after_clear = 100;									//自身を消滅させるタイミング
+		this->time_create_fade_after_clear = 100;					//自身を消滅させるタイミング
 		this->cnt_create_bubble = 0;								//エフェクトの生成カウンタ
 		this->cnt_available_controll = 0;							//生成後、操作を受け付けるまでのカウンタ
 		this->time_available_controll = 150;						//生成後、操作を受け付けるまでの時間
@@ -180,9 +180,9 @@ namespace  Retry
 			ML::Box2D   src(0, 0, 3200, 1800);
 			DG::Image_Draw(this->res->back_retry, draw, src);
 		}
-		Box2D textBox(ge->screenWidth / 2 - 125, ge->screenHeight / 2, 250, 250);
-		string	 textJp = "スタートボタンで続行\nセレクトボタンでタイトルへ戻る";
-		DG::Font_Draw("fontRetry", textBox, textJp, Color(1.0f, 0.0f, 0.0f, 0.0f));
+		Box2D textBox(ge->screenWidth / 2 - 250, ge->screenHeight / 2, 500, 500);
+		string	 textJp = "　　スタートボタンで続行\n\nセレクトボタンでタイトルへ戻る";
+		DG::Font_Draw("fontRetry", textBox, textJp, Color(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 	//死亡した座標を保存する
 	//引数	：	（Vec2)

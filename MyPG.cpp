@@ -2,6 +2,7 @@
 #include "Task_Game.h"
 #include "Task_Title.h"
 #include "Task_Ending.h"
+#include "Task_Caution_GamePad.h"
 
 namespace MyPG
 {
@@ -15,13 +16,15 @@ namespace MyPG
 			true,							//	フルスクリーンモード
 			480,							//	2D描画用解像度X(現在非対応）
 			270,							//	2D描画用解像度Y(現在非対応）
-			"THE ANYONE (α)",				//	ウインドウタイトル
-			"THE ANYONE (α)"				//	ウィンドウクラス名
+			"THE ANYONE",					//	ウインドウタイトル
+			"THE ANYONE"					//	ウィンドウクラス名
 		) {
 	}
 	//ゲームエンジンに追加したものの初期化と開放
 	bool MyGameEngine::Initialize(HWND wnd_)
 	{
+		//画面中心
+		ge->center = ML::Vec2(float(1920 / 2), float(1080 / 2));
 		//画像描画ライブラリの初期化
 		{
 			bool  rtv = DG::Initialize(wnd_, this->screenWidth, this->screenHeight, this->multiSample,
@@ -57,7 +60,7 @@ namespace MyPG
 			D3DXVECTOR3(0.0f, 1.0f, 0.0f),		//	カメラの上方向ベクトル
 			ML::ToRadian(60.0f), 10.0f, 300.0f,	//	視野角・視野距離
 			(float)ge->screenWidth / (float)ge->screenHeight);		//	画面比率
-		DG::EffectState().param.bgColor = ML::Color(1, 1, 1, 1);
+		DG::EffectState().param.bgColor = ML::Color(1, 0, 0, 0);
 		ge->camera[3] = ge->camera[2] = ge->camera[1] = ge->camera[0];
 
 		//デバッグ用情報の表示ON/OFF
@@ -89,7 +92,7 @@ namespace MyPG
 		DG::EffectState().param.bgColor = ML::Color(0, 1.0f, 1.0f, 1.0f);
 
 		//初期実行タスク生成＆ゲームエンジンに登録
-		auto  firstTask = Title::Object::Create(true);
+		auto  firstTask = Caution::Object::Create(true);
 
 		//------------------------------------------------------------------------------------
 		//レイヤー毎の描画のON/OFF

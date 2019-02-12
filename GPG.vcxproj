@@ -111,6 +111,7 @@
     <ClCompile Include="Task_Boss_Lower.cpp" />
     <ClCompile Include="Task_Boss_Upper.cpp" />
     <ClCompile Include="Task_Boss_Upper_Middle.cpp" />
+    <ClCompile Include="Task_Caution_GamePad.cpp" />
     <ClCompile Include="Task_Corpse.cpp" />
     <ClCompile Include="Task_Display_Effect.cpp" />
     <ClCompile Include="Task_Effect.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="Task_Boss_Lower.h" />
     <ClInclude Include="Task_Boss_Upper.h" />
     <ClInclude Include="Task_Boss_Upper_Middle.h" />
+    <ClInclude Include="Task_Caution_GamePad.h" />
     <ClInclude Include="Task_Corpse.h" />
     <ClInclude Include="Task_Display_Effect.h" />
     <ClInclude Include="Task_Effect.h" />

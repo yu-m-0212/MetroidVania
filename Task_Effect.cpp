@@ -214,10 +214,11 @@ namespace  Task_Effect
 				break;
 			}
 		}
+		this->animCnt++;
 		//ポーズ
 		if (ge->pause) { return; }
 		this->moveCnt++;
-		this->animCnt++;
+		
 		//状態毎の行動
 		this->Move();
 		//移動
