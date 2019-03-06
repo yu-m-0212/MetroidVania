@@ -74,7 +74,7 @@ namespace  Boss_Head
 		this->eff = new Task_Effect::Object();									//エフェクトオブジェクトインスタンス
 		this->vec_shot = ML::Vec2(SPEED_SHOT, 0.0f);							//移動量ショット
 		this->hit_shot = ML::Box2D(-16, -16, 32, 32);							//矩形ショット
-		this->interval_shot = 360;												//生成時間ショット
+		this->interval_shot = 600/*360*/;												//生成時間ショット
 		this->hp = HP_BOSS_HEAD;												//HPボス
 		this->add_un_hit = 60;													//プレイヤに与える無敵時間
 		this->num_shot = 5;														//弾の生成数

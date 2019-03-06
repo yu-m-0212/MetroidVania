@@ -85,7 +85,10 @@ namespace  Game
 		//★タスクの生成
 		//マップの生成
 		auto  m = Map2D::Object::Create(true);
-		m->Load("./data/Map/map0.txt");
+		//通常マップ
+		/*m->Load("./data/Map/map0.txt");*/
+		//プレゼン用マップ
+		m->Load("./data/Map/Map_Presentation.txt");
 		//プレイヤの生成
 		auto  pl = Player::Object::Create(true);
 		pl->pos = ML::Vec2(224.0f,4400.0f);

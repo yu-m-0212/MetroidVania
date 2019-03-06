@@ -206,14 +206,16 @@ void  GameEngine::B_StepSub_DebugOut( )
 //		D3DVIEWPORT9 vp  = {0,0,ge->screenWidth, ge->screenHeight, 0.0f, 1.0f};
 //		dg->Device( )->SetViewport(&vp);
 		DG::Begin_2D();
-		ML::Box2D  d(0,0,screenWidth,16);
+		//矩形のhをスクリーンサイズに変更
+		ML::Box2D  d(0,0,screenWidth,screenHeight);
 		{
-			int  s  =  max(0, int(tasks_detect.size( )) - 10);
+			//最大表示件数を画面目いっぱいの66件に変更
+			int  s  =  max(0, int(tasks_detect.size( )) - 67);
 			int id = s;
 			for(auto it = (tasks_detect.begin( ) + s); it != tasks_detect.end( ); ++it){
 				stringstream ss;
 				ss << id << ">" << (*it).second->groupName << ">" << (*it).second->name << ">" << (*it).second->DebugOut( );
-				DG::Font_Draw("Debug", d, ss.str( ), c[0]);
+				DG::Font_Draw("Debug", d, ss.str( ), /*c[0]*/ML::Color(1,1,1,1));
 				d.Offset(0, 16);
 				if(d.y >= (int)screenHeight){break;}
 				++id;

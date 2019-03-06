@@ -243,6 +243,21 @@ namespace  Player
 			//ゲームオーバーフラグ成立
 			ge->failure = true;
 		}
+		//プレゼン用
+		//左右スティック押し込みでボス前にジャンプ
+		auto in = DI::GPad_GetState(this->controllerName);
+		if (in.L3.on&&
+			in.R3.on)
+		{
+			this->pos = ML::Vec2(7643.0f, 5835.0f);
+		}
+		//バリアのフラグの切り替え
+		if (in.L2.on&&
+			in.R2.down)
+		{
+			this->barrier = !this->barrier;
+			this->active_barrier = !this->active_barrier;
+		}
 	}
 	//-------------------------------------------------------------------
 	//「２Ｄ描画」１フレーム毎に行う処理
